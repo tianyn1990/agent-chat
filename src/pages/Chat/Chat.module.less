@@ -5,7 +5,7 @@
   height: 100%;
   min-height: 0;
   min-width: 0;
-  padding: 20px 24px 18px;
+  padding: 16px 18px 14px;
 }
 
 .chatColumn {
@@ -13,15 +13,15 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .stageHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
-  padding: 4px 4px 0;
+  gap: 12px;
+  padding: 2px 2px 0;
 }
 
 .headerCopy {
@@ -30,64 +30,64 @@
 }
 
 .eyebrow {
-  margin: 0 0 4px;
+  margin: 0 0 2px;
   color: @accent-color;
   font-size: @font-size-xs;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .stageTitle {
   margin: 0;
   color: @text-primary;
-  font-size: clamp(20px, 2.2vw, 28px);
-  line-height: 1.2;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.14;
   font-family: @font-family-display;
   font-weight: 700;
   text-wrap: balance;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .stageSubtitle {
-  margin: 6px 0 0;
-  max-width: 680px;
+  margin: 4px 0 0;
+  max-width: 620px;
   color: @text-secondary;
-  font-size: @font-size-sm;
-  line-height: 1.65;
+  font-size: 11px;
+  line-height: 1.55;
 }
 
 .headerMeta {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .metaCard {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 8px 14px;
-  border-radius: 14px;
-  background: rgba(255, 252, 247, 0.82);
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.76);
   border: 1px solid rgba(71, 58, 39, 0.08);
-  box-shadow: @shadow-sm;
-  min-width: 80px;
+  box-shadow: none;
+  min-width: auto;
 }
 
 .metaLabel {
   color: @text-tertiary;
-  font-size: @font-size-xs;
+  font-size: 10px;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .metaValue {
   color: @text-primary;
-  font-size: @font-size-sm;
+  font-size: 11px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1;
   white-space: nowrap;
 }
 
@@ -96,7 +96,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .messageArea {
@@ -105,11 +105,11 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  border-radius: 28px;
+  border-radius: 18px;
   background:
-    linear-gradient(180deg, rgba(255, 253, 249, 0.94), rgba(255, 249, 241, 0.96)), @paper-bg;
+    linear-gradient(180deg, rgba(255, 253, 249, 0.96), rgba(255, 250, 244, 0.98)), @paper-bg;
   border: 1px solid rgba(71, 58, 39, 0.08);
-  box-shadow: @shadow-md;
+  box-shadow: @shadow-sm;
   overflow: hidden;
 }
 
@@ -117,12 +117,12 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 18px 20px 20px;
-  border-radius: 24px;
-  background: rgba(255, 252, 247, 0.88);
+  gap: 6px;
+  padding: 10px 12px 12px;
+  border-radius: 16px;
+  background: rgba(255, 252, 247, 0.92);
   border: 1px solid rgba(71, 58, 39, 0.08);
-  box-shadow: @shadow-sm;
+  box-shadow: none;
 }
 
 .noSessionTip {
@@ -132,17 +132,18 @@
 
 .composerHint {
   color: @text-tertiary;
-  font-size: @font-size-sm;
-  line-height: 1.6;
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 @media (max-width: 1100px) {
   .container {
-    padding: 18px;
+    padding: 14px;
   }
 
   .stageHeader {
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .headerMeta {
@@ -153,19 +154,20 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 14px;
+    padding: 12px;
   }
 
   .messageArea {
-    border-radius: 22px;
+    border-radius: 16px;
   }
 
   .inputArea {
-    padding: 16px;
-    border-radius: 20px;
+    padding: 10px;
+    border-radius: 14px;
   }
 
   .headerMeta {
-    grid-template-columns: 1fr;
+    width: 100%;
+    justify-content: flex-start;
   }
 }

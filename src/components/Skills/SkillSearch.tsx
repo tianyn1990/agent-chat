@@ -29,6 +29,7 @@ export default function SkillSearch({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         allowClear
+        aria-label="搜索技能"
       />
     </div>
   );

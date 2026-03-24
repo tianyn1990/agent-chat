@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Divider, Tooltip } from 'antd';
-import { MessageOutlined, AppstoreOutlined, PlusOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, MessageOutlined, PlusOutlined, RobotOutlined } from '@ant-design/icons';
 import { APP_NAME, ROUTES } from '@/constants';
 import UserInfo from './UserInfo';
 import styles from './Sidebar.module.less';
@@ -59,7 +59,10 @@ export default function Sidebar({ extra, activeKey }: SidebarProps) {
       {/* Logo 区域 */}
       <div className={styles.logoArea}>
         <div className={styles.logo}>
-          <span className={styles.logoIcon}>🦾</span>
+          {/* 统一使用线性 icon，减少 emoji 带来的视觉重量波动。 */}
+          <span className={styles.logoIcon}>
+            <RobotOutlined />
+          </span>
           <div className={styles.logoTextGroup}>
             <span className={styles.logoText}>{APP_NAME}</span>
             <span className={styles.logoSubtext}>Agent Workspace</span>
@@ -107,7 +110,7 @@ export function NewChatButton({ onClick }: { onClick: () => void }) {
       icon={<PlusOutlined />}
       block
       onClick={onClick}
-      style={{ marginBottom: 8 }}
+      style={{ marginBottom: 6 }}
     >
       新建对话
     </Button>

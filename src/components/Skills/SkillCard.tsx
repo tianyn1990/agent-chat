@@ -1,4 +1,4 @@
-import { Card, Button, Tag } from 'antd';
+import { Button, Tag } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import type { Skill } from '@/types/skill';
 import { SKILL_CATEGORY_LABELS } from '@/types/skill';

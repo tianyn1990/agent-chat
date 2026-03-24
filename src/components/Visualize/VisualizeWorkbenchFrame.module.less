@@ -22,38 +22,61 @@
 
 .toolbar {
   position: absolute;
-  top: 112px;
-  right: 20px;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
   z-index: 2;
   display: inline-flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 8px;
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  background: rgba(16, 22, 30, 0.3);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+}
+
+.primaryAction {
+  height: 36px;
+  padding-inline: 12px !important;
+  border-radius: 999px !important;
+  color: #f8f3ea !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(16, 22, 30, 0.68) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(10px);
 }
 
-.actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+.primaryAction:hover,
+.primaryAction:focus-visible {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  background: rgba(22, 29, 39, 0.8) !important;
 }
 
-.actions :global(.ant-btn) {
+.secondaryActions {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(16, 22, 30, 0.46);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(10px);
+}
+
+.secondaryActions :global(.ant-btn) {
   color: #f8f3ea;
   border-color: rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
+  width: 34px;
+  height: 34px;
 }
 
-.actions :global(.ant-btn.ant-btn-text) {
+.secondaryActions :global(.ant-btn.ant-btn-text) {
   background: rgba(255, 255, 255, 0.03);
 }
 
-.actions :global(.ant-btn:hover),
-.actions :global(.ant-btn:focus-visible) {
+.secondaryActions :global(.ant-btn:hover),
+.secondaryActions :global(.ant-btn:focus-visible) {
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.1);
@@ -61,8 +84,6 @@
 
 @media (max-width: 768px) {
   .toolbar {
-    top: 108px;
-    right: 12px;
-    padding: 6px;
+    right: 10px;
   }
 }

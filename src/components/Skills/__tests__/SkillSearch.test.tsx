@@ -7,8 +7,15 @@ describe('SkillSearch', () => {
     const onChange = vi.fn();
     render(<SkillSearch value="" onChange={onChange} />);
 
-    const input = screen.getByPlaceholderText('搜索技能...');
+    const input = screen.getByRole('textbox', { name: '搜索技能' });
     expect(input).toBeInTheDocument();
+  });
+
+  it('应该补齐无障碍标签', () => {
+    const onChange = vi.fn();
+    render(<SkillSearch value="" onChange={onChange} />);
+
+    expect(screen.getByLabelText('搜索技能')).toBeInTheDocument();
   });
 
   it('应该显示自定义占位文本', () => {

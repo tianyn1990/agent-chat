@@ -488,6 +488,13 @@ export default function ChatPage() {
     currentSessionSending && currentMessages.some((m) => m.status === 'streaming');
 
   const showWelcome = currentMessages.length === 0;
+  /**
+   * 将会话摘要压缩为简洁的工作台副标题。
+   * 这一层不展示技术性 sessionId，只保留用户真正关心的上下文状态。
+   */
+  const stageSummary = showWelcome
+    ? '从左侧档案区进入旧会话，或直接在下方开始一轮新的协作。'
+    : currentRuntime?.detail || '围绕当前会话继续推进分析、写作、代码与执行动作。';
 
   return (
     <div className={styles.container}>
@@ -497,22 +504,19 @@ export default function ChatPage() {
           <div className={styles.headerCopy}>
             <p className={styles.eyebrow}>Paper Ops Workspace</p>
             <h1 className={styles.stageTitle}>{currentSession?.title ?? '智能工作台'}</h1>
-            <p className={styles.stageSubtitle}>
-              {showWelcome
-                ? '从左侧档案区进入旧会话，或直接在下方开始一轮新的协作。'
-                : currentRuntime?.detail || '围绕当前会话继续推进分析、写作、代码与执行动作。'}
-            </p>
+            <p className={styles.stageSubtitle}>{stageSummary}</p>
           </div>
 
-          <div className={styles.headerMeta}>
+          {/* 顶部摘要维持轻量密度，只保留会话状态和关键计数。 */}
+          <div className={styles.headerMeta} aria-label="会话摘要信息">
             <div className={styles.metaCard}>
-              <span className={styles.metaLabel}>运行状态</span>
+              <span className={styles.metaLabel}>状态</span>
               <span className={styles.metaValue}>
                 {currentRuntime ? VISUALIZE_STATE_LABELS[currentRuntime.state] : '待命中'}
               </span>
             </div>
             <div className={styles.metaCard}>
-              <span className={styles.metaLabel}>消息数量</span>
+              <span className={styles.metaLabel}>消息</span>
               <span className={styles.metaValue}>{currentMessages.length}</span>
             </div>
           </div>
@@ -540,7 +544,7 @@ export default function ChatPage() {
               <div className={styles.noSessionTip}>点击左侧「新建对话」开始</div>
             ) : (
               <div className={styles.composerHint}>
-                Enter 发送，Shift+Enter 换行。图表、文件与执行状态会围绕当前会话上下文继续累积。
+                Enter 发送，Shift+Enter 换行。图表、文件与执行状态会继续沉淀到当前会话。
               </div>
             )}
 

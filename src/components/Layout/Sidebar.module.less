@@ -6,13 +6,12 @@
   width: @sidebar-width;
   min-width: @sidebar-width;
   height: 100vh;
-  padding: 18px 16px 14px;
-  border-radius: 30px;
+  padding: 14px 12px 12px;
+  border-radius: 22px;
   background:
-    radial-gradient(circle at top, rgba(183, 121, 69, 0.14), transparent 28%),
-    linear-gradient(180deg, rgba(255, 248, 238, 0.04), rgba(255, 248, 238, 0.01)), @sidebar-bg;
+    linear-gradient(180deg, rgba(255, 248, 238, 0.03), rgba(255, 248, 238, 0.01)), @sidebar-bg;
   border: 1px solid @sidebar-border;
-  box-shadow: @shadow-lg;
+  box-shadow: @shadow-md;
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
@@ -20,7 +19,7 @@
 
 // Logo 区域
 .logoArea {
-  padding: 10px @spacing-sm 18px;
+  padding: 8px @spacing-sm 14px;
   flex-shrink: 0;
 }
 
@@ -31,16 +30,16 @@
 }
 
 .logoIcon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
   background: linear-gradient(135deg, rgba(183, 121, 69, 0.22), rgba(53, 92, 125, 0.28));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .logoTextGroup {
@@ -51,7 +50,7 @@
 
 .logoText {
   color: @sidebar-text;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.03em;
 }
@@ -59,7 +58,7 @@
 .logoSubtext {
   margin-top: 2px;
   color: @sidebar-text-secondary;
-  font-size: @font-size-sm;
+  font-size: @font-size-xs;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -70,7 +69,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .navItem {
@@ -78,9 +77,9 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border: none;
-  border-radius: 16px;
+  border-radius: 12px;
   background: transparent;
   color: @sidebar-text;
   font-size: @font-size-base;
@@ -93,7 +92,7 @@
 
   &:hover {
     background-color: @sidebar-hover-bg;
-    transform: translateX(2px);
+    transform: translateX(1px);
   }
 
   &:focus-visible {
@@ -109,11 +108,11 @@
 }
 
 .navIcon {
-  font-size: 16px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   color: inherit;
-  width: 18px;
+  width: 16px;
 }
 
 .navLabel {
@@ -125,7 +124,7 @@
 // 分割线
 .divider {
   border-color: @sidebar-border !important;
-  margin: @spacing-sm 0 @spacing-md !important;
+  margin: @spacing-sm 0 !important;
 }
 
 // 插槽区域（会话列表等）
@@ -146,6 +145,6 @@
   .sidebar {
     width: 276px;
     min-width: 276px;
-    border-radius: 24px;
+    border-radius: 18px;
   }
 }

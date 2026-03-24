@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from 'antd';
+import { RobotOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/stores/useUserStore';
 import { isTokenValid } from '@/utils/token';
 import {
@@ -79,9 +80,11 @@ export default function LoginPage() {
         </section>
 
         <div className={styles.card}>
-          {/* Logo */}
+          {/* 登录卡片承担主 CTA，品牌图标保持轻量，不与登录动作争夺注意力。 */}
           <div className={styles.logo}>
-            <span className={styles.logoIcon}>🦾</span>
+            <span className={styles.logoIcon}>
+              <RobotOutlined />
+            </span>
             <h2 className={styles.logoText}>{APP_NAME}</h2>
           </div>
 

@@ -2,21 +2,17 @@
 
 .container {
   border: 1px solid rgba(71, 58, 39, 0.12);
-  border-radius: 22px;
+  border-radius: 14px;
   background:
-    linear-gradient(180deg, rgba(255, 254, 251, 0.98), rgba(250, 244, 236, 0.96)), @paper-bg;
-  padding: 12px 14px 12px 12px;
+    linear-gradient(180deg, rgba(255, 254, 251, 0.98), rgba(251, 246, 239, 0.98)), @paper-bg;
+  padding: 10px 12px 10px 10px;
   transition:
     border-color @transition-base,
-    box-shadow @transition-base,
-    transform @transition-base;
+    box-shadow @transition-base;
 
   &:focus-within {
     border-color: rgba(53, 92, 125, 0.32);
-    box-shadow:
-      0 0 0 4px rgba(53, 92, 125, 0.1),
-      @shadow-sm;
-    transform: translateY(-1px);
+    box-shadow: 0 0 0 3px rgba(53, 92, 125, 0.08);
   }
 }
 
@@ -27,14 +23,13 @@
   &:focus-within {
     border-color: rgba(71, 58, 39, 0.12);
     box-shadow: none;
-    transform: none;
   }
 }
 
 .inputRow {
   display: flex;
   align-items: flex-end;
-  gap: 12px;
+  gap: 10px;
 }
 
 .textarea {
@@ -43,14 +38,14 @@
   outline: none;
   resize: none;
   background: transparent;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 14px;
+  line-height: 22px;
   color: @text-primary;
   font-family: inherit;
-  min-height: 24px;
-  max-height: 144px;
+  min-height: 22px;
+  max-height: 132px;
   overflow-y: auto;
-  padding: 4px 2px;
+  padding: 2px;
   transition: height 0.1s ease;
 
   &::placeholder {
@@ -87,9 +82,9 @@
 
 .sendBtn {
   flex-shrink: 0;
-  width: 42px;
-  height: 42px;
-  border-radius: 16px !important;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px !important;
   display: flex;
   align-items: center;
   justify-content: center;

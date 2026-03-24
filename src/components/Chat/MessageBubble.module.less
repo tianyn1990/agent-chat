@@ -3,8 +3,8 @@
 .row {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 8px 0;
+  gap: 10px;
+  padding: 6px 0;
   animation: fadeInUp 0.24s ease;
 }
 
@@ -18,32 +18,41 @@
 
 .avatar {
   flex-shrink: 0;
-  margin-top: 6px;
-  box-shadow: 0 10px 24px rgba(63, 48, 28, 0.12);
+  margin-top: 4px;
+  box-shadow: none;
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  max-width: min(760px, 78%);
+  gap: 4px;
+  max-width: min(740px, 76%);
 }
 
 .contentWide {
-  max-width: min(960px, 92%);
+  max-width: min(920px, 90%);
+}
+
+.rowUser .content {
+  align-items: flex-end;
+}
+
+.rowAssistant .content {
+  align-items: flex-start;
 }
 
 .bubble {
-  padding: 14px 16px;
+  padding: 11px 13px;
   word-break: break-word;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 .bubbleUser {
   background: @user-bubble-bg;
   color: @user-bubble-text;
-  border-radius: 22px 12px 22px 22px;
+  border-radius: 14px 8px 14px 14px;
   align-self: flex-end;
-  box-shadow: 0 16px 24px rgba(41, 64, 88, 0.18);
+  box-shadow: 0 4px 12px rgba(41, 64, 88, 0.12);
 
   a {
     color: rgba(255, 255, 255, 0.9);
@@ -55,7 +64,7 @@
   background: @assistant-bubble-bg;
   border: 1px solid @assistant-bubble-border;
   box-shadow: @assistant-bubble-shadow;
-  border-radius: 12px 22px 22px 22px;
+  border-radius: 8px 14px 14px 14px;
   color: @text-primary;
   font-size: @font-size-base;
 
@@ -233,9 +242,10 @@
 }
 
 .time {
-  font-size: @font-size-sm;
+  font-size: @font-size-xs;
   color: @text-tertiary;
-  margin-top: 6px;
+  margin-top: 0;
+  padding: 0 4px;
 }
 
 .timeLeft {
@@ -250,10 +260,10 @@
   display: flex;
   align-items: center;
   gap: @spacing-sm;
-  padding: 10px 14px;
+  padding: 8px 12px;
   background-color: @assistant-bubble-bg;
   border: 1px solid @assistant-bubble-border;
-  border-radius: 12px 22px 22px 22px;
+  border-radius: 8px 14px 14px 14px;
 }
 
 .placeholderText {
@@ -288,10 +298,10 @@
   display: flex;
   align-items: flex-start;
   gap: @spacing-sm;
-  padding: 12px 14px;
+  padding: 10px 12px;
   background-color: #f8e9e5;
   border: 1px solid #deb7ae;
-  border-radius: 18px;
+  border-radius: 12px;
   max-width: min(760px, 78%);
 }
 

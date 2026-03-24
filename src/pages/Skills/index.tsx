@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { message } from 'antd';
-import { AppstoreOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, CheckCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { useSkillStore } from '@/stores/useSkillStore';
 import { fetchSkills, installSkill, uninstallSkill } from '@/services/skillApi';
 import type { Skill } from '@/types/skill';
@@ -101,7 +101,7 @@ export default function SkillsPage() {
 
   return (
     <div className={styles.container}>
-      {/* 页面头部作为探索页封面，强调技能生态而不是普通列表。 */}
+      {/* 页面头部收敛为能力工作面，突出搜索与筛选，而不是大型展示封面。 */}
       <div className={styles.header}>
         <div className={styles.headerMain}>
           <div className={styles.headerCopy}>
@@ -139,7 +139,7 @@ export default function SkillsPage() {
               <CheckCircleOutlined style={{ color: '#52c41a' }} />
               <span>已安装技能</span>
             </div>
-            <div className={styles.grid}>
+            <div className={`${styles.grid} ${styles.installedGrid}`}>
               {installedSkills.map((skill) => (
                 <SkillCard
                   key={skill.id}
@@ -173,7 +173,7 @@ export default function SkillsPage() {
             </div>
           ) : (
             <div className={styles.empty}>
-              <div className={styles.emptyIcon}>🔍</div>
+              <SearchOutlined className={styles.emptyIcon} />
               <div className={styles.emptyText}>
                 {searchKeyword || selectedCategory !== 'all' ? '未找到匹配的技能' : '暂无技能'}
               </div>

@@ -59,27 +59,31 @@ export default function VisualizeWorkbenchFrame({
         <VisualizeWorkspaceView key={iframeKey} sessionId={sessionId} />
       </div>
 
+      {/* 工具控件退到边缘窄坞，优先保证真实像素办公室的可视面积。 */}
       <header className={styles.toolbar} aria-label="执行状态工作台工具栏">
-        <div className={styles.actions}>
-          <Button
-            icon={<RollbackOutlined />}
-            onClick={handleBack}
-            aria-label="返回聊天"
-            shape="circle"
-          ></Button>
+        <Button
+          icon={<RollbackOutlined />}
+          onClick={handleBack}
+          aria-label="返回聊天"
+          className={styles.primaryAction}
+        >
+          返回聊天
+        </Button>
+
+        <div className={styles.secondaryActions}>
           <Button
             icon={<ReloadOutlined />}
             onClick={handleRefresh}
             aria-label="刷新"
             shape="circle"
-          ></Button>
+          />
           <Button
             type="text"
             icon={<CloseOutlined />}
             onClick={handleBack}
             aria-label="收起"
             shape="circle"
-          ></Button>
+          />
         </div>
       </header>
     </section>

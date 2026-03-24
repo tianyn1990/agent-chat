@@ -68,12 +68,13 @@ describe('SkillsPage', () => {
     expect(screen.getByText('为工作台扩展新能力')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getAllByText('数据分析师')).toHaveLength(2);
+      expect(screen.getAllByText('数据分析师')).toHaveLength(1);
       expect(screen.getByText('文档写作')).toBeInTheDocument();
     });
 
     expect(screen.getByText('已安装技能')).toBeInTheDocument();
     expect(screen.getByText('可用技能')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: '搜索技能' })).toBeInTheDocument();
   });
 
   it('搜索关键词后只保留匹配技能', async () => {
@@ -86,7 +87,7 @@ describe('SkillsPage', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByText('数据分析师')).toHaveLength(2);
+      expect(screen.getAllByText('数据分析师')).toHaveLength(1);
     });
 
     await user.type(screen.getByPlaceholderText('搜索技能...'), '文档');

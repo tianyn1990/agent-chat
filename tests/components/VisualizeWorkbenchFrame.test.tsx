@@ -25,7 +25,7 @@ describe('VisualizeWorkbenchFrame', () => {
     );
 
     expect(screen.getByLabelText('执行状态工作台工具栏')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '返回聊天' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '返回聊天' })).toHaveTextContent('返回聊天');
     expect(screen.getByRole('button', { name: '刷新' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '收起' })).toBeInTheDocument();
   });

@@ -4,8 +4,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 32px 44px;
-  gap: 24px;
+  padding: 22px 24px 18px;
+  gap: 12px;
   overflow-y: auto;
 }
 
@@ -13,24 +13,22 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 24px 28px;
-  border-radius: 22px;
-  background:
-    radial-gradient(circle at top right, rgba(183, 121, 69, 0.14), transparent 28%),
-    linear-gradient(135deg, rgba(255, 253, 249, 0.96), rgba(248, 241, 232, 0.92));
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 253, 249, 0.96), rgba(249, 243, 235, 0.94));
   border: 1px solid rgba(71, 58, 39, 0.08);
-  box-shadow: @shadow-sm;
+  box-shadow: none;
 }
 
 .heroBadge {
   display: inline-flex;
   width: fit-content;
-  padding: 8px 12px;
+  padding: 5px 10px;
   border-radius: 999px;
   background: @accent-soft;
   color: @accent-color;
-  font-size: @font-size-sm;
+  font-size: @font-size-xs;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -41,35 +39,35 @@
 }
 
 .title {
-  font-size: clamp(26px, 3vw, 36px);
+  font-size: clamp(22px, 2.4vw, 30px);
   font-family: @font-family-display;
   font-weight: 700;
   color: @text-primary;
-  margin: 0 0 6px;
-  line-height: 1.15;
+  margin: 0 0 4px;
+  line-height: 1.12;
   text-wrap: balance;
 }
 
 .subtitle {
-  max-width: 680px;
-  font-size: @font-size-base;
+  max-width: 620px;
+  font-size: @font-size-sm;
   color: @text-secondary;
   margin: 0;
-  line-height: 1.75;
+  line-height: 1.6;
 }
 
 .heroNote {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding-top: 8px;
+  gap: 10px;
+  padding-top: 6px;
   border-top: 1px dashed rgba(71, 58, 39, 0.14);
 }
 
 .noteLabel {
   flex-shrink: 0;
   color: @primary-color;
-  font-size: @font-size-sm;
+  font-size: @font-size-xs;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -77,13 +75,14 @@
 
 .noteText {
   color: @text-tertiary;
-  line-height: 1.7;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .suggestions {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -92,22 +91,22 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
-  min-height: 130px;
-  padding: 16px 18px;
+  gap: 4px;
+  min-height: 104px;
+  padding: 12px 14px;
   background:
-    linear-gradient(180deg, rgba(255, 253, 249, 0.92), rgba(248, 241, 232, 0.9)), @paper-bg;
+    linear-gradient(180deg, rgba(255, 253, 249, 0.92), rgba(250, 244, 237, 0.94)), @paper-bg;
   border: 1px solid rgba(71, 58, 39, 0.08);
-  border-radius: 24px;
+  border-radius: 14px;
   cursor: pointer;
   text-align: left;
   transition: all @transition-base;
-  box-shadow: @shadow-sm;
+  box-shadow: none;
 
   &:hover {
     border-color: rgba(53, 92, 125, 0.24);
-    box-shadow: @shadow-md;
-    transform: translateY(-3px) rotate(-0.4deg);
+    background: rgba(255, 253, 249, 0.98);
+    transform: translateY(-1px);
   }
 
   &:active {
@@ -116,32 +115,32 @@
 }
 
 .cardIndex {
-  color: rgba(53, 92, 125, 0.28);
+  color: rgba(53, 92, 125, 0.34);
   font-family: @font-family-display;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
 }
 
 .cardLabel {
-  font-size: @font-size-lg;
+  font-size: 15px;
   font-weight: 700;
   color: @text-primary;
 }
 
 .cardTone {
   display: inline-flex;
-  padding: 4px 10px;
+  padding: 2px 8px;
   border-radius: 999px;
   background: rgba(53, 92, 125, 0.08);
   color: @primary-color;
-  font-size: @font-size-sm;
+  font-size: @font-size-xs;
   font-weight: 600;
 }
 
 .cardText {
-  font-size: @font-size-base;
+  font-size: 12px;
   color: @text-secondary;
-  line-height: 1.75;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -150,7 +149,7 @@
 
 @media (max-width: 900px) {
   .container {
-    padding: 24px;
+    padding: 16px;
   }
 
   .suggestions {
@@ -158,6 +157,6 @@
   }
 
   .hero {
-    padding: 24px;
+    padding: 16px;
   }
 }
