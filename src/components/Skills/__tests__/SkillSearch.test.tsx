@@ -37,7 +37,7 @@ describe('SkillSearch', () => {
     const onChange = vi.fn();
     render(<SkillSearch value="" onChange={onChange} />);
 
-    const input = screen.getByPlaceholderText('搜索技能...');
+    const input = screen.getByPlaceholderText('搜索技能…');
     fireEvent.change(input, { target: { value: 'SQL' } });
 
     expect(onChange).toHaveBeenCalledWith('SQL');

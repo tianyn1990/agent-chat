@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import { HolderOutlined, ReloadOutlined, RollbackOutlined } from '@ant-design/icons';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
@@ -24,10 +24,15 @@ export default function VisualizeWorkbenchFrame({
   sessionId,
   visible,
 }: VisualizeWorkbenchFrameProps) {
+  const MIN_TOOLBAR_LEFT = 12;
+  const MIN_TOOLBAR_TOP = 62;
+  const TOOLBAR_KEYBOARD_STEP = 16;
+  const TOOLBAR_KEYBOARD_STEP_FAST = 48;
   const navigate = useNavigate();
   const hideWorkbench = useVisualizeStore((state) => state.hideWorkbench);
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [toolbarPosition, setToolbarPosition] = useState({ left: 18, top: 68 });
+  const toolbarRef = useRef<HTMLElement | null>(null);
   const dragStateRef = useRef<{
     pointerId: number;
     startX: number;
@@ -58,6 +63,21 @@ export default function VisualizeWorkbenchFrame({
   };
 
   /**
+   * 将工具条位置限制在当前视口内，避免用户拖拽后把入口完全移出屏幕。
+   */
+  const clampToolbarPosition = useCallback((left: number, top: number) => {
+    const toolbarWidth = toolbarRef.current?.offsetWidth ?? 168;
+    const toolbarHeight = toolbarRef.current?.offsetHeight ?? 40;
+    const maxLeft = Math.max(MIN_TOOLBAR_LEFT, window.innerWidth - toolbarWidth - MIN_TOOLBAR_LEFT);
+    const maxTop = Math.max(MIN_TOOLBAR_TOP, window.innerHeight - toolbarHeight - MIN_TOOLBAR_LEFT);
+
+    return {
+      left: Math.min(Math.max(MIN_TOOLBAR_LEFT, left), maxLeft),
+      top: Math.min(Math.max(MIN_TOOLBAR_TOP, top), maxTop),
+    };
+  }, []);
+
+  /**
    * 工具条允许拖动，避免在不同办公室场景中遮挡关键区域。
    * 为了不影响按钮点击，仅允许从容器空白区域开始拖动。
    */
@@ -75,16 +95,19 @@ export default function VisualizeWorkbenchFrame({
     [toolbarPosition.left, toolbarPosition.top],
   );
 
-  const handleToolbarPointerMove = useCallback((event: React.PointerEvent<HTMLElement>) => {
-    const dragState = dragStateRef.current;
-    if (!dragState || dragState.pointerId !== event.pointerId) {
-      return;
-    }
+  const handleToolbarPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLElement>) => {
+      const dragState = dragStateRef.current;
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
 
-    const nextLeft = Math.max(12, dragState.startLeft + event.clientX - dragState.startX);
-    const nextTop = Math.max(62, dragState.startTop + event.clientY - dragState.startY);
-    setToolbarPosition({ left: nextLeft, top: nextTop });
-  }, []);
+      const nextLeft = dragState.startLeft + event.clientX - dragState.startX;
+      const nextTop = dragState.startTop + event.clientY - dragState.startY;
+      setToolbarPosition(clampToolbarPosition(nextLeft, nextTop));
+    },
+    [clampToolbarPosition],
+  );
 
   const handleToolbarPointerUp = useCallback((event: React.PointerEvent<HTMLElement>) => {
     if (dragStateRef.current?.pointerId === event.pointerId) {
@@ -92,6 +115,56 @@ export default function VisualizeWorkbenchFrame({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
   }, []);
+
+  /**
+   * 为拖拽手柄提供键盘可达路径。
+   * 方向键微调位置，Shift+方向键加速，保证无法使用指针时也能重新安置工具条。
+   */
+  const handleDragHandleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      const step = event.shiftKey ? TOOLBAR_KEYBOARD_STEP_FAST : TOOLBAR_KEYBOARD_STEP;
+
+      const nextPosition = (() => {
+        switch (event.key) {
+          case 'ArrowLeft':
+            return clampToolbarPosition(toolbarPosition.left - step, toolbarPosition.top);
+          case 'ArrowRight':
+            return clampToolbarPosition(toolbarPosition.left + step, toolbarPosition.top);
+          case 'ArrowUp':
+            return clampToolbarPosition(toolbarPosition.left, toolbarPosition.top - step);
+          case 'ArrowDown':
+            return clampToolbarPosition(toolbarPosition.left, toolbarPosition.top + step);
+          default:
+            return null;
+        }
+      })();
+
+      if (!nextPosition) {
+        return;
+      }
+
+      event.preventDefault();
+      setToolbarPosition(nextPosition);
+    },
+    [clampToolbarPosition, toolbarPosition.left, toolbarPosition.top],
+  );
+
+  useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
+    const handleResize = () => {
+      setToolbarPosition((current) => clampToolbarPosition(current.left, current.top));
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [clampToolbarPosition, visible]);
 
   if (!sessionId) {
     return null;
@@ -109,20 +182,23 @@ export default function VisualizeWorkbenchFrame({
 
       {/* 工具控件退到边缘窄坞，优先保证真实像素办公室的可视面积。 */}
       <header
+        ref={toolbarRef}
         className={styles.toolbar}
         aria-label="执行状态工作台工具栏"
         style={{ left: toolbarPosition.left, top: toolbarPosition.top }}
       >
-        <div
+        <button
+          type="button"
           className={styles.dragHandle}
           aria-label="拖动执行状态工具栏"
           onPointerDown={handleToolbarPointerDown}
           onPointerMove={handleToolbarPointerMove}
           onPointerUp={handleToolbarPointerUp}
           onPointerCancel={handleToolbarPointerUp}
+          onKeyDown={handleDragHandleKeyDown}
         >
           <HolderOutlined />
-        </div>
+        </button>
         <Button
           icon={<RollbackOutlined />}
           onClick={handleBack}

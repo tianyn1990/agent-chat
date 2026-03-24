@@ -40,6 +40,12 @@ import type { SelectedFile } from '@/components/Chat/FileUploadButton';
 import styles from './Chat.module.less';
 
 /**
+ * 聊天页统一日期格式化器。
+ * 使用 Intl API 代替零散的 toLocaleDateString，便于未来统一处理地区与时区策略。
+ */
+const CHAT_DATE_FORMATTER = new Intl.DateTimeFormat('zh-CN');
+
+/**
  * 判断当前可视化状态是否处于“活跃执行”阶段。
  * 只有真正代表 Agent 正在工作的状态才触发旋转，避免右上角状态胶囊长期抢占注意力。
  */
@@ -624,7 +630,7 @@ export default function ChatPage() {
               <ClockCircleOutlined className={styles.metaIcon} />
               <span className={styles.metaValue}>
                 {currentSession
-                  ? new Date(currentSession.createdAt).toLocaleDateString('zh-CN')
+                  ? CHAT_DATE_FORMATTER.format(new Date(currentSession.createdAt))
                   : '等待开始'}
               </span>
             </div>
@@ -665,9 +671,7 @@ export default function ChatPage() {
               onSend={handleSend}
               disabled={!currentSessionId || currentSessionSending}
               placeholder={
-                !currentSessionId
-                  ? '请先新建一个对话...'
-                  : '输入你的下一步目标、问题或要执行的动作...'
+                !currentSessionId ? '请先新建一个对话…' : '输入你的下一步目标、问题或要执行的动作…'
               }
             />
           </div>

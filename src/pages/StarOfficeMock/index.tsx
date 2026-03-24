@@ -139,7 +139,7 @@ export default function StarOfficeMockPage() {
     return (
       <div className={styles.loadingWrap}>
         <Spin size="large" />
-        <Typography.Text type="secondary">正在连接本地执行状态服务...</Typography.Text>
+        <Typography.Text type="secondary">正在连接本地执行状态服务…</Typography.Text>
       </div>
     );
   }

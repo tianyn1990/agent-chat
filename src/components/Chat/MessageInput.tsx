@@ -38,7 +38,7 @@ export default function MessageInput({
   onFilesChange,
   onSend,
   disabled,
-  placeholder = '输入消息，Enter 发送，Shift+Enter 换行...',
+  placeholder = '输入消息，Enter 发送，Shift+Enter 换行…',
 }: MessageInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -108,7 +108,7 @@ export default function MessageInput({
           <Tooltip
             title={
               disabled
-                ? 'AI 回复中，请稍候...'
+                ? 'AI 回复中，请稍候…'
                 : isOverLimit
                   ? `消息过长（最多 ${MAX_LENGTH} 字）`
                   : 'Enter 发送'

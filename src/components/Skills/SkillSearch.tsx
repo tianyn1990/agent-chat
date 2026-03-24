@@ -18,7 +18,7 @@ interface SkillSearchProps {
 export default function SkillSearch({
   value,
   onChange,
-  placeholder = '搜索技能...',
+  placeholder = '搜索技能…',
 }: SkillSearchProps) {
   return (
     <div className={styles.container}>

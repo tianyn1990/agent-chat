@@ -91,7 +91,7 @@ describe('SkillsPage', () => {
       expect(screen.getAllByText('数据分析师')).toHaveLength(1);
     });
 
-    await user.type(screen.getByPlaceholderText('搜索技能...'), '文档');
+    await user.type(screen.getByPlaceholderText('搜索技能…'), '文档');
 
     expect(screen.getByText('文档写作')).toBeInTheDocument();
     expect(screen.getAllByText('数据分析师')).toHaveLength(1);

@@ -19,7 +19,11 @@
   color: @text-secondary;
   font-size: @font-size-sm;
   cursor: pointer;
-  transition: all @transition-base;
+  transition:
+    background-color @transition-base,
+    border-color @transition-base,
+    color @transition-base,
+    transform @transition-base;
   white-space: nowrap;
   pointer-events: auto;
 

@@ -64,11 +64,7 @@ export default function AuthCallbackPage() {
 
   return (
     <div className={styles.page}>
-      <Result
-        icon={<Spin size="large" />}
-        title="正在登录..."
-        subTitle="请稍候，正在处理飞书授权"
-      />
+      <Result icon={<Spin size="large" />} title="正在登录…" subTitle="请稍候，正在处理飞书授权" />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -81,5 +81,26 @@ describe('VisualizeWorkbenchFrame', () => {
 
     expect(useVisualizeStore.getState().isWorkbenchVisible).toBe(false);
     expect(screen.getByText('聊天页')).toBeInTheDocument();
+  });
+
+  it('拖拽手柄支持方向键微调位置，并限制在最小边界内', () => {
+    render(
+      <MemoryRouter initialEntries={['/visualize/session_keyboard']}>
+        <VisualizeWorkbenchFrame sessionId="session_keyboard" visible />
+      </MemoryRouter>,
+    );
+
+    const toolbar = screen.getByLabelText('执行状态工作台工具栏');
+    const dragHandle = screen.getByRole('button', { name: '拖动执行状态工具栏' });
+
+    fireEvent.keyDown(dragHandle, { key: 'ArrowLeft' });
+    fireEvent.keyDown(dragHandle, { key: 'ArrowUp' });
+
+    expect(toolbar).toHaveStyle({ left: '12px', top: '62px' });
+
+    fireEvent.keyDown(dragHandle, { key: 'ArrowRight', shiftKey: true });
+    fireEvent.keyDown(dragHandle, { key: 'ArrowDown', shiftKey: true });
+
+    expect(toolbar).toHaveStyle({ left: '60px', top: '110px' });
   });
 });

@@ -5,7 +5,10 @@
   flex-direction: column;
   gap: @spacing-xs;
   width: 100%;
-  transition: all @transition-slow;
+  transition:
+    background-color @transition-slow,
+    opacity @transition-slow,
+    transform @transition-slow;
 }
 
 .fullscreen {

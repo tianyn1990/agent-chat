@@ -8,12 +8,25 @@
   width: 100%;
 }
 
+.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: @spacing-md;
+  background: rgba(15, 19, 25, 0.98);
+}
+
 .chartContainer {
   width: 100%;
   min-width: min(720px, 100%);
   overflow: hidden;
   border-radius: @border-radius-sm;
   background: rgba(255, 255, 255, 0.02);
+
+  .fullscreen & {
+    flex: 1;
+    min-width: 0;
+  }
 
   canvas {
     display: block;
@@ -28,6 +41,10 @@
   background-color: rgba(255, 255, 255, 0.04);
   border-radius: @border-radius-sm;
   border: 1px dashed rgba(255, 255, 255, 0.1);
+
+  .fullscreen & {
+    min-height: 100%;
+  }
 }
 
 .errorState {
@@ -48,6 +65,10 @@
   gap: @spacing-xs;
   padding-top: @spacing-xs;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  .fullscreen & {
+    flex-shrink: 0;
+  }
 }
 
 .toolBtn {

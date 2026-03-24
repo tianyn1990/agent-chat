@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Chart } from '@antv/g2';
 import { Button, Tooltip, Spin } from 'antd';
-import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
 import type { G2ChartPayload } from '@/types/chart';
 import styles from './G2Chart.module.less';
 
@@ -41,6 +41,7 @@ export default function G2Chart({ payload }: G2ChartProps) {
   const chartRef = useRef<Chart | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   /**
    * 计算实际渲染高度。
@@ -141,7 +142,7 @@ export default function G2Chart({ payload }: G2ChartProps) {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
       {/* 加载中蒙层 */}
       {loading && (
         <div className={styles.loadingMask} style={{ height: chartHeight }}>
@@ -169,10 +170,11 @@ export default function G2Chart({ payload }: G2ChartProps) {
           <Tooltip title="全屏查看">
             <Button
               type="text"
-              icon={<FullscreenOutlined />}
+              icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
               size="small"
-              onClick={handleExport}
+              onClick={() => setIsFullscreen((value) => !value)}
               className={styles.toolBtn}
+              aria-label={isFullscreen ? '退出全屏查看图表' : '全屏查看图表'}
             />
           </Tooltip>
         </div>
