@@ -5,29 +5,50 @@
   height: 100vh;
   overflow: hidden;
   background: transparent;
-  padding: 10px;
-  gap: 10px;
+  padding: @frame-padding;
+  gap: 0;
 }
 
 .content {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(25, 29, 36, 0.96), rgba(18, 22, 29, 0.98)), @paper-bg;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: @shadow-sm;
+  position: relative;
+  padding-left: @frame-gap;
+
+  /**
+   * 内容区不再承担整块深色大壳体，只作为主舞台容器。
+   * 左侧用一条结构分隔线承接 rail/panel 与内容区的边界。
+   */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      @frame-divider-strong 6%,
+      @frame-divider 18%,
+      @frame-divider 82%,
+      @frame-divider-strong 94%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
 }
 
 @media (max-width: 1100px) {
   .layout {
     padding: 8px;
-    gap: 8px;
   }
 
   .content {
-    border-radius: 16px;
+    padding-left: 12px;
   }
 }

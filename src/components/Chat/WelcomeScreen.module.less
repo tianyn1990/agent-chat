@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 26px 24px 20px;
+  padding: 22px 12px 12px;
   overflow-y: auto;
 }
 
@@ -14,9 +14,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   width: min(900px, 100%);
-  padding: 8px 0 0;
+  padding: 4px 0 0;
 }
 
 .heroBadge {
@@ -24,7 +24,7 @@
   width: fit-content;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
+  background: @frame-surface-subtle;
   color: @accent-color;
   font-size: @font-size-xs;
   font-weight: 700;
@@ -49,7 +49,7 @@
   max-width: 680px;
   font-size: 14px;
   color: @text-secondary;
-  margin: 10px auto 0;
+  margin: 8px auto 0;
   line-height: 1.65;
 }
 
@@ -64,8 +64,8 @@
   height: 34px;
   padding: 0 14px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid @frame-divider;
+  background: @frame-surface-subtle;
   color: @text-secondary;
   cursor: pointer;
   transition:
@@ -100,7 +100,7 @@
 .suggestions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -110,13 +110,12 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 5px;
-  min-height: 108px;
-  padding: 13px 14px;
+  min-height: 102px;
+  padding: 12px 13px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)),
-    rgba(15, 18, 24, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent), rgba(15, 18, 24, 0.78);
+  border: 1px solid @frame-divider;
+  border-radius: 12px;
   cursor: pointer;
   text-align: left;
   transition:

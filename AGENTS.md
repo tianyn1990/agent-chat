@@ -34,6 +34,7 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 - 当任务涉及页面视觉、组件样式、交互层级或新增前端模块时，必须先阅读 [docs/UI-视觉系统指南.md](/Users/hetao/Documents/github/agent-chat/docs/UI-视觉系统指南.md)。
 - 新增页面或组件默认继承当前 `Paper Ops / Graphite Console` 视觉主轴，不得回退到通用蓝白后台风。
 - 优先复用 `src/styles/variables.less` 中的 token，不要无必要写死新的颜色、圆角、阴影和间距。
+- 主应用框架优先采用“线性分隔工作台”策略：避免重新引入左右双大壳体；框架级区域尽量用分隔线、留白和弱表面层表达，内容级主舞台再保留必要容器。
 - 执行状态相关体验继续遵循“主界面克制专业、沉浸式工作台 iframe-first”的边界，不要重新引入大面积说明层挤占真实工作台画面。
 
 ## 提交协作规则（长期生效）

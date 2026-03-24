@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Chart } from '@antv/g2';
 import { Button, Tooltip, Spin } from 'antd';
 import { DownloadOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
@@ -15,9 +15,26 @@ const MAX_HEIGHT = 560;
 
 /** 图表默认高度 */
 const DEFAULT_HEIGHT = 440;
+/** 全屏态顶部/底部保留的安全高度 */
+const FULLSCREEN_SAFE_OFFSET = 104;
 
 interface G2ChartProps {
   payload: G2ChartPayload;
+}
+
+/**
+ * 计算全屏态图表高度。
+ *
+ * 设计原因：
+ * - 进入浏览器全屏后，图表应尽量占满主视口
+ * - 仍需为工具条和少量安全边距预留空间，避免内容被挤压
+ */
+function getFullscreenHeight(baseHeight: number) {
+  if (typeof window === 'undefined') {
+    return baseHeight;
+  }
+
+  return Math.max(baseHeight, window.innerHeight - FULLSCREEN_SAFE_OFFSET);
 }
 
 /**
@@ -37,6 +54,7 @@ interface G2ChartProps {
  *   - 组件卸载时 chart.destroy() 释放资源
  */
 export default function G2Chart({ payload }: G2ChartProps) {
+  const shellRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<Chart | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +69,10 @@ export default function G2Chart({ payload }: G2ChartProps) {
    * - 这里统一抬高默认高度，并为旧 mock / 历史 payload 提供最小高度兜底
    */
   const chartHeight = Math.min(Math.max(payload.height ?? DEFAULT_HEIGHT, MIN_HEIGHT), MAX_HEIGHT);
+  const displayHeight = useMemo(
+    () => (isFullscreen ? getFullscreenHeight(chartHeight) : chartHeight),
+    [chartHeight, isFullscreen],
+  );
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -71,7 +93,7 @@ export default function G2Chart({ payload }: G2ChartProps) {
         const chart = new Chart({
           container: containerRef.current!,
           autoFit: true, // 宽度自适应容器
-          height: chartHeight,
+          height: displayHeight,
         });
 
         // 合并用户传入的 spec 与基础配置
@@ -87,7 +109,7 @@ export default function G2Chart({ payload }: G2ChartProps) {
           padding: [28, 28, 40, 44],
           ...payload.spec,
           // 强制覆盖高度，确保不超过限制
-          height: chartHeight,
+          height: displayHeight,
         });
 
         await chart.render();
@@ -119,7 +141,64 @@ export default function G2Chart({ payload }: G2ChartProps) {
     };
     // spec 用 JSON 序列化比较，避免对象引用变化导致不必要的重渲染
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(payload.spec), chartHeight]);
+  }, [JSON.stringify(payload.spec), displayHeight]);
+
+  useEffect(() => {
+    /**
+     * 浏览器原生全屏状态变化时，需要同步按钮文案和图表尺寸。
+     * 仅切换 CSS class 不足以让 G2 重新按全屏容器计算高度。
+     */
+    const handleFullscreenChange = () => {
+      const nextFullscreen = document.fullscreenElement === shellRef.current;
+      setIsFullscreen(nextFullscreen);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!chartRef.current || !containerRef.current) return;
+
+    // 进入或退出全屏后，主动同步 G2 实例尺寸，避免画布仍停留在旧高度。
+    const nextWidth = containerRef.current.clientWidth || containerRef.current.offsetWidth;
+
+    if (nextWidth > 0) {
+      chartRef.current.changeSize(nextWidth, displayHeight);
+    }
+  }, [displayHeight]);
+
+  /** 切换图表全屏模式，优先使用浏览器 Fullscreen API，失败时回退到样式级全屏。 */
+  const handleToggleFullscreen = async () => {
+    const shell = shellRef.current;
+
+    if (!shell) {
+      setIsFullscreen((value) => !value);
+      return;
+    }
+
+    if (document.fullscreenElement === shell) {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else {
+        setIsFullscreen(false);
+      }
+      return;
+    }
+
+    if (shell.requestFullscreen) {
+      try {
+        await shell.requestFullscreen();
+        return;
+      } catch (fullscreenError) {
+        console.warn('[G2Chart] 浏览器全屏失败，回退到样式级全屏:', fullscreenError);
+      }
+    }
+
+    setIsFullscreen(true);
+  };
 
   /** 导出图表为 PNG 图片 */
   const handleExport = () => {
@@ -142,16 +221,16 @@ export default function G2Chart({ payload }: G2ChartProps) {
   }
 
   return (
-    <div className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
+    <div ref={shellRef} className={`${styles.container} ${isFullscreen ? styles.fullscreen : ''}`}>
       {/* 加载中蒙层 */}
       {loading && (
-        <div className={styles.loadingMask} style={{ height: chartHeight }}>
+        <div className={styles.loadingMask} style={{ height: displayHeight }}>
           <Spin size="default" />
         </div>
       )}
 
       {/* G2 图表挂载容器 */}
-      <div ref={containerRef} className={styles.chartContainer} style={{ height: chartHeight }} />
+      <div ref={containerRef} className={styles.chartContainer} style={{ height: displayHeight }} />
 
       {/* 工具栏（导出 / 全屏） */}
       {payload.exportable && !loading && (
@@ -172,7 +251,7 @@ export default function G2Chart({ payload }: G2ChartProps) {
               type="text"
               icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
               size="small"
-              onClick={() => setIsFullscreen((value) => !value)}
+              onClick={handleToggleFullscreen}
               className={styles.toolBtn}
               aria-label={isFullscreen ? '退出全屏查看图表' : '全屏查看图表'}
             />

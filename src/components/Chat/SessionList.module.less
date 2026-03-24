@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -14,18 +14,18 @@
 
 .newBtn {
   height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 12px !important;
+  border: 1px solid @frame-divider !important;
+  border-radius: 10px !important;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: @text-primary !important;
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: @frame-surface-subtle !important;
   box-shadow: none;
 
   &:hover,
   &:focus-visible {
     border-color: rgba(123, 145, 255, 0.2) !important;
-    background: rgba(123, 145, 255, 0.16) !important;
+    background: rgba(123, 145, 255, 0.12) !important;
     color: @text-primary !important;
   }
 }
@@ -39,7 +39,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   min-width: 0;
-  padding-right: 2px;
+  padding-right: 4px;
 
   // 自定义滚动条（适配深色背景）
   &::-webkit-scrollbar {
