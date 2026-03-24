@@ -12,7 +12,7 @@ import styles from './G2Chart.module.less';
 const MAX_HEIGHT = 480;
 
 /** 图表默认高度 */
-const DEFAULT_HEIGHT = 300;
+const DEFAULT_HEIGHT = 360;
 
 interface G2ChartProps {
   payload: G2ChartPayload;
@@ -68,6 +68,14 @@ export default function G2Chart({ payload }: G2ChartProps) {
         // 合并用户传入的 spec 与基础配置
         chart.options({
           theme: 'classicDark',
+          /**
+           * 为结果区图表提供更宽松的默认留白。
+           *
+           * 设计原因：
+           * - 当前消息卡片承载空间有限，若图表默认 padding 太小，坐标轴、图例和标题会显得拥挤
+           * - 这里先给出一组更稳妥的默认值，用户自定义 spec 仍然可以覆盖
+           */
+          padding: [28, 28, 40, 44],
           ...payload.spec,
           // 强制覆盖高度，确保不超过限制
           height: chartHeight,

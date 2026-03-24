@@ -22,6 +22,7 @@ import {
 } from '@/constants';
 import { prefixedId } from '@/utils/id';
 import { VISUALIZE_STATE_LABELS } from '@/types/visualize';
+import type { VisualizeRuntimeState } from '@/types/visualize';
 import type {
   WsMessageChunk,
   WsCardMessage,
@@ -37,6 +38,16 @@ import WelcomeScreen from '@/components/Chat/WelcomeScreen';
 import VisualizePanel from '@/components/Visualize/VisualizePanel';
 import type { SelectedFile } from '@/components/Chat/FileUploadButton';
 import styles from './Chat.module.less';
+
+/**
+ * 判断当前可视化状态是否处于“活跃执行”阶段。
+ * 只有真正代表 Agent 正在工作的状态才触发旋转，避免右上角状态胶囊长期抢占注意力。
+ */
+function isRuntimeActive(state?: VisualizeRuntimeState): boolean {
+  return (
+    state === 'researching' || state === 'writing' || state === 'executing' || state === 'syncing'
+  );
+}
 
 /**
  * 对话页面（主容器）
@@ -579,6 +590,7 @@ export default function ChatPage() {
   const currentStateLabel = currentRuntime
     ? VISUALIZE_STATE_LABELS[currentRuntime.state]
     : '待命中';
+  const isRuntimeBusy = isRuntimeActive(currentRuntime?.state);
 
   return (
     <div className={styles.container}>
@@ -594,8 +606,14 @@ export default function ChatPage() {
           </div>
 
           <div className={styles.headerMeta} aria-label="会话摘要信息">
-            <div className={styles.metaCard}>
-              <Loading3QuartersOutlined className={styles.metaIcon} />
+            <div
+              className={styles.metaCard}
+              data-running={isRuntimeBusy ? 'true' : 'false'}
+              aria-label={`当前执行状态：${currentStateLabel}`}
+            >
+              <Loading3QuartersOutlined
+                className={`${styles.metaIcon} ${isRuntimeBusy ? styles.metaIconSpinning : ''}`}
+              />
               <span className={styles.metaValue}>{currentStateLabel}</span>
             </div>
             <div className={styles.metaCard}>

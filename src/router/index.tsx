@@ -4,6 +4,7 @@ import AuthGuard from '@/components/Auth/AuthGuard';
 import AppShell from '@/components/Layout/AppShell';
 import MainLayout from '@/components/Layout/MainLayout';
 import { LazyPage } from '@/components/Common/PageLoading';
+import RouteErrorBoundary from '@/components/Common/RouteErrorBoundary';
 import { ROUTES } from '@/constants';
 
 // 路由级懒加载，减小首屏包体积
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppShell />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
         // 本地 Star-Office mock 页面（用于 iframe 承接，不依赖主布局）
@@ -65,6 +67,7 @@ export const router = createBrowserRouter([
             <MainLayout />
           </AuthGuard>
         ),
+        errorElement: <RouteErrorBoundary />,
         children: [
           {
             // 对话页（支持可选的 sessionId 参数）

@@ -16,14 +16,51 @@ export default function MessageActions({ message, copyText }: MessageActionsProp
   const navigate = useNavigate();
   const openWorkbench = useVisualizeStore((state) => state.openWorkbench);
 
+  /**
+   * 使用兼容性更强的复制流程。
+   *
+   * 设计原因：
+   * - `navigator.clipboard` 在部分浏览器、非安全上下文或权限受限环境下会失败
+   * - 聊天结果中的“复制”属于高频操作，需要提供兜底方案，避免本地开发和企业内网环境频繁报错
+   */
+  const copyWithFallback = async (text: string) => {
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // 权限受限时继续走旧式兜底复制，不在这里直接报错。
+      }
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', 'true');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-9999px';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    try {
+      return document.execCommand('copy');
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  };
+
   const handleCopy = async () => {
     if (!copyText) return;
 
     try {
-      await navigator.clipboard.writeText(copyText);
-      messageApi.success('已复制消息内容');
+      const copied = await copyWithFallback(copyText);
+      if (copied) {
+        messageApi.success('已复制消息内容');
+      } else {
+        messageApi.error('复制失败，请稍后重试');
+      }
     } catch {
-      messageApi.error('复制失败，请检查浏览器权限');
+      messageApi.error('复制失败，请稍后重试');
     }
   };
 

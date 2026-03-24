@@ -92,4 +92,39 @@ describe('ChatPage', () => {
       );
     }, { timeout: 2000 });
   });
+
+  it('执行态会让右上角状态胶囊进入运行样式', async () => {
+    const sessionId = 'session-running';
+
+    useChatStore.setState({
+      sessions: [
+        {
+          id: sessionId,
+          title: '执行中的会话',
+          createdAt: Date.now(),
+        },
+      ],
+      currentSessionId: sessionId,
+      messages: {
+        [sessionId]: [],
+      },
+    });
+
+    useVisualizeStore.setState({
+      runtimeBySession: {
+        [sessionId]: {
+          state: 'executing',
+          detail: '正在执行工作流',
+          updatedAt: Date.now(),
+          source: 'frontend',
+        },
+      },
+    });
+
+    renderChatPage(`/chat/${sessionId}`);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('当前执行状态：执行中')).toHaveAttribute('data-running', 'true');
+    });
+  });
 });

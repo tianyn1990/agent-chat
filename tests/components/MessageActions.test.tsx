@@ -62,6 +62,38 @@ describe('MessageActions', () => {
     expect(await screen.findByText('已复制消息内容')).toBeInTheDocument();
   });
 
+  it('clipboard 失败时回退到 execCommand 复制', async () => {
+    const user = userEvent.setup();
+    const writeText = vi.fn().mockRejectedValue(new Error('denied'));
+    const execCommand = vi.fn().mockReturnValue(true);
+
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText,
+      },
+    });
+
+    Object.defineProperty(document, 'execCommand', {
+      configurable: true,
+      value: execCommand,
+    });
+
+    render(
+      <App>
+        <MemoryRouter>
+          <MessageActions message={makeMessage()} copyText="可复制内容" />
+        </MemoryRouter>
+      </App>,
+    );
+
+    await user.click(screen.getByRole('button', { name: '复制' }));
+
+    expect(writeText).toHaveBeenCalledWith('可复制内容');
+    expect(execCommand).toHaveBeenCalledWith('copy');
+    expect(await screen.findByText('已复制消息内容')).toBeInTheDocument();
+  });
+
   it('点击查看执行状态后直接进入沉浸式工作台', async () => {
     const user = userEvent.setup();
 

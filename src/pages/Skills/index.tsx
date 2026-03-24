@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { message } from 'antd';
+import { App } from 'antd';
 import {
   AppstoreOutlined,
   CheckCircleOutlined,
@@ -20,6 +20,7 @@ import styles from './Skills.module.less';
  * 展示所有可用技能，支持搜索、筛选、安装、卸载
  */
 export default function SkillsPage() {
+  const { message } = App.useApp();
   const {
     searchKeyword,
     selectedCategory,

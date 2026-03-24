@@ -3,7 +3,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: @spacing-xs;
+  gap: @spacing-sm;
   position: relative;
   width: 100%;
 }
@@ -11,6 +11,8 @@
 .chartContainer {
   width: 100%;
   overflow: hidden;
+  border-radius: @border-radius-sm;
+  background: rgba(255, 255, 255, 0.02);
 
   canvas {
     max-width: 100%;

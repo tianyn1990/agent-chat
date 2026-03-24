@@ -50,8 +50,8 @@ export default function MessageList({
   onCardAction,
   onCardExpire,
 }: MessageListProps) {
-  /** 外层滚动容器 ref */
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  /** 实际承载消息滚动的视口 ref */
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
 
   /** 用户是否已向上滚动（超出阈值，暂停自动滚底） */
   const [isUserScrolledUp, setIsUserScrolledUp] = useState(false);
@@ -67,7 +67,7 @@ export default function MessageList({
 
   const virtualizer = useVirtualizer({
     count: messages.length,
-    getScrollElement: () => scrollContainerRef.current,
+    getScrollElement: () => scrollViewportRef.current,
     // 按消息类型给出贴近真实高度的初始估算值
     // 减少虚拟列表因测量修正导致的位置跳变（滚动抖动）
     estimateSize: (index) => {
@@ -85,7 +85,7 @@ export default function MessageList({
   // ===========================
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
-    const container = scrollContainerRef.current;
+    const container = scrollViewportRef.current;
     if (!container) return;
     container.scrollTo({ top: container.scrollHeight, behavior });
   }, []);
@@ -95,7 +95,7 @@ export default function MessageList({
   // ===========================
 
   const handleScroll = useCallback(() => {
-    const container = scrollContainerRef.current;
+    const container = scrollViewportRef.current;
     if (!container) return;
 
     const { scrollTop, scrollHeight, clientHeight } = container;
@@ -147,52 +147,54 @@ export default function MessageList({
   }, []); // 仅在首次挂载时执行
 
   return (
-    <div ref={scrollContainerRef} className={styles.container} onScroll={handleScroll}>
-      {/* 虚拟列表总高度撑开容器 */}
-      <div
-        style={{
-          height: virtualizer.getTotalSize(),
-          width: '100%',
-          position: 'relative',
-        }}
-      >
-        {/* 仅渲染视口内的消息条目 */}
-        {virtualizer.getVirtualItems().map((virtualItem) => {
-          const message = messages[virtualItem.index];
-          const streamingText = streamingBuffer[message.id];
+    <div className={styles.root}>
+      <div ref={scrollViewportRef} className={styles.container} onScroll={handleScroll}>
+        {/* 虚拟列表总高度撑开容器 */}
+        <div
+          style={{
+            height: virtualizer.getTotalSize(),
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {/* 仅渲染视口内的消息条目 */}
+          {virtualizer.getVirtualItems().map((virtualItem) => {
+            const message = messages[virtualItem.index];
+            const streamingText = streamingBuffer[message.id];
 
-          return (
-            <div
-              key={virtualItem.key}
-              data-index={virtualItem.index}
-              ref={virtualizer.measureElement} // 动态测量实际高度
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                transform: `translateY(${virtualItem.start}px)`,
-              }}
-            >
-              <MessageBubble
-                message={message}
-                streamingText={streamingText}
-                onCardAction={onCardAction}
-                onCardExpire={onCardExpire}
-              />
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={virtualItem.key}
+                data-index={virtualItem.index}
+                ref={virtualizer.measureElement} // 动态测量实际高度
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <MessageBubble
+                  message={message}
+                  streamingText={streamingText}
+                  onCardAction={onCardAction}
+                  onCardExpire={onCardExpire}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* AI 思考中动画（在最后一条消息之后显示） */}
+        {isStreaming && (
+          <div className={styles.typingWrapper}>
+            <TypingIndicator />
+          </div>
+        )}
       </div>
 
-      {/* AI 思考中动画（在最后一条消息之后显示） */}
-      {isStreaming && (
-        <div className={styles.typingWrapper}>
-          <TypingIndicator />
-        </div>
-      )}
-
-      {/* 回到底部浮动按钮 */}
+      {/* 回到底部按钮提升为舞台级 overlay，避免随着滚动内容一起移动。 */}
       <ScrollToBottom
         visible={isUserScrolledUp}
         hasNewMessage={hasNewMessage}

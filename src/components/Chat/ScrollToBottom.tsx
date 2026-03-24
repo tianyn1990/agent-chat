@@ -18,7 +18,12 @@ export default function ScrollToBottom({ visible, hasNewMessage, onClick }: Scro
   if (!visible) return null;
 
   return (
-    <button className={styles.btn} onClick={onClick} aria-label="回到最新消息">
+    <button
+      className={styles.btn}
+      onClick={onClick}
+      aria-label={hasNewMessage ? '回到底部查看新消息' : '回到最新消息'}
+      data-has-new-message={hasNewMessage ? 'true' : 'false'}
+    >
       {hasNewMessage && <span className={styles.badge} />}
       <DownOutlined className={styles.icon} />
       {hasNewMessage && <span className={styles.text}>新消息</span>}

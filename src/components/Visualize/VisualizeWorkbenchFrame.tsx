@@ -27,7 +27,7 @@ export default function VisualizeWorkbenchFrame({
   const navigate = useNavigate();
   const hideWorkbench = useVisualizeStore((state) => state.hideWorkbench);
   const [refreshVersion, setRefreshVersion] = useState(0);
-  const [toolbarPosition, setToolbarPosition] = useState({ left: 18, top: 18 });
+  const [toolbarPosition, setToolbarPosition] = useState({ left: 18, top: 68 });
   const dragStateRef = useRef<{
     pointerId: number;
     startX: number;
@@ -82,7 +82,7 @@ export default function VisualizeWorkbenchFrame({
     }
 
     const nextLeft = Math.max(12, dragState.startLeft + event.clientX - dragState.startX);
-    const nextTop = Math.max(12, dragState.startTop + event.clientY - dragState.startY);
+    const nextTop = Math.max(62, dragState.startTop + event.clientY - dragState.startY);
     setToolbarPosition({ left: nextLeft, top: nextTop });
   }, []);
 
