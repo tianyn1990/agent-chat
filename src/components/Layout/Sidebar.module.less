@@ -2,149 +2,209 @@
 
 .sidebar {
   display: flex;
-  flex-direction: column;
-  width: @sidebar-width;
-  min-width: @sidebar-width;
+  align-items: stretch;
+  width: @sidebar-collapsed-width;
+  min-width: @sidebar-collapsed-width;
   height: 100vh;
-  padding: 14px 12px 12px;
-  border-radius: 22px;
+  border-radius: 20px;
   background:
-    linear-gradient(180deg, rgba(255, 248, 238, 0.03), rgba(255, 248, 238, 0.01)), @sidebar-bg;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)), @sidebar-bg;
   border: 1px solid @sidebar-border;
-  box-shadow: @shadow-md;
+  box-shadow: @shadow-sm;
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
+  transition: width @transition-base;
 }
 
-// Logo 区域
-.logoArea {
-  padding: 8px @spacing-sm 14px;
-  flex-shrink: 0;
+.sidebarExpanded {
+  width: @sidebar-width;
+  min-width: @sidebar-width;
 }
 
-.logo {
+.rail {
+  width: @sidebar-collapsed-width;
+  min-width: @sidebar-collapsed-width;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 10px 10px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.logoIcon {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+.railTop {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.railAction {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  line-height: 1;
-  background: linear-gradient(135deg, rgba(183, 121, 69, 0.22), rgba(53, 92, 125, 0.28));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.logoTextGroup {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.logoText {
+  padding: 0;
+  background: rgba(255, 255, 255, 0.02);
   color: @sidebar-text;
+  cursor: pointer;
+  transition:
+    background-color @transition-base,
+    border-color @transition-base,
+    color @transition-base;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(123, 145, 255, 0.5);
+    outline-offset: 2px;
+  }
+}
+
+.railAction {
   font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
 }
 
-.logoSubtext {
-  margin-top: 2px;
-  color: @sidebar-text-secondary;
-  font-size: @font-size-xs;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-// 导航菜单
 .nav {
-  padding: 0 @spacing-xs;
-  flex-shrink: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
   width: 100%;
-  padding: 10px 12px;
-  border: none;
-  border-radius: 12px;
-  background: transparent;
+  height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.01);
   color: @sidebar-text;
-  font-size: @font-size-base;
+  font-size: 16px;
   cursor: pointer;
   transition:
     background-color @transition-base,
-    transform @transition-base,
+    border-color @transition-base,
     color @transition-base;
-  text-align: left;
 
   &:hover {
     background-color: @sidebar-hover-bg;
-    transform: translateX(1px);
+    border-color: rgba(255, 255, 255, 0.08);
   }
 
   &:focus-visible {
-    outline: 2px solid rgba(255, 249, 240, 0.3);
+    outline: 2px solid rgba(123, 145, 255, 0.5);
     outline-offset: 2px;
   }
 }
 
 .navItemActive {
   background: @sidebar-active-bg !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
   color: @sidebar-active-text;
-  box-shadow: inset 0 1px 0 rgba(255, 249, 240, 0.12);
 }
 
 .navIcon {
-  font-size: 15px;
   display: flex;
   align-items: center;
+  justify-content: center;
   color: inherit;
-  width: 16px;
 }
 
 .navLabel {
-  font-size: @font-size-base;
-  color: inherit;
-  font-weight: 500;
+  display: none;
 }
 
-// 分割线
+.railBottom {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.panel {
+  width: calc(@sidebar-width - @sidebar-collapsed-width);
+  min-width: calc(@sidebar-width - @sidebar-collapsed-width);
+  max-width: calc(@sidebar-width - @sidebar-collapsed-width);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 12px 12px 10px;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.015);
+  overflow: hidden;
+}
+
+.panelHidden {
+  display: none;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0 8px;
+}
+
+.panelCopy {
+  min-width: 0;
+}
+
+.panelTitle {
+  color: @sidebar-text;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.panelSubtitle {
+  margin-top: 4px;
+  color: @sidebar-text-secondary;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .divider {
-  border-color: @sidebar-border !important;
-  margin: @spacing-sm 0 !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  margin: 0 !important;
 }
 
-// 插槽区域（会话列表等）
 .extra {
+  display: flex;
   flex: 1;
   overflow-y: auto;
-  padding: 0 @spacing-xs;
+  overflow-x: hidden;
   min-height: 0;
 }
 
-// 底部
 .footer {
-  flex-shrink: 0;
-  padding: 0 @spacing-xs @spacing-xs;
+  display: none;
 }
 
 @media (max-width: 1100px) {
   .sidebar {
-    width: 276px;
-    min-width: 276px;
-    border-radius: 18px;
+    border-radius: 16px;
+  }
+
+  .sidebarExpanded {
+    width: 286px;
+    min-width: 286px;
+  }
+
+  .panel {
+    width: calc(286px - @sidebar-collapsed-width);
+    min-width: calc(286px - @sidebar-collapsed-width);
   }
 }

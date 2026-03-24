@@ -102,6 +102,13 @@ function ButtonActionItem({ action, disabled, onAction }: ButtonActionItemProps)
       loading={loading}
       onClick={handleClick}
       size="small"
+      className={`${styles.actionBtn} ${
+        action.type === 'danger'
+          ? styles.actionBtnDanger
+          : action.type === 'primary'
+            ? styles.actionBtnPrimary
+            : ''
+      }`}
     >
       {action.text}
     </Button>
@@ -132,6 +139,7 @@ function SelectActionItem({ action, disabled, onAction }: SelectActionItemProps)
       onChange={(value) => onAction(action.key, value)}
       style={{ minWidth: 120 }}
       size="small"
+      className={styles.actionSelect}
     />
   );
 }

@@ -60,18 +60,28 @@ export default function SkillDetail({
       onClose={onClose}
       closeIcon={<CloseOutlined />}
       footer={
-        <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+        <Space className={styles.footerActions}>
           {skill.installed ? (
             <>
-              <Button onClick={handleInstall} loading={loading} danger>
+              <Button
+                onClick={handleInstall}
+                loading={loading}
+                danger
+                className={styles.uninstallButton}
+              >
                 卸载
               </Button>
-              <Button type="primary" onClick={handleUseInChat}>
+              <Button type="primary" onClick={handleUseInChat} className={styles.primaryAction}>
                 在对话中使用
               </Button>
             </>
           ) : (
-            <Button type="primary" onClick={handleInstall} loading={loading}>
+            <Button
+              type="primary"
+              onClick={handleInstall}
+              loading={loading}
+              className={styles.primaryAction}
+            >
               安装
             </Button>
           )}
@@ -81,14 +91,14 @@ export default function SkillDetail({
       <div className={styles.container}>
         {/* 基本信息 */}
         <div className={styles.meta}>
-          <Space size="middle">
+          <Space size="middle" className={styles.metaInfo}>
             <Text type="secondary">版本: {skill.version}</Text>
             <Text type="secondary">作者: {skill.author}</Text>
           </Space>
-          <div style={{ marginTop: 8 }}>
-            <Tag color="blue">{SKILL_CATEGORY_LABELS[skill.category]}</Tag>
+          <div className={styles.metaTags}>
+            <Tag className={styles.categoryTag}>{SKILL_CATEGORY_LABELS[skill.category]}</Tag>
             {skill.installed && (
-              <Tag color="success" icon={<CheckCircleOutlined />}>
+              <Tag className={styles.installedTag} icon={<CheckCircleOutlined />}>
                 已安装
               </Tag>
             )}

@@ -22,24 +22,43 @@
 
 .toolbar {
   position: absolute;
-  top: 50%;
-  right: 14px;
-  transform: translateY(-50%);
   z-index: 2;
   display: inline-flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: center;
   gap: 8px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(11, 16, 22, 0.28);
+  user-select: none;
+}
+
+.dragHandle {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(248, 243, 234, 0.8);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: grab;
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .primaryAction {
-  height: 36px;
-  padding-inline: 12px !important;
+  height: 34px;
+  padding-inline: 10px !important;
   border-radius: 999px !important;
   color: #f8f3ea !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
-  background: rgba(16, 22, 30, 0.68) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  background: rgba(16, 22, 30, 0.56) !important;
+  box-shadow: none;
   backdrop-filter: blur(10px);
 }
 
@@ -52,23 +71,22 @@
 
 .secondaryActions {
   display: inline-flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 6px;
-  padding: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  background: rgba(16, 22, 30, 0.46);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
-  backdrop-filter: blur(10px);
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .secondaryActions :global(.ant-btn) {
   color: #f8f3ea;
   border-color: rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
 }
 
 .secondaryActions :global(.ant-btn.ant-btn-text) {
@@ -84,6 +102,8 @@
 
 @media (max-width: 768px) {
   .toolbar {
-    right: 10px;
+    top: 12px;
+    left: 12px;
+    gap: 6px;
   }
 }

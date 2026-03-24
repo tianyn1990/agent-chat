@@ -11,7 +11,7 @@ export function PageLoading() {
         alignItems: 'center',
         justifyContent: 'center',
         background:
-          'radial-gradient(circle at top left, rgba(183,121,69,0.12), transparent 24%), linear-gradient(180deg, #f8f2e8 0%, #efe4d3 100%)',
+          'radial-gradient(circle at top left, rgba(123,145,255,0.1), transparent 24%), radial-gradient(circle at bottom right, rgba(199,155,101,0.08), transparent 22%), linear-gradient(180deg, #0a0c10 0%, #10141b 100%)',
       }}
     >
       <Spin size="large" />

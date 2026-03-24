@@ -63,7 +63,11 @@ export default function VisualizeSummaryView({
       <div className={styles.meta}>
         <span className={styles.session}>会话：{sessionId}</span>
         {runtime ? (
-          <Tag color={runtime.state === 'error' ? 'error' : 'processing'}>
+          <Tag
+            className={
+              runtime.state === 'error' ? styles.statusTagError : styles.statusTagProcessing
+            }
+          >
             {VISUALIZE_STATE_LABELS[runtime.state]}
           </Tag>
         ) : (

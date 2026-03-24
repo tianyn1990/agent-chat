@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Divider, Tooltip } from 'antd';
-import { AppstoreOutlined, MessageOutlined, PlusOutlined, RobotOutlined } from '@ant-design/icons';
-import { APP_NAME, ROUTES } from '@/constants';
+import {
+  AppstoreOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  MessageOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
+import { ROUTES } from '@/constants';
 import UserInfo from './UserInfo';
 import styles from './Sidebar.module.less';
 
@@ -47,7 +53,12 @@ export default function Sidebar({ extra, activeKey }: SidebarProps) {
   const currentKey =
     activeKey ?? NAV_ITEMS.find((item) => location.pathname.startsWith(item.path))?.key ?? 'chat';
 
+  /**
+   * 会话档案面板只在聊天页作为二级 shelf 出现。
+   * 默认展开，但允许用户手动收起，把宽度还给主舞台。
+   */
   const [showExtra, setShowExtra] = useState(true);
+  const canShowExtra = Boolean(extra) && currentKey === 'chat';
 
   const handleNavClick = (item: NavItem) => {
     navigate(item.path);
@@ -55,47 +66,60 @@ export default function Sidebar({ extra, activeKey }: SidebarProps) {
   };
 
   return (
-    <aside className={styles.sidebar}>
-      {/* Logo 区域 */}
-      <div className={styles.logoArea}>
-        <div className={styles.logo}>
-          {/* 统一使用线性 icon，减少 emoji 带来的视觉重量波动。 */}
-          <span className={styles.logoIcon}>
-            <RobotOutlined />
-          </span>
-          <div className={styles.logoTextGroup}>
-            <span className={styles.logoText}>{APP_NAME}</span>
-            <span className={styles.logoSubtext}>Agent Workspace</span>
-          </div>
+    <aside
+      className={`${styles.sidebar} ${canShowExtra && showExtra ? styles.sidebarExpanded : ''}`}
+    >
+      <div className={styles.rail}>
+        <div className={styles.railTop}>
+          <nav className={styles.nav} aria-label="主导航">
+            {NAV_ITEMS.map((item) => (
+              <Tooltip key={item.key} title={item.label} placement="right">
+                <button
+                  className={`${styles.navItem} ${
+                    currentKey === item.key ? styles.navItemActive : ''
+                  }`}
+                  onClick={() => handleNavClick(item)}
+                  aria-label={item.label}
+                >
+                  <span className={styles.navIcon}>{item.icon}</span>
+                  <span className={styles.navLabel}>{item.label}</span>
+                </button>
+              </Tooltip>
+            ))}
+          </nav>
+        </div>
+
+        <div className={styles.railBottom}>
+          {canShowExtra ? (
+            <Tooltip title={showExtra ? '收起档案面板' : '展开档案面板'} placement="right">
+              {/* rail 只负责触发二级上下文，避免主舞台长期被宽侧栏锁死。 */}
+              <button
+                type="button"
+                className={styles.railAction}
+                onClick={() => setShowExtra((value) => !value)}
+                aria-label={showExtra ? '收起档案面板' : '展开档案面板'}
+              >
+                {showExtra ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+              </button>
+            </Tooltip>
+          ) : null}
+
+          <UserInfo compact />
         </div>
       </div>
 
-      {/* 导航菜单 */}
-      <nav className={styles.nav}>
-        {NAV_ITEMS.map((item) => (
-          <Tooltip key={item.key} title="" placement="right">
-            <button
-              className={`${styles.navItem} ${currentKey === item.key ? styles.navItemActive : ''}`}
-              onClick={() => handleNavClick(item)}
-            >
-              <span className={styles.navIcon}>{item.icon}</span>
-              <span className={styles.navLabel}>{item.label}</span>
-            </button>
-          </Tooltip>
-        ))}
-      </nav>
-
-      <Divider className={styles.divider} />
-
-      {/* 插槽区域（当前菜单对应的子内容，如会话列表） */}
-      {/* 始终渲染以占据剩余空间，将底部用户信息推到底部 */}
-      <div className={`${styles.extra} sidebar-scrollbar`}>{showExtra && extra}</div>
-
-      {/* 底部用户信息 */}
-      <div className={styles.footer}>
-        <Divider className={styles.divider} />
-        <UserInfo />
-      </div>
+      {canShowExtra ? (
+        <section className={`${styles.panel} ${showExtra ? '' : styles.panelHidden}`}>
+          <div className={styles.panelHeader}>
+            <div className={styles.panelCopy}>
+              <div className={styles.panelTitle}>会话档案</div>
+              <div className={styles.panelSubtitle}>保留主舞台宽度，只在需要时展开上下文。</div>
+            </div>
+          </div>
+          <Divider className={styles.divider} />
+          <div className={`${styles.extra} sidebar-scrollbar`}>{showExtra ? extra : null}</div>
+        </section>
+      ) : null}
     </aside>
   );
 }

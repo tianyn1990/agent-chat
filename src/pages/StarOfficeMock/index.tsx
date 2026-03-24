@@ -122,7 +122,7 @@ export default function StarOfficeMockPage() {
   if (!STAR_OFFICE_MOCK_ENABLED) {
     return (
       <Result
-        icon={<DeploymentUnitOutlined style={{ color: '#1677ff' }} />}
+        icon={<DeploymentUnitOutlined className={styles.resultIcon} />}
         title="本地执行状态 Mock 未启用"
         subTitle="请开启 VITE_STAR_OFFICE_MOCK_ENABLED 后重试。"
       />
@@ -160,11 +160,11 @@ export default function StarOfficeMockPage() {
         <header className={styles.header}>
           <p className={styles.eyebrow}>Star-Office-UI Local Mock</p>
           <h1 className={styles.title}>执行状态本地预览</h1>
-          <Tag color="default">会话：{sessionId}</Tag>
+          <Tag className={styles.sessionTag}>会话：{sessionId}</Tag>
         </header>
 
         <Result
-          icon={<DeploymentUnitOutlined style={{ color: '#1677ff' }} />}
+          icon={<DeploymentUnitOutlined className={styles.resultIcon} />}
           title="等待该会话的执行状态"
           subTitle="当前会话尚未产生可同步到本地 mock adapter 的运行态。"
         />
@@ -181,8 +181,12 @@ export default function StarOfficeMockPage() {
         </div>
 
         <Space wrap>
-          <Tag color="blue">会话：{sessionId}</Tag>
-          <Tag color={status.state === 'error' ? 'error' : 'processing'}>
+          <Tag className={styles.sessionTag}>会话：{sessionId}</Tag>
+          <Tag
+            className={
+              status.state === 'error' ? styles.statusTagError : styles.statusTagProcessing
+            }
+          >
             {VISUALIZE_STATE_LABELS[status.state]}
           </Tag>
         </Space>
@@ -255,7 +259,11 @@ export default function StarOfficeMockPage() {
             <Card key={agent.agentId} className={styles.agentCard}>
               <div className={styles.agentHeader}>
                 <strong>{agent.name}</strong>
-                <Tag color={agent.state === 'error' ? 'error' : 'processing'}>
+                <Tag
+                  className={
+                    agent.state === 'error' ? styles.statusTagError : styles.statusTagProcessing
+                  }
+                >
                   {VISUALIZE_STATE_LABELS[agent.state]}
                 </Tag>
               </div>

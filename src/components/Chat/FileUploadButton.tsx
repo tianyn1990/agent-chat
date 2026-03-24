@@ -103,15 +103,6 @@ export default function FileUploadButton({ files, onChange, disabled }: FileUplo
 
   return (
     <div className={styles.wrapper}>
-      {/* 已选文件预览列表 */}
-      {files.length > 0 && (
-        <div className={styles.fileList}>
-          {files.map((f) => (
-            <FilePreviewItem key={f.localId} file={f} onRemove={() => handleRemove(f.localId)} />
-          ))}
-        </div>
-      )}
-
       {/* 隐藏的原生文件 input */}
       <input
         ref={inputRef}
@@ -133,6 +124,15 @@ export default function FileUploadButton({ files, onChange, disabled }: FileUplo
           aria-label="上传文件"
         />
       </Tooltip>
+
+      {/* 已选文件预览列表与附件按钮并排展示，保持输入区为单条 dock 结构。 */}
+      {files.length > 0 && (
+        <div className={styles.fileList}>
+          {files.map((f) => (
+            <FilePreviewItem key={f.localId} file={f} onRemove={() => handleRemove(f.localId)} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -25,9 +25,10 @@ describe('VisualizeWorkbenchFrame', () => {
     );
 
     expect(screen.getByLabelText('执行状态工作台工具栏')).toBeInTheDocument();
+    expect(screen.getByLabelText('拖动执行状态工具栏')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '返回聊天' })).toHaveTextContent('返回聊天');
     expect(screen.getByRole('button', { name: '刷新' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '收起' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '收起' })).not.toBeInTheDocument();
   });
 
   it('隐藏时保留已挂载的 iframe，再次显示时复用同一节点', () => {

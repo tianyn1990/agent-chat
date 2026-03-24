@@ -5,7 +5,7 @@
   height: 100%;
   min-height: 0;
   min-width: 0;
-  padding: 16px 18px 14px;
+  padding: 14px 16px 12px;
 }
 
 .chatColumn {
@@ -13,24 +13,24 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .stageHeader {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 2px 2px 0;
+  padding: 0 2px;
 }
 
-.headerCopy {
+.stageIdentity {
   min-width: 0;
   flex: 1;
 }
 
 .eyebrow {
-  margin: 0 0 2px;
+  margin: 0;
   color: @accent-color;
   font-size: @font-size-xs;
   font-weight: 700;
@@ -38,22 +38,30 @@
   text-transform: uppercase;
 }
 
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
 .stageTitle {
   margin: 0;
   color: @text-primary;
-  font-size: clamp(18px, 2vw, 24px);
-  line-height: 1.14;
-  font-family: @font-family-display;
+  font-size: clamp(16px, 1.7vw, 22px);
+  line-height: 1.12;
   font-weight: 700;
-  text-wrap: balance;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stageSubtitle {
   margin: 4px 0 0;
-  max-width: 620px;
+  max-width: 760px;
   color: @text-secondary;
   font-size: 11px;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
 .headerMeta {
@@ -68,25 +76,22 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
+  padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(255, 252, 247, 0.76);
-  border: 1px solid rgba(71, 58, 39, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: none;
   min-width: auto;
 }
 
-.metaLabel {
+.metaIcon {
   color: @text-tertiary;
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
 }
 
 .metaValue {
   color: @text-primary;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   white-space: nowrap;
 }
@@ -96,7 +101,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .messageArea {
@@ -107,9 +112,9 @@
   position: relative;
   border-radius: 18px;
   background:
-    linear-gradient(180deg, rgba(255, 253, 249, 0.96), rgba(255, 250, 244, 0.98)), @paper-bg;
-  border: 1px solid rgba(71, 58, 39, 0.08);
-  box-shadow: @shadow-sm;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+    rgba(11, 14, 19, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   overflow: hidden;
 }
 
@@ -117,23 +122,25 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px 12px;
-  border-radius: 16px;
-  background: rgba(255, 252, 247, 0.92);
-  border: 1px solid rgba(71, 58, 39, 0.08);
+  gap: 8px;
+  padding: 10px 0 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
   box-shadow: none;
 }
 
 .noSessionTip {
   color: @text-secondary;
   font-size: @font-size-sm;
+  padding: 0 2px;
 }
 
 .composerHint {
   color: @text-tertiary;
   font-size: 11px;
   line-height: 1.45;
+  padding: 0 2px;
 }
 
 @media (max-width: 1100px) {
@@ -149,6 +156,10 @@
   .headerMeta {
     width: 100%;
     min-width: 0;
+  }
+
+  .titleRow {
+    flex-wrap: wrap;
   }
 }
 

@@ -50,7 +50,8 @@ function renderChart(chart: ChartMessage) {
       <Suspense
         fallback={
           <div className={styles.loading}>
-            <Spin tip="图表加载中..." />
+            <Spin size="default" />
+            <span>图表加载中...</span>
           </div>
         }
       >
@@ -68,7 +69,8 @@ function renderChart(chart: ChartMessage) {
         <Suspense
           fallback={
             <div className={styles.loading}>
-              <Spin tip="表格加载中..." />
+              <Spin size="default" />
+              <span>表格加载中...</span>
             </div>
           }
         >

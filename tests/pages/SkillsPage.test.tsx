@@ -65,7 +65,7 @@ describe('SkillsPage', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByText('为工作台扩展新能力')).toBeInTheDocument();
+    expect(screen.getByText('能力模块')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getAllByText('数据分析师')).toHaveLength(1);
@@ -75,6 +75,7 @@ describe('SkillsPage', () => {
     expect(screen.getByText('已安装技能')).toBeInTheDocument();
     expect(screen.getByText('可用技能')).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: '搜索技能' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /新建技能/ })).toBeDisabled();
   });
 
   it('搜索关键词后只保留匹配技能', async () => {

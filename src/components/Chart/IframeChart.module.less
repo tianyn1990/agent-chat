@@ -15,7 +15,7 @@
   right: 0;
   bottom: 0;
   z-index: 1000;
-  background: rgba(255, 252, 247, 0.98);
+  background: rgba(15, 19, 25, 0.98);
   padding: @spacing-md;
   display: flex;
   flex-direction: column;
@@ -28,7 +28,7 @@
 
   .fullscreen & {
     flex-shrink: 0;
-    border-bottom: 1px solid rgba(71, 58, 39, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     padding-bottom: @spacing-sm;
   }
 }
@@ -46,7 +46,7 @@
   width: 100%;
   overflow: hidden;
   border-radius: @border-radius-sm;
-  border: 1px solid rgba(71, 58, 39, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 
   .fullscreen & {
     flex: 1;
@@ -58,10 +58,17 @@
   position: absolute;
   inset: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 252, 247, 0.88);
+  gap: @spacing-sm;
+  background: rgba(17, 21, 28, 0.88);
   z-index: 1;
+}
+
+.loadingText {
+  color: @text-secondary;
+  font-size: @font-size-sm;
 }
 
 .iframe {

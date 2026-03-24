@@ -32,7 +32,7 @@ export default function VisualizeWorkspaceView({ sessionId }: VisualizeWorkspace
         <div className={styles.emptyWrap}>
           <Result
             className={styles.empty}
-            icon={<DeploymentUnitOutlined style={{ color: '#1677ff' }} />}
+            icon={<DeploymentUnitOutlined className={styles.emptyIcon} />}
             title="未配置 Star-Office-UI 地址"
             subTitle="请设置 VITE_STAR_OFFICE_URL、开启真实 Star-Office 本地联调，或启用本地 Star-Office mock。"
             extra={[

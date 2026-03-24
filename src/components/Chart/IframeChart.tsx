@@ -62,7 +62,8 @@ export default function IframeChart({ payload }: IframeChartProps) {
         {/* 加载中蒙层 */}
         {loading && (
           <div className={styles.loadingMask}>
-            <Spin tip="加载中..." />
+            <Spin size="default" />
+            <span className={styles.loadingText}>加载中...</span>
           </div>
         )}
 

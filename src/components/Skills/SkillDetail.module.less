@@ -8,6 +8,18 @@
   margin-bottom: @spacing-md;
 }
 
+.metaInfo {
+  color: @text-secondary;
+}
+
+.metaTags {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .section {
   margin-bottom: @spacing-lg;
 
@@ -16,4 +28,31 @@
     color: @text-primary !important;
     font-family: @font-family-display;
   }
+}
+
+.categoryTag {
+  margin: 0 !important;
+  border-color: rgba(123, 145, 255, 0.2) !important;
+  background: rgba(123, 145, 255, 0.12) !important;
+  color: #d5ddff !important;
+}
+
+.installedTag {
+  margin: 0 !important;
+  border-color: rgba(112, 179, 140, 0.22) !important;
+  background: rgba(112, 179, 140, 0.12) !important;
+  color: #c9ebd4 !important;
+}
+
+.footerActions {
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.primaryAction {
+  min-width: 108px;
+}
+
+.uninstallButton {
+  min-width: 88px;
 }

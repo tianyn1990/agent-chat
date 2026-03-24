@@ -2,18 +2,22 @@
 
 .wrapper {
   display: flex;
-  flex-direction: column;
-  gap: @spacing-xs;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: @spacing-sm;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .uploadBtn {
   color: @text-secondary !important;
   font-size: 16px;
   border-radius: 14px !important;
+  flex-shrink: 0;
 
   &:hover:not(:disabled) {
-    color: @primary-color !important;
-    background: rgba(53, 92, 125, 0.08) !important;
+    color: @text-primary !important;
+    background: rgba(123, 145, 255, 0.1) !important;
   }
 }
 
@@ -21,33 +25,32 @@
   display: flex;
   flex-wrap: wrap;
   gap: @spacing-sm;
-  padding: 4px 0 12px;
-  border-bottom: 1px dashed rgba(71, 58, 39, 0.12);
-  margin-bottom: 4px;
+  align-items: center;
+  min-width: 0;
 }
 
 .previewItem {
   display: flex;
   align-items: center;
   gap: @spacing-sm;
-  padding: 8px 10px 8px 8px;
-  background: rgba(255, 251, 246, 0.92);
-  border: 1px solid rgba(71, 58, 39, 0.1);
-  border-radius: 16px;
-  max-width: 240px;
-  box-shadow: @shadow-sm;
+  padding: 6px 8px 6px 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  max-width: 220px;
+  box-shadow: none;
 }
 
 .previewThumb {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 9px;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(53, 92, 125, 0.1), rgba(183, 121, 69, 0.1));
+  background: linear-gradient(135deg, rgba(123, 145, 255, 0.1), rgba(199, 155, 101, 0.1));
 }
 
 .thumbImg {
@@ -58,7 +61,7 @@
 
 .fileIcon {
   color: @primary-color;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .previewInfo {
@@ -101,7 +104,7 @@
     color @transition-base;
 
   &:hover {
-    background-color: rgba(71, 58, 39, 0.08);
+    background-color: rgba(255, 255, 255, 0.08);
     color: @text-primary;
   }
 }

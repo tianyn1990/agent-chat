@@ -1,31 +1,31 @@
 @import '@/styles/variables.less';
 
-// 悬浮在消息列表右下角
 .btn {
   position: absolute;
-  bottom: 16px;
-  right: 24px;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
   z-index: 10;
 
   display: flex;
   align-items: center;
   gap: @spacing-xs;
   padding: 6px 14px;
-  border: 1px solid #e8e8e8;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: @shadow-md;
-  color: #666;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(20, 24, 31, 0.92);
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+  color: @text-secondary;
   font-size: @font-size-sm;
   cursor: pointer;
   transition: all @transition-base;
   white-space: nowrap;
 
   &:hover {
-    background-color: #f5f5f5;
-    box-shadow: @shadow-lg;
-    color: @primary-color;
-    border-color: @primary-color;
+    background-color: rgba(23, 29, 38, 0.96);
+    color: @text-primary;
+    border-color: rgba(123, 145, 255, 0.22);
   }
 }
 
@@ -34,7 +34,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: #ff4d4f;
+  background-color: @accent-color;
   flex-shrink: 0;
 }
 

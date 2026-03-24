@@ -54,7 +54,13 @@ export default function FormElementRenderer({
 
       {/* 提交按钮 */}
       <Form.Item style={{ marginBottom: 0, marginTop: 12 }}>
-        <Button type="primary" htmlType="submit" size="small" disabled={disabled}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          size="small"
+          disabled={disabled}
+          className={styles.formSubmitBtn}
+        >
           {element.submitText ?? '提交'}
         </Button>
       </Form.Item>

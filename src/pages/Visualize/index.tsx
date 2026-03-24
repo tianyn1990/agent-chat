@@ -1,6 +1,7 @@
 import { Result } from 'antd';
 import { NodeIndexOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
+import styles from './index.module.less';
 
 export default function VisualizePage() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -8,7 +9,7 @@ export default function VisualizePage() {
   if (!sessionId) {
     return (
       <Result
-        icon={<NodeIndexOutlined style={{ color: '#1677ff' }} />}
+        icon={<NodeIndexOutlined className={styles.resultIcon} />}
         title="缺少会话 ID"
         subTitle="请从对话上下文进入执行状态页面。"
       />

@@ -5,20 +5,20 @@
   display: flex;
   align-items: flex-start;
   gap: @spacing-sm;
-  padding: 10px;
+  padding: 10px 10px 9px;
   border-radius: 12px;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
   transition:
     background-color @transition-base,
     border-color @transition-base,
     transform @transition-base;
   position: relative;
-  min-height: 60px;
+  min-height: 56px;
 
   &:hover {
     background-color: @sidebar-hover-bg;
-    border-color: rgba(255, 248, 238, 0.08);
+    border-color: rgba(255, 255, 255, 0.08);
     transform: translateX(1px);
   }
 }
@@ -26,7 +26,7 @@
 // 激活态（当前会话）
 .itemActive {
   background: @sidebar-active-bg !important;
-  border-color: rgba(255, 248, 238, 0.12);
+  border-color: rgba(255, 255, 255, 0.08);
 
   .title {
     color: @sidebar-active-text;
@@ -52,7 +52,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 248, 238, 0.06);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 // 标题与摘要容器
@@ -104,15 +104,15 @@
 // 内联重命名输入框
 .renameInput {
   // 覆盖 Ant Design 默认样式，适配深色背景
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
   color: @sidebar-text !important;
   font-size: @font-size-base;
   border-radius: 10px;
 
   &:focus {
     border-color: @primary-color !important;
-    box-shadow: 0 0 0 2px rgba(53, 92, 125, 0.2) !important;
+    box-shadow: 0 0 0 2px rgba(123, 145, 255, 0.18) !important;
   }
 }
 
@@ -135,7 +135,7 @@
   padding: 0;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.1);
     color: @sidebar-text;
   }
 }

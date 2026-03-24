@@ -15,7 +15,7 @@ import sql from 'react-syntax-highlighter/dist/esm/languages/prism/sql';
 import tsx from 'react-syntax-highlighter/dist/esm/languages/prism/tsx';
 import typescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
 import yaml from 'react-syntax-highlighter/dist/esm/languages/prism/yaml';
-import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import styles from './MessageBubble.module.less';
 
 interface MarkdownTextProps {
@@ -100,7 +100,7 @@ export default function MarkdownText({ text, isUser }: MarkdownTextProps) {
 
             return (
               <SyntaxHighlighter
-                style={oneLight}
+                style={oneDark}
                 language={language}
                 PreTag="div"
                 className={styles.codeBlock}

@@ -76,11 +76,11 @@ export default function MessageInput({
 
   return (
     <div className={`${styles.container} ${disabled ? styles.disabled : ''}`}>
-      {/* 文件上传按钮（含已选文件预览） */}
-      <FileUploadButton files={files} onChange={onFilesChange} disabled={disabled} />
-
-      {/* 输入区域行 */}
+      {/* 输入区域行：附件、文本和发送动作保持在同一条 dock 中，避免附件独占一行。 */}
       <div className={styles.inputRow}>
+        {/* 文件上传按钮（含已选文件预览） */}
+        <FileUploadButton files={files} onChange={onFilesChange} disabled={disabled} />
+
         {/* 多行文本输入框 */}
         <textarea
           ref={textareaRef}

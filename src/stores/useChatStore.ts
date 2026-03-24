@@ -202,3 +202,22 @@ export function createTempSession(title?: string): Session {
     messageCount: 0,
   };
 }
+
+/**
+ * 查找可复用的空白会话。
+ *
+ * 设计原因：
+ * - 当前产品不希望用户在尚未发送任何消息前连续创建多个“空新对话”
+ * - 因此点击“新建对话”时，应优先复用已有的空白会话，而不是继续新增
+ */
+export function findReusableDraftSession(
+  sessions: Session[],
+  messages: Record<string, Message[]>,
+): Session | null {
+  return (
+    sessions.find((session) => {
+      const sessionMessages = messages[session.id] ?? [];
+      return sessionMessages.length === 0;
+    }) ?? null
+  );
+}

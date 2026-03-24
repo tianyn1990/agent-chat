@@ -1,6 +1,6 @@
 import { Button } from 'antd';
-import { CloseOutlined, ReloadOutlined, RollbackOutlined } from '@ant-design/icons';
-import { useMemo, useState } from 'react';
+import { HolderOutlined, ReloadOutlined, RollbackOutlined } from '@ant-design/icons';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
@@ -27,6 +27,14 @@ export default function VisualizeWorkbenchFrame({
   const navigate = useNavigate();
   const hideWorkbench = useVisualizeStore((state) => state.hideWorkbench);
   const [refreshVersion, setRefreshVersion] = useState(0);
+  const [toolbarPosition, setToolbarPosition] = useState({ left: 18, top: 18 });
+  const dragStateRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startLeft: number;
+    startTop: number;
+  } | null>(null);
 
   const iframeKey = useMemo(() => {
     if (!sessionId) {
@@ -36,11 +44,11 @@ export default function VisualizeWorkbenchFrame({
     return `${sessionId}-${refreshVersion}`;
   }, [refreshVersion, sessionId]);
 
-  if (!sessionId) {
-    return null;
-  }
-
   const handleBack = () => {
+    if (!sessionId) {
+      return;
+    }
+
     hideWorkbench();
     navigate(`${ROUTES.CHAT}/${sessionId}`);
   };
@@ -48,6 +56,46 @@ export default function VisualizeWorkbenchFrame({
   const handleRefresh = () => {
     setRefreshVersion((value) => value + 1);
   };
+
+  /**
+   * 工具条允许拖动，避免在不同办公室场景中遮挡关键区域。
+   * 为了不影响按钮点击，仅允许从容器空白区域开始拖动。
+   */
+  const handleToolbarPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLElement>) => {
+      dragStateRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        startLeft: toolbarPosition.left,
+        startTop: toolbarPosition.top,
+      };
+      event.currentTarget.setPointerCapture(event.pointerId);
+    },
+    [toolbarPosition.left, toolbarPosition.top],
+  );
+
+  const handleToolbarPointerMove = useCallback((event: React.PointerEvent<HTMLElement>) => {
+    const dragState = dragStateRef.current;
+    if (!dragState || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const nextLeft = Math.max(12, dragState.startLeft + event.clientX - dragState.startX);
+    const nextTop = Math.max(12, dragState.startTop + event.clientY - dragState.startY);
+    setToolbarPosition({ left: nextLeft, top: nextTop });
+  }, []);
+
+  const handleToolbarPointerUp = useCallback((event: React.PointerEvent<HTMLElement>) => {
+    if (dragStateRef.current?.pointerId === event.pointerId) {
+      dragStateRef.current = null;
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }, []);
+
+  if (!sessionId) {
+    return null;
+  }
 
   return (
     <section
@@ -60,7 +108,21 @@ export default function VisualizeWorkbenchFrame({
       </div>
 
       {/* 工具控件退到边缘窄坞，优先保证真实像素办公室的可视面积。 */}
-      <header className={styles.toolbar} aria-label="执行状态工作台工具栏">
+      <header
+        className={styles.toolbar}
+        aria-label="执行状态工作台工具栏"
+        style={{ left: toolbarPosition.left, top: toolbarPosition.top }}
+      >
+        <div
+          className={styles.dragHandle}
+          aria-label="拖动执行状态工具栏"
+          onPointerDown={handleToolbarPointerDown}
+          onPointerMove={handleToolbarPointerMove}
+          onPointerUp={handleToolbarPointerUp}
+          onPointerCancel={handleToolbarPointerUp}
+        >
+          <HolderOutlined />
+        </div>
         <Button
           icon={<RollbackOutlined />}
           onClick={handleBack}
@@ -75,13 +137,6 @@ export default function VisualizeWorkbenchFrame({
             icon={<ReloadOutlined />}
             onClick={handleRefresh}
             aria-label="刷新"
-            shape="circle"
-          />
-          <Button
-            type="text"
-            icon={<CloseOutlined />}
-            onClick={handleBack}
-            aria-label="收起"
             shape="circle"
           />
         </div>

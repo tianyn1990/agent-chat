@@ -4,29 +4,42 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  gap: 10px;
+  min-width: 0;
 }
 
-// 新建对话按钮区域
 .newBtnWrapper {
-  padding: 0 0 @spacing-sm;
   flex-shrink: 0;
 }
 
 .newBtn {
-  height: 40px;
-  border: none !important;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px !important;
   font-weight: 600;
   letter-spacing: 0.02em;
-  background: linear-gradient(135deg, rgba(183, 121, 69, 0.92), rgba(159, 98, 49, 0.98)) !important;
-  box-shadow: 0 6px 14px rgba(85, 49, 18, 0.16);
+  color: @text-primary !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: none;
+
+  &:hover,
+  &:focus-visible {
+    border-color: rgba(123, 145, 255, 0.2) !important;
+    background: rgba(123, 145, 255, 0.16) !important;
+    color: @text-primary !important;
+  }
 }
 
 // 会话列表滚动区域
 .list {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   overflow-y: auto;
   overflow-x: hidden;
+  min-width: 0;
+  padding-right: 2px;
 
   // 自定义滚动条（适配深色背景）
   &::-webkit-scrollbar {
@@ -38,11 +51,11 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
     border-radius: 2px;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.2);
     }
   }
 }

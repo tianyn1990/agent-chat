@@ -67,6 +67,7 @@ export default function G2Chart({ payload }: G2ChartProps) {
 
         // 合并用户传入的 spec 与基础配置
         chart.options({
+          theme: 'classicDark',
           ...payload.spec,
           // 强制覆盖高度，确保不超过限制
           height: chartHeight,

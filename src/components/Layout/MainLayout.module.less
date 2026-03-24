@@ -5,8 +5,8 @@
   height: 100vh;
   overflow: hidden;
   background: transparent;
-  padding: 12px;
-  gap: 12px;
+  padding: 10px;
+  gap: 10px;
 }
 
 .content {
@@ -15,21 +15,19 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(255, 253, 249, 0.82), rgba(252, 247, 239, 0.94)), @paper-bg;
-  border: 1px solid rgba(71, 58, 39, 0.08);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(25, 29, 36, 0.96), rgba(18, 22, 29, 0.98)), @paper-bg;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: @shadow-sm;
-  backdrop-filter: blur(12px);
 }
 
 @media (max-width: 1100px) {
   .layout {
-    padding: 10px;
-    gap: 10px;
+    padding: 8px;
+    gap: 8px;
   }
 
   .content {
-    border-radius: 18px;
+    border-radius: 16px;
   }
 }

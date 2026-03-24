@@ -1,13 +1,18 @@
 import { useEffect, useCallback, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { App } from 'antd';
-import { useChatStore, generateSessionTitle } from '@/stores/useChatStore';
+import {
+  useChatStore,
+  findReusableDraftSession,
+  generateSessionTitle,
+} from '@/stores/useChatStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
 import { mockWsService } from '@/mocks/websocket';
 import { localStarOfficeBridge } from '@/mocks/starOffice/bridge';
 import { wsService } from '@/services/websocket';
+import { ClockCircleOutlined, CommentOutlined, Loading3QuartersOutlined } from '@ant-design/icons';
 import {
   IS_MOCK_ENABLED,
   ROUTES,
@@ -47,6 +52,7 @@ export default function ChatPage() {
   const { message: antMessage } = App.useApp();
   const navigate = useNavigate();
   const { sessionId: routeSessionId } = useParams<{ sessionId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Store
   const {
@@ -76,6 +82,15 @@ export default function ChatPage() {
 
   /** 当前输入框待发送的文件列表 */
   const [pendingFiles, setPendingFiles] = useState<SelectedFile[]>([]);
+  /**
+   * 待注入到目标会话输入框的草稿。
+   *
+   * 设计原因：
+   * - 欢迎态快捷建议、技能详情跳转等入口，可能发生在“当前还没有会话”时
+   * - 此时需要先创建/复用会话，再把文案一次性注入到新会话草稿中
+   * - 使用本地桥接态可以避免用户必须点击第二次才能看到预填内容
+   */
+  const [pendingDraftInjection, setPendingDraftInjection] = useState<string | null>(null);
 
   // 根据 Mock/真实模式选择 WS 服务
   const ws = IS_MOCK_ENABLED ? mockWsService : wsService;
@@ -291,6 +306,26 @@ export default function ChatPage() {
   }, []);
 
   // ===========================
+  // 新建对话
+  // ===========================
+
+  const handleNewChat = useCallback(() => {
+    const state = useChatStore.getState();
+    const reusableSession = findReusableDraftSession(state.sessions, state.messages);
+
+    // 若已经存在未发送任何消息的新会话，则直接复用，避免用户堆积多个空白会话。
+    if (reusableSession) {
+      state.setCurrentSession(reusableSession.id);
+      navigate(`${ROUTES.CHAT}/${reusableSession.id}`);
+      return;
+    }
+
+    const requestId = prefixedId('req');
+    // 仅当不存在空白会话时，才请求服务端创建新的 session。
+    ws.send({ type: 'create_session', requestId, title: '新对话' });
+  }, [navigate, ws]);
+
+  // ===========================
   // 路由参数与当前会话同步
   // ===========================
 
@@ -308,6 +343,61 @@ export default function ChatPage() {
     }
   }, [routeSessionId, sessions, currentSessionId, setCurrentSession, navigate]);
 
+  /**
+   * 当新会话创建完成或切换到可复用空白会话后，将桥接草稿注入输入框。
+   *
+   * 这里不直接在 `handleSuggestion` 中写入，是因为首次点击时目标 session 尚未存在。
+   */
+  useEffect(() => {
+    if (!pendingDraftInjection || !currentSessionId) return;
+
+    setDraft(currentSessionId, pendingDraftInjection);
+    setPendingDraftInjection(null);
+  }, [pendingDraftInjection, currentSessionId, setDraft]);
+
+  /**
+   * 兼容从技能详情等入口通过 `?skill=` 打开对话页的场景。
+   *
+   * 行为约束：
+   * - 有当前会话时直接预填到该会话
+   * - 无当前会话时自动创建/复用会话，并在创建完成后注入草稿
+   * - 注入完成后清理查询参数，避免刷新或重新聚焦时重复覆盖用户输入
+   */
+  useEffect(() => {
+    const skillName = searchParams.get('skill')?.trim();
+    if (!skillName) return;
+
+    const nextDraft = `请介绍技能「${skillName}」，并告诉我如何在当前工作台中使用它。`;
+
+    if (!currentSessionId) {
+      // 如果已有会话但当前会话尚未同步到位，先等待路由同步逻辑完成，避免额外创建新会话。
+      if (sessions.length > 0) {
+        setPendingDraftInjection(nextDraft);
+        return;
+      }
+
+      if (pendingDraftInjection !== nextDraft) {
+        setPendingDraftInjection(nextDraft);
+        handleNewChat();
+      }
+      return;
+    }
+
+    setDraft(currentSessionId, nextDraft);
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete('skill');
+    setSearchParams(nextSearchParams, { replace: true });
+  }, [
+    searchParams,
+    currentSessionId,
+    sessions.length,
+    pendingDraftInjection,
+    handleNewChat,
+    setDraft,
+    setSearchParams,
+  ]);
+
   // ===========================
   // 向侧边栏注入会话列表
   // ===========================
@@ -318,16 +408,6 @@ export default function ChatPage() {
     // 每次 handleNewChat 引用变化时重新注入
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setExtraContent]);
-
-  // ===========================
-  // 新建对话
-  // ===========================
-
-  const handleNewChat = useCallback(() => {
-    const requestId = prefixedId('req');
-    // 发送 create_session 消息
-    ws.send({ type: 'create_session', requestId, title: '新对话' });
-  }, [ws]);
 
   // ===========================
   // 发送消息
@@ -417,7 +497,8 @@ export default function ChatPage() {
   const handleSuggestion = useCallback(
     (text: string) => {
       if (!currentSessionId) {
-        // 没有会话时先新建
+        // 没有会话时，先记住待注入草稿，再创建/复用会话，避免用户需要点击第二次。
+        setPendingDraftInjection(text);
         handleNewChat();
         return;
       }
@@ -490,40 +571,50 @@ export default function ChatPage() {
   const showWelcome = currentMessages.length === 0;
   /**
    * 将会话摘要压缩为简洁的工作台副标题。
-   * 这一层不展示技术性 sessionId，只保留用户真正关心的上下文状态。
+   * `Graphite Console` 阶段有意弱化头部说明，因此这里只保留真正影响下一步操作的信息。
    */
   const stageSummary = showWelcome
-    ? '从左侧档案区进入旧会话，或直接在下方开始一轮新的协作。'
+    ? '从左侧档案架恢复历史协作，或直接在下方开始新的任务。'
     : currentRuntime?.detail || '围绕当前会话继续推进分析、写作、代码与执行动作。';
+  const currentStateLabel = currentRuntime
+    ? VISUALIZE_STATE_LABELS[currentRuntime.state]
+    : '待命中';
 
   return (
     <div className={styles.container}>
       <div className={styles.chatColumn}>
-        {/* 顶部标题区用于强化“工作台”语义，让当前会话、状态与主内容形成统一舞台。 */}
+        {/* 顶部改为极简 console bar，把空间优先让给中部主舞台和底部 dock。 */}
         <header className={styles.stageHeader}>
-          <div className={styles.headerCopy}>
-            <p className={styles.eyebrow}>Paper Ops Workspace</p>
-            <h1 className={styles.stageTitle}>{currentSession?.title ?? '智能工作台'}</h1>
+          <div className={styles.stageIdentity}>
+            <div className={styles.titleRow}>
+              <span className={styles.eyebrow}>Agent Console</span>
+              <h1 className={styles.stageTitle}>{currentSession?.title ?? '新建会话'}</h1>
+            </div>
             <p className={styles.stageSubtitle}>{stageSummary}</p>
           </div>
 
-          {/* 顶部摘要维持轻量密度，只保留会话状态和关键计数。 */}
           <div className={styles.headerMeta} aria-label="会话摘要信息">
             <div className={styles.metaCard}>
-              <span className={styles.metaLabel}>状态</span>
-              <span className={styles.metaValue}>
-                {currentRuntime ? VISUALIZE_STATE_LABELS[currentRuntime.state] : '待命中'}
-              </span>
+              <Loading3QuartersOutlined className={styles.metaIcon} />
+              <span className={styles.metaValue}>{currentStateLabel}</span>
             </div>
             <div className={styles.metaCard}>
-              <span className={styles.metaLabel}>消息</span>
-              <span className={styles.metaValue}>{currentMessages.length}</span>
+              <CommentOutlined className={styles.metaIcon} />
+              <span className={styles.metaValue}>{currentMessages.length} 条消息</span>
+            </div>
+            <div className={styles.metaCard}>
+              <ClockCircleOutlined className={styles.metaIcon} />
+              <span className={styles.metaValue}>
+                {currentSession
+                  ? new Date(currentSession.createdAt).toLocaleDateString('zh-CN')
+                  : '等待开始'}
+              </span>
             </div>
           </div>
         </header>
 
         <div className={styles.workspace}>
-          {/* 消息区域作为中央阅读画布，维持更聚焦的阅读宽度与留白。 */}
+          {/* 主舞台保持最大可视面积：欢迎态居中，对话态优先正文轨道。 */}
           <div className={styles.messageArea}>
             {showWelcome ? (
               <WelcomeScreen onSuggestionClick={handleSuggestion} />
@@ -538,13 +629,13 @@ export default function ChatPage() {
             )}
           </div>
 
-          {/* 输入区域独立成“批注条”，在视觉上与上方消息画布形成同一工作台。 */}
+          {/* 输入区重构为底部 dock，让发送动作稳定停靠在主舞台底部。 */}
           <div className={styles.inputArea}>
             {!currentSessionId ? (
               <div className={styles.noSessionTip}>点击左侧「新建对话」开始</div>
             ) : (
               <div className={styles.composerHint}>
-                Enter 发送，Shift+Enter 换行。图表、文件与执行状态会继续沉淀到当前会话。
+                Enter 发送，Shift+Enter 换行。结果、图表与执行状态会继续沉淀到当前会话。
               </div>
             )}
 

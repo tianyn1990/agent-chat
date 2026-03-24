@@ -19,10 +19,14 @@ interface SessionListProps {
 export default function SessionList({ onNewChat }: SessionListProps) {
   const navigate = useNavigate();
   const sessions = useChatStore((s) => s.sessions);
+  const messages = useChatStore((s) => s.messages);
   const currentSessionId = useChatStore((s) => s.currentSessionId);
   const setCurrentSession = useChatStore((s) => s.setCurrentSession);
   const updateSession = useChatStore((s) => s.updateSession);
   const removeSession = useChatStore((s) => s.removeSession);
+  const hasReusableDraftSession = sessions.some(
+    (session) => (messages[session.id] ?? []).length === 0,
+  );
 
   /** 处理删除会话，需要二次确认 */
   const handleDelete = useCallback(
@@ -60,7 +64,7 @@ export default function SessionList({ onNewChat }: SessionListProps) {
           onClick={onNewChat}
           className={styles.newBtn}
         >
-          新建对话
+          {hasReusableDraftSession ? '继续新对话' : '新建对话'}
         </Button>
       </div>
 

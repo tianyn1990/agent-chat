@@ -88,6 +88,25 @@ describe('MessageInput', () => {
     expect(screen.getByRole('button', { name: '上传文件' })).toBeInTheDocument();
   });
 
+  it('有附件时在输入区内显示附件预览', () => {
+    const file = new File(['hello'], 'report.txt', { type: 'text/plain' });
+    render(
+      <MessageInput
+        {...defaultProps}
+        files={[
+          {
+            localId: 'local_file_1',
+            file,
+            fileId: 'mock_file_1',
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('report.txt')).toBeInTheDocument();
+    expect(screen.getByText(/5 B/i)).toBeInTheDocument();
+  });
+
   it('使用自定义 placeholder', () => {
     render(<MessageInput {...defaultProps} placeholder="自定义提示文字" />);
     const textarea = screen.getByRole('textbox');

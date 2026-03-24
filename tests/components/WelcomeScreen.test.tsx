@@ -7,7 +7,7 @@ describe('WelcomeScreen', () => {
   it('未登录时显示默认称呼"同学"', () => {
     useUserStore.setState({ userInfo: null, token: null });
     render(<WelcomeScreen onSuggestionClick={vi.fn()} />);
-    expect(screen.getByText('你好，同学')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /你好，同学/ })).toBeInTheDocument();
   });
 
   it('已登录时显示用户姓名', () => {
@@ -16,21 +16,21 @@ describe('WelcomeScreen', () => {
       token: 'fake_token',
     });
     render(<WelcomeScreen onSuggestionClick={vi.fn()} />);
-    expect(screen.getByText('你好，张三')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /你好，张三/ })).toBeInTheDocument();
   });
 
   it('渲染快捷提问建议卡片', () => {
     useUserStore.setState({ userInfo: null, token: null });
     render(<WelcomeScreen onSuggestionClick={vi.fn()} />);
 
-    expect(screen.getByText('Today\'s Desk')).toBeInTheDocument();
+    expect(screen.getByText('Agent Console')).toBeInTheDocument();
     expect(screen.getByText(/今天准备推进什么工作/)).toBeInTheDocument();
 
-    // 应该有 4 个建议卡片
-    expect(screen.getByText('数据分析')).toBeInTheDocument();
-    expect(screen.getByText('写作助手')).toBeInTheDocument();
-    expect(screen.getByText('代码助手')).toBeInTheDocument();
-    expect(screen.getByText('常用功能')).toBeInTheDocument();
+    // quick chip 与 suggestion card 都会复用标题，因此这里只校验快捷按钮行
+    expect(screen.getByRole('button', { name: '数据分析' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '写作助手' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '代码助手' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '常用功能' })).toBeInTheDocument();
   });
 
   it('点击建议卡片触发回调并传入对应文本', () => {
@@ -38,8 +38,8 @@ describe('WelcomeScreen', () => {
     const mockCallback = vi.fn();
     render(<WelcomeScreen onSuggestionClick={mockCallback} />);
 
-    // 点击"数据分析"卡片
-    fireEvent.click(screen.getByText('数据分析').closest('button')!);
+    // 点击顶部 quick chip，确保回调仍然传出完整建议文本
+    fireEvent.click(screen.getByRole('button', { name: '数据分析' }));
 
     // 回调应被调用，传入对应的提问文本
     expect(mockCallback).toHaveBeenCalledTimes(1);

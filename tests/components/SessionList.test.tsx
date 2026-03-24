@@ -47,6 +47,18 @@ describe('SessionList', () => {
     expect(mockOnNewChat).toHaveBeenCalledTimes(1);
   });
 
+  it('存在空白会话时按钮文案切换为继续新对话', () => {
+    const session = createTempSession('新对话');
+    useChatStore.setState({
+      sessions: [session],
+      messages: { [session.id]: [] },
+    });
+
+    renderWithRouter(<SessionList onNewChat={mockOnNewChat} />);
+
+    expect(screen.getByRole('button', { name: /继续新对话/ })).toBeInTheDocument();
+  });
+
   it('点击会话条目切换当前会话', () => {
     const session = createTempSession('目标会话');
     useChatStore.setState({ sessions: [session] });

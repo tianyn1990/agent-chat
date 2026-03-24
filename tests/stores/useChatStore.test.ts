@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useChatStore, createTempSession, generateSessionTitle } from '@/stores/useChatStore';
+import {
+  useChatStore,
+  createTempSession,
+  findReusableDraftSession,
+  generateSessionTitle,
+} from '@/stores/useChatStore';
 import type { Message } from '@/types/message';
 
 describe('useChatStore', () => {
@@ -168,5 +173,26 @@ describe('工具函数', () => {
   it('generateSessionTitle: 无参数返回包含当前日期的标题', () => {
     const result = generateSessionTitle();
     expect(result.startsWith('对话 ')).toBe(true);
+  });
+
+  it('findReusableDraftSession: 返回首个未发送消息的空白会话', () => {
+    const emptySession = createTempSession('空白会话');
+    const usedSession = createTempSession('已发送会话');
+    const message: Message = {
+      id: 'msg_used',
+      sessionId: usedSession.id,
+      role: 'user',
+      contentType: 'text',
+      content: { text: 'hello' },
+      status: 'done',
+      timestamp: Date.now(),
+    };
+
+    const result = findReusableDraftSession([usedSession, emptySession], {
+      [usedSession.id]: [message],
+      [emptySession.id]: [],
+    });
+
+    expect(result?.id).toBe(emptySession.id);
   });
 });

@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { message } from 'antd';
-import { AppstoreOutlined, CheckCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  AppstoreOutlined,
+  CheckCircleOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import { useSkillStore } from '@/stores/useSkillStore';
 import { fetchSkills, installSkill, uninstallSkill } from '@/services/skillApi';
 import type { Skill } from '@/types/skill';
@@ -106,12 +111,24 @@ export default function SkillsPage() {
         <div className={styles.headerMain}>
           <div className={styles.headerCopy}>
             <p className={styles.eyebrow}>Skill Library</p>
-            <h1 className={styles.title}>为工作台扩展新能力</h1>
+            <h1 className={styles.title}>能力模块</h1>
             <p className={styles.subtitle}>
-              在这里挑选分析、写作、代码与办公技能，把常用动作沉淀成可复用的工作模块。
+              管理工作台中的可复用能力，把常用动作沉淀成可以直接调用的模块。
             </p>
           </div>
 
+          <div className={styles.toolbar}>
+            <SkillSearch value={searchKeyword} onChange={setSearchKeyword} />
+            {/* 当前尚未开放创建流程，这里先保留壳层入口，避免后续新增功能时重新破坏布局。 */}
+            <button type="button" className={styles.createButton} disabled aria-disabled="true">
+              <PlusOutlined />
+              <span>新建技能</span>
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.filterRow}>
+          <SkillFilter selectedCategory={selectedCategory} onChange={setCategory} />
           <div className={styles.stats}>
             <div className={styles.statCard}>
               <span className={styles.statLabel}>已安装</span>
@@ -123,11 +140,6 @@ export default function SkillsPage() {
             </div>
           </div>
         </div>
-
-        <div className={styles.toolbar}>
-          <SkillSearch value={searchKeyword} onChange={setSearchKeyword} />
-          <SkillFilter selectedCategory={selectedCategory} onChange={setCategory} />
-        </div>
       </div>
 
       {/* 内容区域 */}
@@ -136,7 +148,7 @@ export default function SkillsPage() {
         {installedSkills.length > 0 && (
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
-              <CheckCircleOutlined style={{ color: '#52c41a' }} />
+              <CheckCircleOutlined className={styles.sectionTitleIconSuccess} />
               <span>已安装技能</span>
             </div>
             <div className={`${styles.grid} ${styles.installedGrid}`}>

@@ -2,76 +2,77 @@
 // 品牌与场景色
 // ===========================
 
-// 主品牌色：偏稳重的靛蓝，用于核心动作与高亮焦点
-@primary-color: #355c7d;
-@primary-hover: #426f95;
-@primary-active: #27445d;
-@primary-soft: rgba(53, 92, 125, 0.12);
+// 主品牌色：在深色 console 中保持清晰识别的靛蓝高亮
+@primary-color: #7b91ff;
+@primary-hover: #92a5ff;
+@primary-active: #6278db;
+@primary-soft: rgba(123, 145, 255, 0.14);
 
-// 辅助强调色：铜棕色，用于标签、装饰和局部强调
-@accent-color: #b77945;
-@accent-soft: rgba(183, 121, 69, 0.14);
+// 辅助强调色：保留 Paper Ops 的铜棕记忆点，但仅作为点缀使用
+@accent-color: #c79b65;
+@accent-soft: rgba(199, 155, 101, 0.16);
 
 // 成功 / 警告 / 错误反馈
-@success-color: #5f7f64;
-@warning-color: #b47c2d;
-@danger-color: #b0584f;
+@success-color: #70b38c;
+@warning-color: #d2a65c;
+@danger-color: #d87b7b;
 
 // ===========================
 // 页面背景与表面层
 // ===========================
 
-// 页面主背景：偏纸面的暖白工作台
-@content-bg: #f2ebdf;
-@content-bg-secondary: #ece3d4;
-@paper-bg: #fbf7f0;
-@paper-bg-strong: #fffdf9;
-@panel-bg: rgba(255, 251, 245, 0.94);
-@panel-border: rgba(71, 58, 39, 0.1);
+// 页面主背景：深 graphite console，主应用优先呈现原生桌面壳层
+@content-bg: #0d0f13;
+@content-bg-secondary: #141821;
+@paper-bg: #171b22;
+@paper-bg-strong: #202630;
+@panel-bg: rgba(23, 27, 34, 0.94);
+@panel-border: rgba(255, 255, 255, 0.08);
 
 // 主文本与辅助文本
-@text-primary: #1f2730;
-@text-secondary: #60584a;
-@text-tertiary: #8c836f;
-@text-on-dark: rgba(255, 249, 240, 0.9);
-@text-on-dark-secondary: rgba(255, 249, 240, 0.58);
+@text-primary: #edf2fb;
+@text-secondary: #a7b0bf;
+@text-tertiary: #7d8796;
+@text-on-dark: rgba(237, 242, 251, 0.94);
+@text-on-dark-secondary: rgba(237, 242, 251, 0.58);
 
 // ===========================
 // 侧边栏
 // ===========================
 
-@sidebar-width: 284px;
-@sidebar-collapsed-width: 60px;
-@sidebar-bg: #232933;
-@sidebar-surface: rgba(255, 248, 238, 0.05);
+@sidebar-width: 320px;
+@sidebar-collapsed-width: 76px;
+@sidebar-panel-width: 232px;
+@sidebar-bg: #101319;
+@sidebar-surface: rgba(255, 255, 255, 0.04);
 @sidebar-text: @text-on-dark;
 @sidebar-text-secondary: @text-on-dark-secondary;
-@sidebar-hover-bg: rgba(255, 248, 238, 0.08);
-@sidebar-active-bg: linear-gradient(135deg, rgba(183, 121, 69, 0.18), rgba(53, 92, 125, 0.28));
-@sidebar-active-text: #f9efe0;
-@sidebar-border: rgba(255, 248, 238, 0.1);
+@sidebar-hover-bg: rgba(255, 255, 255, 0.06);
+@sidebar-active-bg: linear-gradient(135deg, rgba(199, 155, 101, 0.18), rgba(123, 145, 255, 0.2));
+@sidebar-active-text: #ffffff;
+@sidebar-border: rgba(255, 255, 255, 0.08);
 
 // ===========================
 // 消息与结果容器
 // ===========================
 
-@user-bubble-bg: linear-gradient(135deg, #355c7d 0%, #2e4e6a 100%);
-@user-bubble-text: #fdfaf4;
-@assistant-bubble-bg: rgba(255, 252, 247, 0.96);
-@assistant-bubble-border: rgba(71, 58, 39, 0.1);
-@assistant-bubble-shadow: 0 4px 10px rgba(69, 55, 36, 0.04);
+@user-bubble-bg: linear-gradient(135deg, #2c3340 0%, #262d39 100%);
+@user-bubble-text: #f6f8fb;
+@assistant-bubble-bg: rgba(255, 255, 255, 0.03);
+@assistant-bubble-border: rgba(255, 255, 255, 0.06);
+@assistant-bubble-shadow: none;
 
 // 卡片主题色
-@card-blue-bg: #edf3f8;
-@card-blue-border: #b6cadc;
-@card-green-bg: #edf3eb;
-@card-green-border: #c3d6bf;
-@card-yellow-bg: #faf0df;
-@card-yellow-border: #e2c99c;
-@card-red-bg: #f8e9e5;
-@card-red-border: #deb7ae;
-@card-grey-bg: #f4efe7;
-@card-grey-border: #d9cebf;
+@card-blue-bg: #172333;
+@card-blue-border: #2d4362;
+@card-green-bg: #18271f;
+@card-green-border: #305240;
+@card-yellow-bg: #292113;
+@card-yellow-border: #70562d;
+@card-red-bg: #2b1b1d;
+@card-red-border: #6e3c45;
+@card-grey-bg: #1f2228;
+@card-grey-border: #383d46;
 
 // ===========================
 // 尺寸变量
@@ -80,8 +81,8 @@
 @border-radius-xs: 4px;
 @border-radius-sm: 8px;
 @border-radius: 10px;
-@border-radius-lg: 14px;
-@border-radius-xl: 18px;
+@border-radius-lg: 12px;
+@border-radius-xl: 16px;
 
 @spacing-2xs: 2px;
 @spacing-xs: 4px;
@@ -112,10 +113,10 @@
 // 阴影与边框
 // ===========================
 
-@shadow-sm: 0 2px 6px rgba(69, 55, 36, 0.04);
-@shadow-md: 0 8px 20px rgba(69, 55, 36, 0.08);
-@shadow-lg: 0 14px 32px rgba(40, 29, 17, 0.12);
-@shadow-float: 0 18px 40px rgba(28, 20, 12, 0.16);
+@shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.12);
+@shadow-md: 0 10px 28px rgba(0, 0, 0, 0.2);
+@shadow-lg: 0 18px 42px rgba(0, 0, 0, 0.28);
+@shadow-float: 0 20px 48px rgba(0, 0, 0, 0.32);
 
 // ===========================
 // 动画变量
@@ -129,5 +130,5 @@
 // 布局尺寸
 // ===========================
 
-@content-padding: 20px;
+@content-padding: 18px;
 @max-reading-width: 980px;

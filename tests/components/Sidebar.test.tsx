@@ -1,0 +1,50 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import { beforeEach, describe, expect, it } from 'vitest';
+import Sidebar from '@/components/Layout/Sidebar';
+import { useUserStore } from '@/stores/useUserStore';
+
+describe('Sidebar', () => {
+  beforeEach(() => {
+    useUserStore.setState({
+      token: 'test-token',
+      userInfo: {
+        id: 'user_sidebar',
+        name: '田亚楠',
+        avatar: '',
+        department: '研发',
+      },
+      isLoading: false,
+    });
+  });
+
+  it('在聊天页展示可折叠的会话档案面板', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={['/chat/session_sidebar']}>
+        <Sidebar extra={<div>会话插槽内容</div>} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('会话档案')).toBeInTheDocument();
+    expect(screen.getByText('会话插槽内容')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '收起档案面板' }));
+
+    expect(screen.queryByText('会话插槽内容')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '展开档案面板' })).toBeInTheDocument();
+  });
+
+  it('在非聊天页不展示多余的二级面板按钮', () => {
+    render(
+      <MemoryRouter initialEntries={['/skills']}>
+        <Sidebar />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('button', { name: '收起档案面板' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '展开档案面板' })).not.toBeInTheDocument();
+  });
+});
