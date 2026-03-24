@@ -63,6 +63,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 3000,
+      host: true,
       proxy: {
         // 代理 HTTP API 请求到后端
         '/api': {

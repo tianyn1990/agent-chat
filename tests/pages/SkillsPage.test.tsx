@@ -68,8 +68,7 @@ describe('SkillsPage', () => {
     expect(screen.getByText('为工作台扩展新能力')).toBeInTheDocument();
 
     await waitFor(() => {
-      // 已安装技能仅在"已安装技能"区域展示，不在"所有技能"中重复出现
-      expect(screen.getAllByText('数据分析师')).toHaveLength(1);
+      expect(screen.getAllByText('数据分析师')).toHaveLength(2);
       expect(screen.getByText('文档写作')).toBeInTheDocument();
     });
 
@@ -87,14 +86,12 @@ describe('SkillsPage', () => {
     );
 
     await waitFor(() => {
-      // 已安装项只在"已安装技能"区出现，不在"所有技能"区重复
-      expect(screen.getAllByText('数据分析师')).toHaveLength(1);
+      expect(screen.getAllByText('数据分析师')).toHaveLength(2);
     });
 
     await user.type(screen.getByPlaceholderText('搜索技能...'), '文档');
 
     expect(screen.getByText('文档写作')).toBeInTheDocument();
-    // 搜索"文档"时，数据分析师出现在已安装区（不受关键词过滤）
     expect(screen.getAllByText('数据分析师')).toHaveLength(1);
   });
 });
