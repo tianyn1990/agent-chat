@@ -3,6 +3,7 @@ import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/stores/useUserStore';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
+import { useState } from 'react';
 import styles from './UserInfo.module.less';
 
 /**
@@ -13,6 +14,8 @@ export default function UserInfo({ compact = false }: { compact?: boolean }) {
   const navigate = useNavigate();
   const userInfo = useUserStore((s) => s.userInfo);
   const logout = useUserStore((s) => s.logout);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -56,9 +59,32 @@ export default function UserInfo({ compact = false }: { compact?: boolean }) {
   );
 
   return (
-    <Dropdown menu={{ items: menuItems }} placement="topLeft" trigger={['click']}>
+    <Dropdown
+      menu={{ items: menuItems }}
+      placement="topLeft"
+      trigger={['click']}
+      open={dropdownOpen}
+      onOpenChange={(open) => {
+        setDropdownOpen(open);
+        if (open) {
+          // 下拉菜单展开时立即关闭 hover 气泡，避免两层浮层互相遮挡。
+          setTooltipOpen(false);
+        }
+      }}
+    >
       {compact ? (
-        <Tooltip title={`${userInfo.name} · ${userInfo.department}`}>{content}</Tooltip>
+        <Tooltip
+          title={`${userInfo.name} · ${userInfo.department}`}
+          open={tooltipOpen && !dropdownOpen}
+          onOpenChange={(open) => {
+            if (!dropdownOpen) {
+              setTooltipOpen(open);
+            }
+          }}
+          destroyTooltipOnHide
+        >
+          {content}
+        </Tooltip>
       ) : (
         content
       )}
