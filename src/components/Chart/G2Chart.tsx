@@ -5,14 +5,16 @@ import { DownloadOutlined, FullscreenOutlined } from '@ant-design/icons';
 import type { G2ChartPayload } from '@/types/chart';
 import styles from './G2Chart.module.less';
 
+/** 图表最小高度（px） */
+const MIN_HEIGHT = 400;
 /**
  * 图表最大高度（px）
  * 超过此高度时启用内部滚动，避免超出一屏
  */
-const MAX_HEIGHT = 480;
+const MAX_HEIGHT = 560;
 
 /** 图表默认高度 */
-const DEFAULT_HEIGHT = 360;
+const DEFAULT_HEIGHT = 440;
 
 interface G2ChartProps {
   payload: G2ChartPayload;
@@ -40,8 +42,14 @@ export default function G2Chart({ payload }: G2ChartProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 计算实际渲染高度（不超过 MAX_HEIGHT）
-  const chartHeight = Math.min(payload.height ?? DEFAULT_HEIGHT, MAX_HEIGHT);
+  /**
+   * 计算实际渲染高度。
+   *
+   * 设计原因：
+   * - 当前对话舞台已经为图表消息腾出了更宽轨道，继续沿用 360px 会让图表显得过扁、信息拥挤
+   * - 这里统一抬高默认高度，并为旧 mock / 历史 payload 提供最小高度兜底
+   */
+  const chartHeight = Math.min(Math.max(payload.height ?? DEFAULT_HEIGHT, MIN_HEIGHT), MAX_HEIGHT);
 
   useEffect(() => {
     if (!containerRef.current) return;

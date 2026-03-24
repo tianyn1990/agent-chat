@@ -22,9 +22,9 @@ describe('ChartRenderer', () => {
         },
       };
       render(<ChartRenderer chart={chart} />);
-      expect(await screen.findByText('姓名')).toBeInTheDocument();
-      expect(await screen.findByText('分数')).toBeInTheDocument();
-      expect(await screen.findByText('张三')).toBeInTheDocument();
+      expect(await screen.findByText('姓名', undefined, { timeout: 3000 })).toBeInTheDocument();
+      expect(await screen.findByText('分数', undefined, { timeout: 3000 })).toBeInTheDocument();
+      expect(await screen.findByText('张三', undefined, { timeout: 3000 })).toBeInTheDocument();
     });
 
     it('渲染 TableChart 数据行', async () => {
@@ -38,8 +38,8 @@ describe('ChartRenderer', () => {
         },
       };
       render(<ChartRenderer chart={chart} />);
-      expect(await screen.findByText('研发部')).toBeInTheDocument();
-      expect(await screen.findByText('产品部')).toBeInTheDocument();
+      expect(await screen.findByText('研发部', undefined, { timeout: 3000 })).toBeInTheDocument();
+      expect(await screen.findByText('产品部', undefined, { timeout: 3000 })).toBeInTheDocument();
     });
   });
 

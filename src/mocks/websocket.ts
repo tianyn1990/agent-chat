@@ -340,7 +340,8 @@ class MockWebSocketService {
           encode: { x: 'date', y: 'value', color: 'category' },
           title: { text: '2024 年度销售额 vs 成本趋势' },
         },
-        height: 360,
+        // 本地 mock 需要更接近真实可读图表尺寸，避免在聊天轨道中显得过小。
+        height: 440,
         exportable: true,
       },
     };
@@ -390,7 +391,8 @@ class MockWebSocketService {
           transform: [{ type: 'dodgeX' }],
           title: { text: '2024 年各部门季度营收对比（万元）' },
         },
-        height: 360,
+        // 柱状图类目较多，提升高度后标签与图例更易读。
+        height: 440,
         exportable: true,
       },
     };
@@ -656,7 +658,8 @@ class MockWebSocketService {
           style: { fillOpacity: 0.6 },
           title: { text: '2024 年 PC 端 vs 移动端月度访问量' },
         },
-        height: 360,
+        // 面积图包含双序列，使用更高的默认尺寸避免曲线与坐标轴过度拥挤。
+        height: 440,
         exportable: true,
       },
     };

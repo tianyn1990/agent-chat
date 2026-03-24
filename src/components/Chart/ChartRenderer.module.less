@@ -1,13 +1,17 @@
 @import '@/styles/variables.less';
 
 .container {
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  min-width: min(720px, 100%);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)), @paper-bg;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 14px 16px 12px;
   box-shadow: none;
+  overflow-x: auto;
 }
 
 .loading {
@@ -30,4 +34,10 @@
   border-radius: @border-radius-sm;
   color: #845b20;
   font-size: @font-size-sm;
+}
+
+@media (max-width: 900px) {
+  .container {
+    min-width: 100%;
+  }
 }

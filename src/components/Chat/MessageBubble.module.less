@@ -30,7 +30,15 @@
 }
 
 .contentWide {
-  max-width: min(920px, 90%);
+  /**
+   * 图表 / 卡片结果需要占据更明确的宽轨道。
+   *
+   * 仅放宽 max-width 还不够，flex item 在消息行中仍可能按内容收缩，
+   * 这里直接给出目标宽度，避免图表结果退化成窄卡片。
+   */
+  width: min(1040px, calc(100% - 42px));
+  max-width: min(1040px, calc(100% - 42px));
+  min-width: min(720px, calc(100% - 42px));
 }
 
 .rowUser .content {
@@ -304,6 +312,14 @@
   border: 1px solid #6e3c45;
   border-radius: 12px;
   max-width: min(760px, 78%);
+}
+
+@media (max-width: 900px) {
+  .contentWide {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
 }
 
 .errorIcon {

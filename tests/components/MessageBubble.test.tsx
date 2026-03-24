@@ -212,6 +212,26 @@ describe('MessageBubble', () => {
       // ChartRenderer 应渲染容器元素
       expect(container.querySelector('[class*="container"]')).toBeInTheDocument();
     });
+
+    it('图表消息使用宽轨道布局，避免结果区被压成窄卡片', async () => {
+      const msg = makeMessage({
+        role: 'assistant',
+        contentType: 'chart',
+        content: {
+          type: 'chart',
+          messageId: 'm2',
+          chartType: 'table',
+          payload: {
+            columns: [{ key: 'name', title: '姓名' }],
+            rows: [{ name: '张三' }],
+          },
+        } as unknown as Message['content'],
+      });
+      const { container } = render(<MessageBubble message={msg} />);
+      await screen.findByText('姓名');
+
+      expect(container.querySelector('[class*="contentWide"]')).toBeInTheDocument();
+    });
   });
 
   describe('消息布局', () => {

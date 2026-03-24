@@ -10,11 +10,13 @@
 
 .chartContainer {
   width: 100%;
+  min-width: min(720px, 100%);
   overflow: hidden;
   border-radius: @border-radius-sm;
   background: rgba(255, 255, 255, 0.02);
 
   canvas {
+    display: block;
     max-width: 100%;
   }
 }
