@@ -5,7 +5,7 @@
   align-items: stretch;
   width: @sidebar-collapsed-width;
   min-width: @sidebar-collapsed-width;
-  height: 100vh;
+  height: 100%;
   border-radius: 20px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)), @sidebar-bg;
@@ -29,7 +29,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 10px 10px;
+  padding: 12px 10px 16px;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -131,7 +131,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding-bottom: 2px;
 }
 
 .panel {

@@ -42,7 +42,10 @@ export default function UserInfo({ compact = false }: { compact?: boolean }) {
   if (!userInfo) return null;
 
   const content = (
-    <div className={`${styles.container} ${compact ? styles.containerCompact : ''}`}>
+    <div
+      className={`${styles.container} ${compact ? styles.containerCompact : ''}`}
+      aria-label={compact ? `用户菜单：${userInfo.name}` : undefined}
+    >
       <Avatar
         src={userInfo.avatar}
         size={compact ? 34 : 36}
@@ -75,13 +78,14 @@ export default function UserInfo({ compact = false }: { compact?: boolean }) {
       {compact ? (
         <Tooltip
           title={`${userInfo.name} · ${userInfo.department}`}
+          placement="right"
           open={tooltipOpen && !dropdownOpen}
           onOpenChange={(open) => {
             if (!dropdownOpen) {
               setTooltipOpen(open);
             }
           }}
-          destroyTooltipOnHide
+          destroyOnHidden
         >
           {content}
         </Tooltip>

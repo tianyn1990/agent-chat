@@ -29,10 +29,12 @@ describe('UserInfo', () => {
       </MemoryRouter>,
     );
 
-    await user.hover(screen.getByRole('img', { name: 'user' }));
+    const trigger = screen.getByLabelText('用户菜单：田亚楠');
+
+    await user.hover(trigger);
     expect(await screen.findByText('田亚楠 · 研发')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('img', { name: 'user' }));
+    await user.click(trigger);
 
     expect(await screen.findByText('退出登录')).toBeInTheDocument();
     await waitFor(() => {
