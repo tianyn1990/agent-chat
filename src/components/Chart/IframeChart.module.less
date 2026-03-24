@@ -8,7 +8,6 @@
   transition: all @transition-slow;
 }
 
-// 全屏模式：fixed 覆盖视口
 .fullscreen {
   position: fixed;
   top: 0;
@@ -16,7 +15,7 @@
   right: 0;
   bottom: 0;
   z-index: 1000;
-  background: #fff;
+  background: rgba(255, 252, 247, 0.98);
   padding: @spacing-md;
   display: flex;
   flex-direction: column;
@@ -28,27 +27,26 @@
   padding-bottom: @spacing-xs;
 
   .fullscreen & {
-    // 全屏时工具栏固定在顶部
     flex-shrink: 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid rgba(71, 58, 39, 0.08);
     padding-bottom: @spacing-sm;
   }
 }
 
 .toolBtn {
-  color: #666;
+  color: @text-secondary;
+
   &:hover {
     color: @primary-color;
   }
 }
 
-// iframe 容器（相对定位，用于遮罩层定位）
 .iframeWrapper {
   position: relative;
   width: 100%;
   overflow: hidden;
   border-radius: @border-radius-sm;
-  border: 1px solid #e8e8e8;
+  border: 1px solid rgba(71, 58, 39, 0.08);
 
   .fullscreen & {
     flex: 1;
@@ -56,14 +54,13 @@
   }
 }
 
-// 加载中蒙层
 .loadingMask {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 252, 247, 0.88);
   z-index: 1;
 }
 

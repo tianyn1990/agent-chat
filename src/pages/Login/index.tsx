@@ -62,31 +62,48 @@ export default function LoginPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
-        {/* Logo */}
-        <div className={styles.logo}>
-          <span className={styles.logoIcon}>🦾</span>
-          <h1 className={styles.logoText}>{APP_NAME}</h1>
+      <div className={styles.shell}>
+        <section className={styles.hero}>
+          <p className={styles.eyebrow}>Paper Ops Workspace</p>
+          <h1 className={styles.heroTitle}>把对话、技能与执行状态放进同一张工作台。</h1>
+          <p className={styles.heroSubtitle}>
+            {APP_NAME}{' '}
+            为内部协作提供多会话对话、技能管理与执行状态可视化能力，帮助团队把复杂任务拆解成可持续推进的工作流。
+          </p>
+
+          <ul className={styles.featureList}>
+            <li>统一承接问答、图表、卡片与文件协作</li>
+            <li>支持技能市场扩展和沉浸式执行状态查看</li>
+            <li>与 OpenClaw / Star-Office-UI 联动，形成完整工作闭环</li>
+          </ul>
+        </section>
+
+        <div className={styles.card}>
+          {/* Logo */}
+          <div className={styles.logo}>
+            <span className={styles.logoIcon}>🦾</span>
+            <h2 className={styles.logoText}>{APP_NAME}</h2>
+          </div>
+
+          <p className={styles.subtitle}>智能工作台入口</p>
+
+          {/* 登录区域 */}
+          <div className={styles.loginArea}>
+            <p className={styles.hint}>请使用飞书账号登录</p>
+            <Button
+              type="primary"
+              size="large"
+              block
+              loading={isLoading}
+              onClick={handleFeishuLogin}
+              className={styles.loginBtn}
+            >
+              {IS_MOCK_ENABLED ? '开发模式登录' : '使用飞书登录'}
+            </Button>
+          </div>
+
+          <p className={styles.footer}>仅限公司内部使用 · {APP_NAME} v0.1.0</p>
         </div>
-
-        <p className={styles.subtitle}>AI 驱动的智能工作助手</p>
-
-        {/* 登录区域 */}
-        <div className={styles.loginArea}>
-          <p className={styles.hint}>请使用飞书账号登录</p>
-          <Button
-            type="primary"
-            size="large"
-            block
-            loading={isLoading}
-            onClick={handleFeishuLogin}
-            className={styles.loginBtn}
-          >
-            {IS_MOCK_ENABLED ? '开发模式登录' : '使用飞书登录'}
-          </Button>
-        </div>
-
-        <p className={styles.footer}>仅限公司内部使用 · {APP_NAME} v0.1.0</p>
       </div>
     </div>
   );

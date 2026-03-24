@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Input, Dropdown, type MenuProps, type InputRef } from 'antd';
 import { EditOutlined, DeleteOutlined, EllipsisOutlined, MessageOutlined } from '@ant-design/icons';
 import type { Session } from '@/types/session';
+import { fromNow } from '@/utils/format';
 import styles from './SessionItem.module.less';
 
 interface SessionItemProps {
@@ -124,7 +125,12 @@ export default function SessionItem({
           />
         ) : (
           <>
-            <span className={styles.title}>{session.title}</span>
+            <div className={styles.metaRow}>
+              <span className={styles.title}>{session.title}</span>
+              {session.lastMessageAt ? (
+                <span className={styles.updatedAt}>{fromNow(session.lastMessageAt)}</span>
+              ) : null}
+            </div>
             {/* 最后一条消息摘要 */}
             {session.lastMessage && (
               <span className={styles.lastMessage}>{session.lastMessage}</span>

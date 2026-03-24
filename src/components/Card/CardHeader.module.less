@@ -1,6 +1,5 @@
 @import '@/styles/variables.less';
 
-// 卡片头部基础样式
 .header {
   display: flex;
   align-items: center;
@@ -10,14 +9,12 @@
   position: relative;
 }
 
-// 图标
 .icon {
   font-size: 18px;
   flex-shrink: 0;
   line-height: 1;
 }
 
-// 文字区域
 .textArea {
   flex: 1;
   min-width: 0;
@@ -28,87 +25,81 @@
 
 .title {
   font-size: @font-size-base;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
 }
 
 .subtitle {
   font-size: @font-size-sm;
-  opacity: 0.75;
+  opacity: 0.78;
   line-height: 1.4;
 }
 
-// 过期角标
 .expiredBadge {
   font-size: @font-size-sm;
-  padding: 1px 6px;
-  border-radius: @border-radius-sm;
-  background: rgba(0, 0, 0, 0.15);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.12);
   color: inherit;
-  opacity: 0.8;
+  opacity: 0.82;
   flex-shrink: 0;
 }
 
-// 过期整体降色
 .expired {
   opacity: 0.7;
 }
 
-// ===========================
-// 主题色
-// ===========================
-
 .templateBlue {
   background-color: @card-blue-bg;
   border-bottom: 1px solid @card-blue-border;
-  color: #003eb3;
+  color: #27445d;
 
   .expiredBadge {
     background-color: @card-blue-border;
-    color: #003eb3;
+    color: #27445d;
   }
 }
 
 .templateGreen {
   background-color: @card-green-bg;
   border-bottom: 1px solid @card-green-border;
-  color: #237804;
+  color: #446048;
 
   .expiredBadge {
     background-color: @card-green-border;
-    color: #237804;
+    color: #446048;
   }
 }
 
 .templateYellow {
   background-color: @card-yellow-bg;
   border-bottom: 1px solid @card-yellow-border;
-  color: #874d00;
+  color: #845b20;
 
   .expiredBadge {
     background-color: @card-yellow-border;
-    color: #874d00;
+    color: #845b20;
   }
 }
 
 .templateRed {
   background-color: @card-red-bg;
   border-bottom: 1px solid @card-red-border;
-  color: #a8071a;
+  color: #8c4d45;
 
   .expiredBadge {
     background-color: @card-red-border;
-    color: #a8071a;
+    color: #8c4d45;
   }
 }
 
 .templateGrey {
   background-color: @card-grey-bg;
   border-bottom: 1px solid @card-grey-border;
-  color: #595959;
+  color: @text-secondary;
 
   .expiredBadge {
     background-color: @card-grey-border;
-    color: #595959;
+    color: @text-secondary;
   }
 }

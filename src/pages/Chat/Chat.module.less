@@ -1,11 +1,11 @@
 @import '@/styles/variables.less';
 
-// 对话页面主容器：垂直布局（消息区 + 输入区）
 .container {
   display: flex;
   height: 100%;
-  background-color: @content-bg;
+  min-height: 0;
   min-width: 0;
+  padding: 20px 24px 18px;
 }
 
 .chatColumn {
@@ -13,35 +13,159 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 14px;
 }
 
-// 消息滚动区域（占据剩余高度）
+.stageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 4px 0;
+}
+
+.headerCopy {
+  min-width: 0;
+  flex: 1;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: @accent-color;
+  font-size: @font-size-xs;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stageTitle {
+  margin: 0;
+  color: @text-primary;
+  font-size: clamp(20px, 2.2vw, 28px);
+  line-height: 1.2;
+  font-family: @font-family-display;
+  font-weight: 700;
+  text-wrap: balance;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stageSubtitle {
+  margin: 6px 0 0;
+  max-width: 680px;
+  color: @text-secondary;
+  font-size: @font-size-sm;
+  line-height: 1.65;
+}
+
+.headerMeta {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.metaCard {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: rgba(255, 252, 247, 0.82);
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  box-shadow: @shadow-sm;
+  min-width: 80px;
+}
+
+.metaLabel {
+  color: @text-tertiary;
+  font-size: @font-size-xs;
+  letter-spacing: 0.04em;
+}
+
+.metaValue {
+  color: @text-primary;
+  font-size: @font-size-sm;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.workspace {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .messageArea {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   position: relative;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.94), rgba(255, 249, 241, 0.96)), @paper-bg;
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  box-shadow: @shadow-md;
+  overflow: hidden;
 }
 
-// 底部输入区域
 .inputArea {
   flex-shrink: 0;
-  padding: @spacing-sm @spacing-lg @spacing-md;
-  background-color: @content-bg;
-  border-top: 1px solid #ebebeb;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px 20px;
+  border-radius: 24px;
+  background: rgba(255, 252, 247, 0.88);
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  box-shadow: @shadow-sm;
 }
 
-// 无会话时的提示文字
 .noSessionTip {
-  text-align: center;
-  color: #999;
+  color: @text-secondary;
   font-size: @font-size-sm;
-  padding-bottom: @spacing-xs;
+}
+
+.composerHint {
+  color: @text-tertiary;
+  font-size: @font-size-sm;
+  line-height: 1.6;
 }
 
 @media (max-width: 1100px) {
   .container {
+    padding: 18px;
+  }
+
+  .stageHeader {
     flex-direction: column;
+  }
+
+  .headerMeta {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 14px;
+  }
+
+  .messageArea {
+    border-radius: 22px;
+  }
+
+  .inputArea {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .headerMeta {
+    grid-template-columns: 1fr;
   }
 }

@@ -34,21 +34,20 @@ describe('SkillCard', () => {
     expect(installButton).toBeInTheDocument();
   });
 
-  it('应该显示"已安装"按钮和标识（已安装状态）', () => {
+  it('应该显示"卸载"按钮和已安装标识（已安装状态）', () => {
     const installedSkill = { ...mockSkill, installed: true };
     render(<SkillCard skill={installedSkill} />);
 
-    expect(screen.getByRole('button', { name: /已安装/ })).toBeInTheDocument();
-    // 标识和按钮都有"已安装"文本，使用 getAllByText
-    const installedTexts = screen.getAllByText('已安装');
-    expect(installedTexts.length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /卸\s*载/ })).toBeInTheDocument();
+    expect(screen.getByText('已安装')).toBeInTheDocument();
   });
 
   it('应该在点击卡片时触发 onClick 回调', () => {
     const onClick = vi.fn();
     render(<SkillCard skill={mockSkill} onClick={onClick} />);
 
-    const card = screen.getByText('测试技能').closest('.ant-card');
+    // 卡片现在是 div，通过技能名称找到卡片容器
+    const card = screen.getByText('测试技能').closest('[class*="card"]');
     fireEvent.click(card!);
 
     expect(onClick).toHaveBeenCalledWith(mockSkill);

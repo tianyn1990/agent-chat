@@ -1,10 +1,10 @@
 @import '@/styles/variables.less';
 
-// 卡片容器：撑满父级宽度，宽度由消息行容器控制
 .card {
-  border: 1px solid #e8e8e8;
-  border-radius: @border-radius-lg;
-  background-color: #fff;
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(247, 240, 230, 0.94)), @paper-bg;
   overflow: hidden;
   box-shadow: @shadow-sm;
   width: 100%;
@@ -12,12 +12,10 @@
   transition: opacity @transition-base;
 }
 
-// 过期态整体降色
 .cardExpired {
   opacity: 0.75;
 }
 
-// 内容区
 .body {
   padding: @spacing-md;
   display: flex;
@@ -25,7 +23,6 @@
   gap: 10px;
 }
 
-// 图片容器
 .imageWrapper {
   text-align: center;
 
@@ -34,24 +31,23 @@
   }
 }
 
-// 已提交覆盖提示（卡片底部）
 .expiredOverlay {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: @spacing-xs;
   padding: 8px @spacing-md;
-  background-color: #f6ffed;
-  border-top: 1px solid #b7eb8f;
+  background-color: #edf3eb;
+  border-top: 1px solid #c3d6bf;
 }
 
 .expiredIcon {
-  color: #52c41a;
+  color: @success-color;
   font-size: 14px;
 }
 
 .expiredText {
-  color: #237804;
+  color: #446048;
   font-size: @font-size-sm;
   font-weight: 500;
 }

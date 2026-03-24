@@ -1,4 +1,4 @@
-import { Space, Tag } from 'antd';
+import { Tag } from 'antd';
 import type { SkillCategory } from '@/types/skill';
 import { SKILL_CATEGORY_LABELS } from '@/types/skill';
 import styles from './SkillFilter.module.less';
@@ -29,7 +29,7 @@ export default function SkillFilter({ selectedCategory, onChange }: SkillFilterP
   return (
     <div className={styles.container}>
       <span className={styles.label}>分类：</span>
-      <Space size="small" wrap>
+      <div className={styles.tags}>
         {CATEGORIES.map((cat) => (
           <Tag.CheckableTag
             key={cat.key}
@@ -40,7 +40,7 @@ export default function SkillFilter({ selectedCategory, onChange }: SkillFilterP
             {cat.label}
           </Tag.CheckableTag>
         ))}
-      </Space>
+      </div>
     </div>
   );
 }

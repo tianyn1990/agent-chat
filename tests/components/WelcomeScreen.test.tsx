@@ -23,6 +23,9 @@ describe('WelcomeScreen', () => {
     useUserStore.setState({ userInfo: null, token: null });
     render(<WelcomeScreen onSuggestionClick={vi.fn()} />);
 
+    expect(screen.getByText('Today\'s Desk')).toBeInTheDocument();
+    expect(screen.getByText(/今天准备推进什么工作/)).toBeInTheDocument();
+
     // 应该有 4 个建议卡片
     expect(screen.getByText('数据分析')).toBeInTheDocument();
     expect(screen.getByText('写作助手')).toBeInTheDocument();

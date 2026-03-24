@@ -38,6 +38,30 @@ describe('MessageActions', () => {
     vi.restoreAllMocks();
   });
 
+  it('复制成功时提示成功消息', async () => {
+    const user = userEvent.setup();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText,
+      },
+    });
+
+    render(
+      <App>
+        <MemoryRouter>
+          <MessageActions message={makeMessage()} copyText="可复制内容" />
+        </MemoryRouter>
+      </App>,
+    );
+
+    await user.click(screen.getByRole('button', { name: '复制' }));
+
+    expect(writeText).toHaveBeenCalledWith('可复制内容');
+    expect(await screen.findByText('已复制消息内容')).toBeInTheDocument();
+  });
+
   it('点击查看执行状态后直接进入沉浸式工作台', async () => {
     const user = userEvent.setup();
 

@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Modal, Empty } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useChatStore } from '@/stores/useChatStore';
+import { ROUTES } from '@/constants';
 import SessionItem from './SessionItem';
 import styles from './SessionList.module.less';
 
@@ -15,6 +17,7 @@ interface SessionListProps {
  * 展示所有历史会话，支持新建、切换、重命名、删除操作
  */
 export default function SessionList({ onNewChat }: SessionListProps) {
+  const navigate = useNavigate();
   const sessions = useChatStore((s) => s.sessions);
   const currentSessionId = useChatStore((s) => s.currentSessionId);
   const setCurrentSession = useChatStore((s) => s.setCurrentSession);
@@ -75,7 +78,10 @@ export default function SessionList({ onNewChat }: SessionListProps) {
               key={session.id}
               session={session}
               isActive={session.id === currentSessionId}
-              onClick={() => setCurrentSession(session.id)}
+              onClick={() => {
+                setCurrentSession(session.id);
+                navigate(`${ROUTES.CHAT}/${session.id}`);
+              }}
               onRename={(newTitle) => handleRename(session.id, newTitle)}
               onDelete={() => handleDelete(session.id, session.title)}
             />

@@ -9,7 +9,6 @@
 
 .image {
   border-radius: @border-radius-sm;
-  // 高度自适应，但不超过屏幕高度的 60%
   max-height: 60vh;
   object-fit: contain;
 }
@@ -23,11 +22,11 @@
   display: flex;
   justify-content: flex-end;
   padding-top: @spacing-xs;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid rgba(71, 58, 39, 0.08);
 }
 
 .toolBtn {
-  color: #666;
+  color: @text-secondary;
   font-size: @font-size-sm;
 
   &:hover {

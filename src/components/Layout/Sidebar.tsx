@@ -60,7 +60,10 @@ export default function Sidebar({ extra, activeKey }: SidebarProps) {
       <div className={styles.logoArea}>
         <div className={styles.logo}>
           <span className={styles.logoIcon}>🦾</span>
-          <span className={styles.logoText}>{APP_NAME}</span>
+          <div className={styles.logoTextGroup}>
+            <span className={styles.logoText}>{APP_NAME}</span>
+            <span className={styles.logoSubtext}>Agent Workspace</span>
+          </div>
         </div>
       </div>
 

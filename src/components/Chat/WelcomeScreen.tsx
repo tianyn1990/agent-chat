@@ -3,10 +3,10 @@ import styles from './WelcomeScreen.module.less';
 
 /** 快捷提问建议 */
 const QUICK_SUGGESTIONS = [
-  { label: '数据分析', text: '帮我分析一份销售数据，找出关键趋势' },
-  { label: '写作助手', text: '帮我写一份项目汇报的邮件模板' },
-  { label: '代码助手', text: '解释下 React useEffect 的执行时机' },
-  { label: '常用功能', text: '有哪些常用的快捷功能可以帮助我提高工作效率？' },
+  { label: '数据分析', text: '帮我分析一份销售数据，找出关键趋势', tone: '趋势与异常' },
+  { label: '写作助手', text: '帮我写一份项目汇报的邮件模板', tone: '结构与措辞' },
+  { label: '代码助手', text: '解释下 React useEffect 的执行时机', tone: '原理与示例' },
+  { label: '常用功能', text: '有哪些常用的快捷功能可以帮助我提高工作效率？', tone: '能力总览' },
 ];
 
 interface WelcomeScreenProps {
@@ -24,22 +24,33 @@ export default function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps)
 
   return (
     <div className={styles.container}>
-      {/* 欢迎语 */}
-      <div className={styles.greeting}>
-        <div className={styles.emoji}>👋</div>
-        <h2 className={styles.title}>你好，{displayName}</h2>
-        <p className={styles.subtitle}>有什么可以帮你的？</p>
+      {/* 欢迎语区域使用“封面页”布局，强化空会话的起始仪式感。 */}
+      <div className={styles.hero}>
+        <div className={styles.heroBadge}>Today&apos;s Desk</div>
+        <div className={styles.greeting}>
+          <h2 className={styles.title}>你好，{displayName}</h2>
+          <p className={styles.subtitle}>今天准备推进什么工作？把目标交给我，我们从这里开始。</p>
+        </div>
+
+        <div className={styles.heroNote}>
+          <span className={styles.noteLabel}>提示</span>
+          <span className={styles.noteText}>
+            你也可以直接输入 test line、test card 或 test iframe 查看完整 mock 效果。
+          </span>
+        </div>
       </div>
 
       {/* 快捷提问建议卡片 */}
       <div className={styles.suggestions}>
-        {QUICK_SUGGESTIONS.map((item) => (
+        {QUICK_SUGGESTIONS.map((item, index) => (
           <button
             key={item.label}
             className={styles.suggestionCard}
             onClick={() => onSuggestionClick(item.text)}
           >
+            <span className={styles.cardIndex}>0{index + 1}</span>
             <span className={styles.cardLabel}>{item.label}</span>
+            <span className={styles.cardTone}>{item.tone}</span>
             <span className={styles.cardText}>{item.text}</span>
           </button>
         ))}

@@ -6,8 +6,9 @@
   height: 100%;
   overflow: hidden;
   background:
-    radial-gradient(circle at top left, rgba(22, 119, 255, 0.08), transparent 24%),
-    linear-gradient(180deg, #f8fbff 0%, #eef3fb 100%);
+    radial-gradient(circle at top left, rgba(183, 121, 69, 0.18), transparent 20%),
+    radial-gradient(circle at bottom right, rgba(53, 92, 125, 0.16), transparent 24%),
+    linear-gradient(180deg, #f8f2e8 0%, #efe4d3 100%);
 }
 
 .frame {
@@ -28,22 +29,23 @@
 }
 
 .empty {
-  width: min(840px, 100%);
-  padding: 24px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+  width: min(860px, 100%);
+  padding: 28px;
+  border-radius: 28px;
+  background: rgba(255, 252, 247, 0.94);
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  box-shadow: @shadow-lg;
 }
 
 .tip {
   margin-top: 12px;
-  color: #64748b;
-  line-height: 1.7;
+  color: @text-secondary;
+  line-height: 1.8;
   text-align: left;
 }
 
 .mode {
   margin-top: 10px;
-  color: #33537c;
+  color: @primary-color;
   font-weight: 600;
 }

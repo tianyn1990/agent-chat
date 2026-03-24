@@ -1,84 +1,133 @@
 // ===========================
-// 颜色变量
+// 品牌与场景色
 // ===========================
 
-// 品牌色
-@primary-color: #1677ff;
-@primary-hover: #4096ff;
-@primary-active: #0958d9;
+// 主品牌色：偏稳重的靛蓝，用于核心动作与高亮焦点
+@primary-color: #355c7d;
+@primary-hover: #426f95;
+@primary-active: #27445d;
+@primary-soft: rgba(53, 92, 125, 0.12);
 
+// 辅助强调色：铜棕色，用于标签、装饰和局部强调
+@accent-color: #b77945;
+@accent-soft: rgba(183, 121, 69, 0.14);
+
+// 成功 / 警告 / 错误反馈
+@success-color: #5f7f64;
+@warning-color: #b47c2d;
+@danger-color: #b0584f;
+
+// ===========================
+// 页面背景与表面层
+// ===========================
+
+// 页面主背景：偏纸面的暖白工作台
+@content-bg: #f4ede2;
+@content-bg-secondary: #efe5d7;
+@paper-bg: #fbf6ee;
+@paper-bg-strong: #fffdf9;
+@panel-bg: rgba(255, 250, 243, 0.92);
+@panel-border: rgba(71, 58, 39, 0.12);
+
+// 主文本与辅助文本
+@text-primary: #1f2730;
+@text-secondary: #60584a;
+@text-tertiary: #8c836f;
+@text-on-dark: rgba(255, 249, 240, 0.9);
+@text-on-dark-secondary: rgba(255, 249, 240, 0.58);
+
+// ===========================
 // 侧边栏
-@sidebar-width: 260px;
+// ===========================
+
+@sidebar-width: 308px;
 @sidebar-collapsed-width: 60px;
-@sidebar-bg: #1e1e2e;
-@sidebar-text: rgba(255, 255, 255, 0.85);
-@sidebar-text-secondary: rgba(255, 255, 255, 0.45);
-@sidebar-hover-bg: rgba(255, 255, 255, 0.08);
-@sidebar-active-bg: rgba(22, 119, 255, 0.2);
-@sidebar-active-text: #4096ff;
-@sidebar-border: rgba(255, 255, 255, 0.08);
+@sidebar-bg: #232933;
+@sidebar-surface: rgba(255, 248, 238, 0.05);
+@sidebar-text: @text-on-dark;
+@sidebar-text-secondary: @text-on-dark-secondary;
+@sidebar-hover-bg: rgba(255, 248, 238, 0.08);
+@sidebar-active-bg: linear-gradient(135deg, rgba(183, 121, 69, 0.18), rgba(53, 92, 125, 0.28));
+@sidebar-active-text: #f9efe0;
+@sidebar-border: rgba(255, 248, 238, 0.1);
 
-// 内容区
-@content-bg: #f5f6fa;
-@content-padding: 24px;
+// ===========================
+// 消息与结果容器
+// ===========================
 
-// 消息气泡
-@user-bubble-bg: #1677ff;
-@user-bubble-text: #ffffff;
-@assistant-bubble-bg: #ffffff;
-@assistant-bubble-border: #e8e8e8;
-@assistant-bubble-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+@user-bubble-bg: linear-gradient(135deg, #355c7d 0%, #2e4e6a 100%);
+@user-bubble-text: #fdfaf4;
+@assistant-bubble-bg: rgba(255, 252, 247, 0.96);
+@assistant-bubble-border: rgba(71, 58, 39, 0.1);
+@assistant-bubble-shadow: 0 12px 24px rgba(69, 55, 36, 0.08);
 
 // 卡片主题色
-@card-blue-bg: #e6f4ff;
-@card-blue-border: #91caff;
-@card-green-bg: #f6ffed;
-@card-green-border: #b7eb8f;
-@card-yellow-bg: #fffbe6;
-@card-yellow-border: #ffe58f;
-@card-red-bg: #fff2f0;
-@card-red-border: #ffccc7;
-@card-grey-bg: #fafafa;
-@card-grey-border: #d9d9d9;
+@card-blue-bg: #edf3f8;
+@card-blue-border: #b6cadc;
+@card-green-bg: #edf3eb;
+@card-green-border: #c3d6bf;
+@card-yellow-bg: #faf0df;
+@card-yellow-border: #e2c99c;
+@card-red-bg: #f8e9e5;
+@card-red-border: #deb7ae;
+@card-grey-bg: #f4efe7;
+@card-grey-border: #d9cebf;
 
 // ===========================
 // 尺寸变量
 // ===========================
 
-@border-radius-sm: 4px;
-@border-radius: 8px;
-@border-radius-lg: 12px;
-@border-radius-xl: 16px;
+@border-radius-xs: 6px;
+@border-radius-sm: 10px;
+@border-radius: 14px;
+@border-radius-lg: 20px;
+@border-radius-xl: 28px;
 
-@spacing-xs: 4px;
-@spacing-sm: 8px;
+@spacing-2xs: 2px;
+@spacing-xs: 6px;
+@spacing-sm: 10px;
 @spacing-md: 16px;
 @spacing-lg: 24px;
 @spacing-xl: 32px;
+@spacing-2xl: 48px;
 
 // ===========================
 // 字体变量
 // ===========================
 
+@font-family-sans: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+@font-family-display: 'Noto Serif SC', 'Songti SC', 'STSong', 'Times New Roman', serif;
+@font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Courier New', monospace;
+
+@font-size-xs: 11px;
 @font-size-sm: 12px;
 @font-size-base: 14px;
 @font-size-lg: 16px;
 @font-size-xl: 18px;
-@font-size-2xl: 20px;
-@font-size-3xl: 24px;
+@font-size-2xl: 22px;
+@font-size-3xl: 30px;
+@font-size-4xl: 40px;
 
 // ===========================
-// 阴影变量
+// 阴影与边框
 // ===========================
 
-@shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-@shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-@shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+@shadow-sm: 0 6px 14px rgba(69, 55, 36, 0.06);
+@shadow-md: 0 16px 36px rgba(69, 55, 36, 0.1);
+@shadow-lg: 0 26px 56px rgba(40, 29, 17, 0.16);
+@shadow-float: 0 20px 60px rgba(28, 20, 12, 0.18);
 
 // ===========================
 // 动画变量
 // ===========================
 
-@transition-fast: 0.15s ease;
-@transition-base: 0.2s ease;
-@transition-slow: 0.3s ease;
+@transition-fast: 0.16s ease;
+@transition-base: 0.24s ease;
+@transition-slow: 0.36s ease;
+
+// ===========================
+// 布局尺寸
+// ===========================
+
+@content-padding: 28px;
+@max-reading-width: 980px;

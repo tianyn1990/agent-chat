@@ -5,15 +5,71 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1e1e2e 0%, #313244 50%, #1e1e2e 100%);
+  padding: 32px;
+  background:
+    radial-gradient(circle at top left, rgba(183, 121, 69, 0.14), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(53, 92, 125, 0.18), transparent 30%),
+    linear-gradient(135deg, #f7f0e5 0%, #efe4d3 48%, #e8dcc8 100%);
+}
+
+.shell {
+  width: min(1120px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(360px, 420px);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 44px;
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at top right, rgba(183, 121, 69, 0.14), transparent 28%),
+    linear-gradient(160deg, rgba(255, 253, 249, 0.96), rgba(245, 236, 223, 0.92));
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  box-shadow: @shadow-lg;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: @accent-color;
+  font-size: @font-size-sm;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  margin: 0;
+  color: @text-primary;
+  font-size: clamp(38px, 4vw, 58px);
+  line-height: 1.05;
+  font-family: @font-family-display;
+}
+
+.heroSubtitle {
+  margin: 18px 0 0;
+  color: @text-secondary;
+  font-size: @font-size-lg;
+  line-height: 1.9;
+}
+
+.featureList {
+  margin: 28px 0 0;
+  padding-left: 18px;
+  color: @text-secondary;
+  line-height: 1.9;
 }
 
 .card {
-  width: 400px;
-  padding: 48px 40px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: @border-radius-xl;
+  width: 100%;
+  padding: 40px 34px;
+  background: rgba(255, 253, 248, 0.82);
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  border-radius: 32px;
   backdrop-filter: blur(20px);
   text-align: center;
   box-shadow: @shadow-lg;
@@ -28,40 +84,58 @@
 }
 
 .logoIcon {
-  font-size: 40px;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  background: linear-gradient(135deg, rgba(183, 121, 69, 0.22), rgba(53, 92, 125, 0.2));
 }
 
 .logoText {
   margin: 0;
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 700;
-  color: #ffffff;
+  color: @text-primary;
+  font-family: @font-family-display;
 }
 
 .subtitle {
-  color: rgba(255, 255, 255, 0.55);
+  color: @text-secondary;
   font-size: @font-size-base;
-  margin: 0 0 40px;
+  margin: 0 0 32px;
 }
 
 .loginArea {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .hint {
-  color: rgba(255, 255, 255, 0.65);
+  color: @text-secondary;
   font-size: @font-size-base;
   margin-bottom: 16px;
 }
 
 .loginBtn {
-  height: 46px;
+  height: 48px;
   font-size: 16px;
-  border-radius: @border-radius !important;
+  border-radius: 16px !important;
 }
 
 .footer {
-  color: rgba(255, 255, 255, 0.3);
+  color: @text-tertiary;
   font-size: @font-size-sm;
   margin: 0;
+}
+
+@media (max-width: 960px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 30px;
+  }
 }

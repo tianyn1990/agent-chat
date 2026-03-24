@@ -15,10 +15,17 @@ export default function App() {
       locale={zhCN}
       theme={{
         token: {
-          colorPrimary: '#1677ff',
-          borderRadius: 8,
+          // 统一 Ant Design 基础 token，保证框架控件与自定义界面属于同一视觉系统。
+          colorPrimary: '#355c7d',
+          colorInfo: '#355c7d',
+          colorSuccess: '#5f7f64',
+          colorWarning: '#b47c2d',
+          colorError: '#b0584f',
+          colorTextBase: '#1f2730',
+          colorBgBase: '#fbf6ee',
+          borderRadius: 14,
           fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif",
+            "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif",
         },
       }}
     >

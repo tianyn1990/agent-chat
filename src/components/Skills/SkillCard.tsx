@@ -35,48 +35,42 @@ export default function SkillCard({
   };
 
   return (
-    <Card
-      hoverable
-      className={styles.card}
+    <div
+      className={`${styles.card} ${skill.installed ? styles.cardInstalled : ''}`}
       onClick={handleCardClick}
-      cover={
-        <div className={styles.iconWrapper}>
-          <span className={styles.icon}>{skill.icon}</span>
-        </div>
-      }
     >
-      {/* 已安装标识 */}
-      {skill.installed && (
-        <div className={styles.installedBadge}>
-          <CheckCircleOutlined />
-          <span>已安装</span>
+      {/* 卡片头部：图标 + 名称 + 状态 */}
+      <div className={styles.cardHeader}>
+        <span className={styles.icon}>{skill.icon}</span>
+        <div className={styles.headerRight}>
+          <div className={styles.name}>{skill.name}</div>
+          <div className={styles.tags}>
+            <Tag className={styles.categoryTag}>{SKILL_CATEGORY_LABELS[skill.category]}</Tag>
+            {skill.installed && (
+              <span className={styles.installedBadge}>
+                <CheckCircleOutlined />
+                已安装
+              </span>
+            )}
+          </div>
         </div>
-      )}
-
-      {/* 技能名称 */}
-      <div className={styles.name}>{skill.name}</div>
+      </div>
 
       {/* 技能描述 */}
       <div className={styles.description}>{skill.description}</div>
 
-      {/* 分类标签 */}
-      <div className={styles.meta}>
-        <Tag color="blue">{SKILL_CATEGORY_LABELS[skill.category]}</Tag>
+      {/* 底部：版本 + 操作按钮 */}
+      <div className={styles.footer}>
         <span className={styles.version}>v{skill.version}</span>
-      </div>
-
-      {/* 操作按钮 */}
-      <div className={styles.actions}>
         <Button
           type={skill.installed ? 'default' : 'primary'}
           size="small"
-          block
           loading={loading}
           onClick={handleInstallClick}
         >
-          {skill.installed ? '已安装' : '安装'}
+          {skill.installed ? '卸载' : '安装'}
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -8,9 +8,12 @@
 }
 
 .table {
-  // 紧凑表格样式
+  :global(.ant-table) {
+    background: transparent;
+  }
+
   :global(.ant-table-thead > tr > th) {
-    background-color: #fafafa;
+    background-color: rgba(53, 92, 125, 0.06);
     font-size: @font-size-sm;
     font-weight: 600;
     padding: 8px 12px;
@@ -19,15 +22,15 @@
   :global(.ant-table-tbody > tr > td) {
     padding: 7px 12px;
     font-size: @font-size-sm;
+    background: rgba(255, 252, 247, 0.72);
   }
 
-  // 斑马纹
   :global(.ant-table-tbody > tr:nth-child(even) > td) {
-    background-color: #fafafa;
+    background-color: rgba(244, 239, 232, 0.72);
   }
 
   :global(.ant-table-tbody > tr:hover > td) {
-    background-color: #e6f4ff !important;
+    background-color: rgba(53, 92, 125, 0.08) !important;
   }
 }
 
@@ -35,11 +38,11 @@
   display: flex;
   justify-content: flex-end;
   padding-top: @spacing-xs;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid rgba(71, 58, 39, 0.08);
 }
 
 .toolBtn {
-  color: #666;
+  color: @text-secondary;
   font-size: @font-size-sm;
 
   &:hover {

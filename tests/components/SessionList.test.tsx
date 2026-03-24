@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import SessionList from '@/components/Chat/SessionList';
 import { useChatStore, createTempSession } from '@/stores/useChatStore';
+
+function renderWithRouter(ui: React.ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+}
 
 describe('SessionList', () => {
   const mockOnNewChat = vi.fn();
@@ -21,7 +26,7 @@ describe('SessionList', () => {
   });
 
   it('会话为空时显示空状态提示', () => {
-    render(<SessionList onNewChat={mockOnNewChat} />);
+    renderWithRouter(<SessionList onNewChat={mockOnNewChat} />);
     expect(screen.getByText('暂无对话')).toBeInTheDocument();
   });
 
@@ -30,14 +35,14 @@ describe('SessionList', () => {
     const s2 = createTempSession('会话B');
     useChatStore.setState({ sessions: [s1, s2] });
 
-    render(<SessionList onNewChat={mockOnNewChat} />);
+    renderWithRouter(<SessionList onNewChat={mockOnNewChat} />);
 
     expect(screen.getByText('会话A')).toBeInTheDocument();
     expect(screen.getByText('会话B')).toBeInTheDocument();
   });
 
   it('点击"新建对话"按钮触发回调', () => {
-    render(<SessionList onNewChat={mockOnNewChat} />);
+    renderWithRouter(<SessionList onNewChat={mockOnNewChat} />);
     fireEvent.click(screen.getByRole('button', { name: /新建对话/ }));
     expect(mockOnNewChat).toHaveBeenCalledTimes(1);
   });
@@ -46,7 +51,7 @@ describe('SessionList', () => {
     const session = createTempSession('目标会话');
     useChatStore.setState({ sessions: [session] });
 
-    render(<SessionList onNewChat={mockOnNewChat} />);
+    renderWithRouter(<SessionList onNewChat={mockOnNewChat} />);
     fireEvent.click(screen.getByText('目标会话'));
 
     expect(useChatStore.getState().currentSessionId).toBe(session.id);
@@ -59,7 +64,7 @@ describe('SessionList', () => {
       currentSessionId: session.id,
     });
 
-    const { container } = render(<SessionList onNewChat={mockOnNewChat} />);
+    const { container } = renderWithRouter(<SessionList onNewChat={mockOnNewChat} />);
 
     // 找到会话条目（有激活类名）
     const activeItem = container.querySelector('[class*="itemActive"]');
@@ -70,7 +75,7 @@ describe('SessionList', () => {
     const session = createTempSession('旧标题');
     useChatStore.setState({ sessions: [session] });
 
-    render(<SessionList onNewChat={mockOnNewChat} />);
+    renderWithRouter(<SessionList onNewChat={mockOnNewChat} />);
 
     // 通过 store action 模拟重命名
     useChatStore.getState().updateSession(session.id, { title: '新标题' });

@@ -16,6 +16,7 @@ import {
   STAR_OFFICE_URL,
 } from '@/constants';
 import { prefixedId } from '@/utils/id';
+import { VISUALIZE_STATE_LABELS } from '@/types/visualize';
 import type {
   WsMessageChunk,
   WsCardMessage,
@@ -69,6 +70,9 @@ export default function ChatPage() {
   const token = useUserStore((s) => s.token);
   const setExtraContent = useSidebarStore((s) => s.setExtraContent);
   const isVisualizePanelOpen = useVisualizeStore((s) => s.isPanelOpen);
+  const currentRuntime = useVisualizeStore((s) =>
+    currentSessionId ? s.runtimeBySession[currentSessionId] : null,
+  );
 
   /** 当前输入框待发送的文件列表 */
   const [pendingFiles, setPendingFiles] = useState<SelectedFile[]>([]);
@@ -475,6 +479,9 @@ export default function ChatPage() {
 
   const currentMessages = currentSessionId ? (messages[currentSessionId] ?? []) : [];
   const currentDraft = currentSessionId ? (drafts[currentSessionId] ?? '') : '';
+  const currentSession = currentSessionId
+    ? (sessions.find((session) => session.id === currentSessionId) ?? null)
+    : null;
 
   // 检查是否有消息正在流式传输
   const isStreaming =
@@ -485,38 +492,72 @@ export default function ChatPage() {
   return (
     <div className={styles.container}>
       <div className={styles.chatColumn}>
-        {/* 消息区域 */}
-        <div className={styles.messageArea}>
-          {showWelcome ? (
-            <WelcomeScreen onSuggestionClick={handleSuggestion} />
-          ) : (
-            <MessageList
-              messages={currentMessages}
-              streamingBuffer={streamingBuffer}
-              isStreaming={isStreaming}
-              onCardAction={handleCardAction}
-              onCardExpire={handleCardExpire}
-            />
-          )}
-        </div>
+        {/* 顶部标题区用于强化“工作台”语义，让当前会话、状态与主内容形成统一舞台。 */}
+        <header className={styles.stageHeader}>
+          <div className={styles.headerCopy}>
+            <p className={styles.eyebrow}>Paper Ops Workspace</p>
+            <h1 className={styles.stageTitle}>{currentSession?.title ?? '智能工作台'}</h1>
+            <p className={styles.stageSubtitle}>
+              {showWelcome
+                ? '从左侧档案区进入旧会话，或直接在下方开始一轮新的协作。'
+                : currentRuntime?.detail || '围绕当前会话继续推进分析、写作、代码与执行动作。'}
+            </p>
+          </div>
 
-        {/* 输入区域 */}
-        <div className={styles.inputArea}>
-          {/* 无会话时提示先新建 */}
-          {!currentSessionId && <div className={styles.noSessionTip}>点击左侧「新建对话」开始</div>}
-          <MessageInput
-            value={currentDraft}
-            onChange={(v) => currentSessionId && setDraft(currentSessionId, v)}
-            files={pendingFiles}
-            onFilesChange={setPendingFiles}
-            onSend={handleSend}
-            disabled={!currentSessionId || currentSessionSending}
-            placeholder={
-              !currentSessionId
-                ? '请先新建一个对话...'
-                : '输入消息，Enter 发送，Shift+Enter 换行...'
-            }
-          />
+          <div className={styles.headerMeta}>
+            <div className={styles.metaCard}>
+              <span className={styles.metaLabel}>运行状态</span>
+              <span className={styles.metaValue}>
+                {currentRuntime ? VISUALIZE_STATE_LABELS[currentRuntime.state] : '待命中'}
+              </span>
+            </div>
+            <div className={styles.metaCard}>
+              <span className={styles.metaLabel}>消息数量</span>
+              <span className={styles.metaValue}>{currentMessages.length}</span>
+            </div>
+          </div>
+        </header>
+
+        <div className={styles.workspace}>
+          {/* 消息区域作为中央阅读画布，维持更聚焦的阅读宽度与留白。 */}
+          <div className={styles.messageArea}>
+            {showWelcome ? (
+              <WelcomeScreen onSuggestionClick={handleSuggestion} />
+            ) : (
+              <MessageList
+                messages={currentMessages}
+                streamingBuffer={streamingBuffer}
+                isStreaming={isStreaming}
+                onCardAction={handleCardAction}
+                onCardExpire={handleCardExpire}
+              />
+            )}
+          </div>
+
+          {/* 输入区域独立成“批注条”，在视觉上与上方消息画布形成同一工作台。 */}
+          <div className={styles.inputArea}>
+            {!currentSessionId ? (
+              <div className={styles.noSessionTip}>点击左侧「新建对话」开始</div>
+            ) : (
+              <div className={styles.composerHint}>
+                Enter 发送，Shift+Enter 换行。图表、文件与执行状态会围绕当前会话上下文继续累积。
+              </div>
+            )}
+
+            <MessageInput
+              value={currentDraft}
+              onChange={(v) => currentSessionId && setDraft(currentSessionId, v)}
+              files={pendingFiles}
+              onFilesChange={setPendingFiles}
+              onSend={handleSend}
+              disabled={!currentSessionId || currentSessionSending}
+              placeholder={
+                !currentSessionId
+                  ? '请先新建一个对话...'
+                  : '输入你的下一步目标、问题或要执行的动作...'
+              }
+            />
+          </div>
         </div>
       </div>
 

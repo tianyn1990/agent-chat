@@ -93,20 +93,41 @@ export default function SkillsPage() {
     }
   };
 
-  // 获取过滤后的技能列表
-  const filteredSkills = getFilteredSkills();
+  // 获取过滤后的技能列表（排除已安装，避免与"已安装技能"区域重复）
+  const filteredSkills = getFilteredSkills().filter((s) => !s.installed);
   // 获取已安装的技能列表
   const installedSkills = getInstalledSkills();
+  const totalSkills = useSkillStore((s) => s.skills.length);
 
   return (
     <div className={styles.container}>
-      {/* 头部：标题 + 搜索 + 筛选 */}
+      {/* 页面头部作为探索页封面，强调技能生态而不是普通列表。 */}
       <div className={styles.header}>
-        <div className={styles.headerTop}>
-          <h1 className={styles.title}>技能市场</h1>
-          <SkillSearch value={searchKeyword} onChange={setSearchKeyword} />
+        <div className={styles.headerMain}>
+          <div className={styles.headerCopy}>
+            <p className={styles.eyebrow}>Skill Library</p>
+            <h1 className={styles.title}>为工作台扩展新能力</h1>
+            <p className={styles.subtitle}>
+              在这里挑选分析、写作、代码与办公技能，把常用动作沉淀成可复用的工作模块。
+            </p>
+          </div>
+
+          <div className={styles.stats}>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>已安装</span>
+              <span className={styles.statValue}>{installedSkills.length}</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>可用技能</span>
+              <span className={styles.statValue}>{totalSkills}</span>
+            </div>
+          </div>
         </div>
-        <SkillFilter selectedCategory={selectedCategory} onChange={setCategory} />
+
+        <div className={styles.toolbar}>
+          <SkillSearch value={searchKeyword} onChange={setSearchKeyword} />
+          <SkillFilter selectedCategory={selectedCategory} onChange={setCategory} />
+        </div>
       </div>
 
       {/* 内容区域 */}
@@ -155,6 +176,9 @@ export default function SkillsPage() {
               <div className={styles.emptyIcon}>🔍</div>
               <div className={styles.emptyText}>
                 {searchKeyword || selectedCategory !== 'all' ? '未找到匹配的技能' : '暂无技能'}
+              </div>
+              <div className={styles.emptyHint}>
+                可以尝试切换分类，或使用更宽泛的关键词重新检索。
               </div>
             </div>
           )}

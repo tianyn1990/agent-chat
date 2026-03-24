@@ -4,22 +4,45 @@
   display: flex;
   align-items: center;
   gap: @spacing-sm;
+  flex-shrink: 0;
 }
 
 .label {
-  font-size: @font-size-base;
-  color: #666;
-  font-weight: 500;
+  flex-shrink: 0;
+  font-size: @font-size-sm;
+  color: @text-secondary;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .tag {
-  font-size: @font-size-base;
+  font-size: @font-size-sm;
   padding: 4px 12px;
-  border-radius: @border-radius-sm;
+  border-radius: 999px;
   cursor: pointer;
   transition: all @transition-base;
+  border: 1px solid rgba(71, 58, 39, 0.12);
+  background: rgba(255, 252, 247, 0.8);
+  color: @text-secondary;
+  line-height: 1.6;
+  user-select: none;
 
   &:hover {
-    opacity: 0.8;
+    border-color: rgba(53, 92, 125, 0.3);
+    color: @primary-color;
+    background: rgba(53, 92, 125, 0.06);
   }
+}
+
+// 选中态：蓝底白字，清晰可辨
+:global(.ant-tag-checkable-checked).tag {
+  background: @primary-color !important;
+  border-color: @primary-color !important;
+  color: #fff !important;
 }

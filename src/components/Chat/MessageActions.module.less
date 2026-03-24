@@ -3,16 +3,17 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 8px;
+  gap: 6px;
+  margin-top: 10px;
 }
 
 .btn {
-  color: #64748b;
-  border-radius: 999px;
+  color: @text-tertiary !important;
+  border-radius: 999px !important;
+  background: rgba(53, 92, 125, 0.04);
 
   &:hover {
-    color: #0f172a;
-    background: rgba(15, 23, 42, 0.06);
+    color: @text-primary !important;
+    background: rgba(53, 92, 125, 0.1) !important;
   }
 }

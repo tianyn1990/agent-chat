@@ -4,83 +4,110 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: @spacing-xl;
-  gap: @spacing-xl;
+  padding: 32px 44px;
+  gap: 24px;
+  overflow-y: auto;
 }
 
-// 欢迎问候区
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 28px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(183, 121, 69, 0.14), transparent 28%),
+    linear-gradient(135deg, rgba(255, 253, 249, 0.96), rgba(248, 241, 232, 0.92));
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  box-shadow: @shadow-sm;
+}
+
+.heroBadge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: @accent-soft;
+  color: @accent-color;
+  font-size: @font-size-sm;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .greeting {
-  text-align: center;
-}
-
-.emoji {
-  font-size: 48px;
-  margin-bottom: @spacing-md;
-  line-height: 1;
-  animation: wave 0.8s ease-in-out;
-}
-
-@keyframes wave {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  20% {
-    transform: rotate(20deg);
-  }
-  40% {
-    transform: rotate(-10deg);
-  }
-  60% {
-    transform: rotate(15deg);
-  }
-  80% {
-    transform: rotate(-5deg);
-  }
+  text-align: left;
 }
 
 .title {
-  font-size: @font-size-3xl;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 @spacing-sm;
+  font-size: clamp(26px, 3vw, 36px);
+  font-family: @font-family-display;
+  font-weight: 700;
+  color: @text-primary;
+  margin: 0 0 6px;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .subtitle {
-  font-size: @font-size-lg;
-  color: #666;
+  max-width: 680px;
+  font-size: @font-size-base;
+  color: @text-secondary;
   margin: 0;
+  line-height: 1.75;
 }
 
-// 快捷提问建议卡片网格
+.heroNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(71, 58, 39, 0.14);
+}
+
+.noteLabel {
+  flex-shrink: 0;
+  color: @primary-color;
+  font-size: @font-size-sm;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.noteText {
+  color: @text-tertiary;
+  line-height: 1.7;
+}
+
 .suggestions {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: @spacing-md;
+  gap: 12px;
   width: 100%;
-  max-width: 560px;
 }
 
 .suggestionCard {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: @spacing-xs;
-  padding: @spacing-md;
-  background-color: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: @border-radius-lg;
+  gap: 6px;
+  min-height: 130px;
+  padding: 16px 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.92), rgba(248, 241, 232, 0.9)), @paper-bg;
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  border-radius: 24px;
   cursor: pointer;
   text-align: left;
   transition: all @transition-base;
   box-shadow: @shadow-sm;
 
   &:hover {
-    border-color: @primary-color;
-    box-shadow: 0 2px 8px rgba(22, 119, 255, 0.12);
-    transform: translateY(-1px);
+    border-color: rgba(53, 92, 125, 0.24);
+    box-shadow: @shadow-md;
+    transform: translateY(-3px) rotate(-0.4deg);
   }
 
   &:active {
@@ -88,22 +115,49 @@
   }
 }
 
+.cardIndex {
+  color: rgba(53, 92, 125, 0.28);
+  font-family: @font-family-display;
+  font-size: 20px;
+  font-weight: 700;
+}
+
 .cardLabel {
+  font-size: @font-size-lg;
+  font-weight: 700;
+  color: @text-primary;
+}
+
+.cardTone {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(53, 92, 125, 0.08);
+  color: @primary-color;
   font-size: @font-size-sm;
   font-weight: 600;
-  color: @primary-color;
-  background-color: rgba(22, 119, 255, 0.08);
-  padding: 2px 8px;
-  border-radius: @border-radius-sm;
 }
 
 .cardText {
   font-size: @font-size-base;
-  color: #444;
-  line-height: 1.5;
-  // 超过两行省略
+  color: @text-secondary;
+  line-height: 1.75;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .container {
+    padding: 24px;
+  }
+
+  .suggestions {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 24px;
+  }
 }

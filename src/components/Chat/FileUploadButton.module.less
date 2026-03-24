@@ -6,49 +6,48 @@
   gap: @spacing-xs;
 }
 
-// 附件按钮
 .uploadBtn {
-  color: #666;
+  color: @text-secondary !important;
   font-size: 16px;
+  border-radius: 14px !important;
 
   &:hover:not(:disabled) {
-    color: @primary-color;
+    color: @primary-color !important;
+    background: rgba(53, 92, 125, 0.08) !important;
   }
 }
 
-// 已选文件预览列表
 .fileList {
   display: flex;
   flex-wrap: wrap;
-  gap: @spacing-xs;
-  padding: @spacing-xs 0;
-  border-bottom: 1px solid #f0f0f0;
-  margin-bottom: @spacing-xs;
+  gap: @spacing-sm;
+  padding: 4px 0 12px;
+  border-bottom: 1px dashed rgba(71, 58, 39, 0.12);
+  margin-bottom: 4px;
 }
 
-// 单个文件预览条目
 .previewItem {
   display: flex;
   align-items: center;
-  gap: @spacing-xs;
-  padding: 4px 8px 4px 4px;
-  background-color: #f5f5f5;
-  border: 1px solid #e8e8e8;
-  border-radius: @border-radius;
-  max-width: 200px;
+  gap: @spacing-sm;
+  padding: 8px 10px 8px 8px;
+  background: rgba(255, 251, 246, 0.92);
+  border: 1px solid rgba(71, 58, 39, 0.1);
+  border-radius: 16px;
+  max-width: 240px;
+  box-shadow: @shadow-sm;
 }
 
-// 缩略图/图标区域
 .previewThumb {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: @border-radius-sm;
+  border-radius: 12px;
   overflow: hidden;
-  background-color: #e8e8e8;
+  background: linear-gradient(135deg, rgba(53, 92, 125, 0.1), rgba(183, 121, 69, 0.1));
 }
 
 .thumbImg {
@@ -58,22 +57,21 @@
 }
 
 .fileIcon {
-  color: #888;
+  color: @primary-color;
   font-size: 16px;
 }
 
-// 文件信息
 .previewInfo {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
 }
 
 .previewName {
   font-size: @font-size-sm;
-  color: #333;
+  color: @text-primary;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -81,20 +79,19 @@
 
 .previewSize {
   font-size: 11px;
-  color: #999;
+  color: @text-tertiary;
 }
 
-// 移除按钮
 .removeBtn {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border: none;
   background: transparent;
-  color: #999;
+  color: @text-tertiary;
   cursor: pointer;
   padding: 0;
   border-radius: 50%;
@@ -104,7 +101,7 @@
     color @transition-base;
 
   &:hover {
-    background-color: #e0e0e0;
-    color: #333;
+    background-color: rgba(71, 58, 39, 0.08);
+    color: @text-primary;
   }
 }

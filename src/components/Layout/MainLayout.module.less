@@ -4,7 +4,9 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background-color: @content-bg;
+  background: transparent;
+  padding: 18px;
+  gap: 18px;
 }
 
 .content {
@@ -13,4 +15,21 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.7), rgba(255, 249, 240, 0.88)), @paper-bg;
+  border: 1px solid rgba(71, 58, 39, 0.08);
+  box-shadow: @shadow-md;
+  backdrop-filter: blur(18px);
+}
+
+@media (max-width: 1100px) {
+  .layout {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .content {
+    border-radius: 24px;
+  }
 }
