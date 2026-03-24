@@ -1,0 +1,347 @@
+@import '@/styles/variables.less';
+
+// 消息行容器
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: @spacing-sm;
+  padding: @spacing-xs @spacing-md;
+  animation: fadeInUp 0.2s ease;
+}
+
+// 用户消息：靠右
+.rowUser {
+  flex-direction: row-reverse;
+}
+
+// 助手消息：靠左
+.rowAssistant {
+  flex-direction: row;
+}
+
+// 头像
+.avatar {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+// 消息内容容器（气泡 + 时间）
+.content {
+  display: flex;
+  flex-direction: column;
+  max-width: 72%;
+}
+
+// 图表/卡片消息：放宽至 92%，充分利用聊天区宽度
+.contentWide {
+  max-width: 92%;
+}
+
+// 基础气泡样式
+.bubble {
+  padding: 10px 14px;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+// 用户气泡
+.bubbleUser {
+  background-color: @user-bubble-bg;
+  color: @user-bubble-text;
+  border-radius: @border-radius-lg @border-radius-sm @border-radius-lg @border-radius-lg;
+  align-self: flex-end;
+
+  // Markdown 链接在用户气泡中也白色显示
+  a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: underline;
+  }
+}
+
+// 助手气泡
+.bubbleAssistant {
+  background-color: @assistant-bubble-bg;
+  border: 1px solid @assistant-bubble-border;
+  box-shadow: @assistant-bubble-shadow;
+  border-radius: @border-radius-sm @border-radius-lg @border-radius-lg @border-radius-lg;
+  color: #262626;
+  font-size: @font-size-base;
+
+  // Markdown 内容样式
+  p {
+    margin: 0 0 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 12px 0 6px;
+    line-height: 1.4;
+    color: #1a1a1a;
+  }
+
+  ul,
+  ol {
+    padding-left: 20px;
+    margin: 6px 0;
+  }
+
+  li {
+    margin: 3px 0;
+  }
+
+  blockquote {
+    margin: 8px 0;
+    padding: 6px 12px;
+    border-left: 3px solid #e8e8e8;
+    color: #666;
+    background: #fafafa;
+    border-radius: 0 @border-radius-sm @border-radius-sm 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: @font-size-sm;
+  }
+
+  th,
+  td {
+    border: 1px solid #e8e8e8;
+    padding: 6px 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #fafafa;
+    font-weight: 600;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #e8e8e8;
+    margin: 12px 0;
+  }
+
+  a {
+    color: @primary-color;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  img {
+    max-width: 100%;
+    border-radius: @border-radius-sm;
+  }
+
+  strong {
+    color: #1a1a1a;
+  }
+}
+
+// 用户消息文本（保留换行，不解析 Markdown）
+.userText {
+  margin: 0;
+  font-family: inherit;
+  font-size: @font-size-base;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: inherit;
+}
+
+// 用户消息启用 Markdown 时的样式覆盖（白字背景，需适当调整颜色）
+.bubbleUserMarkdown {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 8px 0 4px;
+    color: inherit;
+    line-height: 1.4;
+  }
+
+  ul,
+  ol {
+    padding-left: 18px;
+    margin: 4px 0;
+  }
+
+  li {
+    margin: 2px 0;
+  }
+
+  p {
+    margin: 0 0 6px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: underline;
+  }
+
+  strong {
+    color: inherit;
+    font-weight: 700;
+  }
+
+  em {
+    color: inherit;
+    font-style: italic;
+  }
+}
+
+// 代码块
+.codeBlock {
+  border-radius: @border-radius-sm;
+  font-size: 13px;
+}
+
+// 行内代码
+.inlineCode {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9em;
+  color: #d63384;
+}
+
+// 流式输入光标
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: #1677ff;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: cursorBlink 0.8s step-end infinite;
+}
+
+@keyframes cursorBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+// 时间戳
+.time {
+  font-size: @font-size-sm;
+  color: #bbb;
+  margin-top: 4px;
+}
+
+.timeLeft {
+  text-align: left;
+}
+
+.timeRight {
+  text-align: right;
+}
+
+// 占位气泡（卡片/图表未实现时）
+.placeholderBubble {
+  display: flex;
+  align-items: center;
+  gap: @spacing-sm;
+  padding: 10px 14px;
+  background-color: @assistant-bubble-bg;
+  border: 1px solid @assistant-bubble-border;
+  border-radius: @border-radius-sm @border-radius-lg @border-radius-lg @border-radius-lg;
+}
+
+.placeholderText {
+  color: #999;
+  font-size: @font-size-sm;
+}
+
+// 图片预览
+.imagePreview {
+  max-width: 240px;
+  max-height: 180px;
+  border-radius: @border-radius-sm;
+  display: block;
+}
+
+// 文件卡片
+.fileCard {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fileName {
+  font-size: @font-size-base;
+  font-weight: 500;
+}
+
+.fileSize {
+  font-size: @font-size-sm;
+  opacity: 0.75;
+}
+
+// 错误气泡
+.errorBubble {
+  display: flex;
+  align-items: flex-start;
+  gap: @spacing-sm;
+  padding: 10px 14px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: @border-radius;
+  max-width: 72%;
+}
+
+.errorIcon {
+  color: #ff4d4f;
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.errorContent {
+  flex: 1;
+}
+
+.errorTitle {
+  color: #ff4d4f;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.errorMsg {
+  color: #666;
+  font-size: @font-size-sm;
+}
+
+// 消息淡入动画
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

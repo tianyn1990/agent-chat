@@ -1,0 +1,69 @@
+@import '@/styles/variables.less';
+
+.shell {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  background: #06111f;
+}
+
+.visible {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+.stage {
+  width: 100%;
+  height: 100%;
+}
+
+.toolbar {
+  position: absolute;
+  top: 64px;
+  right: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  background: rgba(6, 17, 31, 0.42);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(14px);
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actions :global(.ant-btn) {
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.actions :global(.ant-btn.ant-btn-text) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.actions :global(.ant-btn:hover),
+.actions :global(.ant-btn:focus-visible) {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    top: 60px;
+    right: 10px;
+    gap: 8px;
+    padding: 7px 8px;
+  }
+}

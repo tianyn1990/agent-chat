@@ -1,0 +1,33 @@
+@import '@/styles/variables.less';
+
+// 消息列表滚动容器
+.container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  padding: @spacing-sm 0;
+
+  // 自定义滚动条样式
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// TypingIndicator 包装器（绝对定位在虚拟列表下方）
+.typingWrapper {
+  padding: @spacing-xs 0;
+}

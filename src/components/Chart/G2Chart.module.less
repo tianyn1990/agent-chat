@@ -1,0 +1,61 @@
+@import '@/styles/variables.less';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: @spacing-xs;
+  position: relative;
+  width: 100%;
+}
+
+// G2 挂载容器
+.chartContainer {
+  width: 100%;
+  overflow: hidden;
+
+  // G2 渲染的 canvas 自适应宽度
+  canvas {
+    max-width: 100%;
+  }
+}
+
+// 加载中蒙层
+.loadingMask {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa;
+  border-radius: @border-radius-sm;
+  border: 1px dashed #e0e0e0;
+}
+
+// 渲染失败错误状态
+.errorState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  background-color: #fff2f0;
+  border: 1px dashed #ffccc7;
+  border-radius: @border-radius-sm;
+  color: #ff4d4f;
+  font-size: @font-size-sm;
+}
+
+// 工具栏
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: @spacing-xs;
+  padding-top: @spacing-xs;
+  border-top: 1px solid #f0f0f0;
+}
+
+.toolBtn {
+  color: #666;
+  font-size: @font-size-sm;
+
+  &:hover {
+    color: @primary-color;
+  }
+}

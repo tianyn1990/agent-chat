@@ -1,0 +1,114 @@
+@import '@/styles/variables.less';
+
+// 卡片头部基础样式
+.header {
+  display: flex;
+  align-items: center;
+  gap: @spacing-sm;
+  padding: 12px @spacing-md;
+  border-radius: @border-radius @border-radius 0 0;
+  position: relative;
+}
+
+// 图标
+.icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+// 文字区域
+.textArea {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-size: @font-size-base;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.subtitle {
+  font-size: @font-size-sm;
+  opacity: 0.75;
+  line-height: 1.4;
+}
+
+// 过期角标
+.expiredBadge {
+  font-size: @font-size-sm;
+  padding: 1px 6px;
+  border-radius: @border-radius-sm;
+  background: rgba(0, 0, 0, 0.15);
+  color: inherit;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+// 过期整体降色
+.expired {
+  opacity: 0.7;
+}
+
+// ===========================
+// 主题色
+// ===========================
+
+.templateBlue {
+  background-color: @card-blue-bg;
+  border-bottom: 1px solid @card-blue-border;
+  color: #003eb3;
+
+  .expiredBadge {
+    background-color: @card-blue-border;
+    color: #003eb3;
+  }
+}
+
+.templateGreen {
+  background-color: @card-green-bg;
+  border-bottom: 1px solid @card-green-border;
+  color: #237804;
+
+  .expiredBadge {
+    background-color: @card-green-border;
+    color: #237804;
+  }
+}
+
+.templateYellow {
+  background-color: @card-yellow-bg;
+  border-bottom: 1px solid @card-yellow-border;
+  color: #874d00;
+
+  .expiredBadge {
+    background-color: @card-yellow-border;
+    color: #874d00;
+  }
+}
+
+.templateRed {
+  background-color: @card-red-bg;
+  border-bottom: 1px solid @card-red-border;
+  color: #a8071a;
+
+  .expiredBadge {
+    background-color: @card-red-border;
+    color: #a8071a;
+  }
+}
+
+.templateGrey {
+  background-color: @card-grey-bg;
+  border-bottom: 1px solid @card-grey-border;
+  color: #595959;
+
+  .expiredBadge {
+    background-color: @card-grey-border;
+    color: #595959;
+  }
+}

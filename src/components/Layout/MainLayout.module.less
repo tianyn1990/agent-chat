@@ -1,0 +1,16 @@
+@import '@/styles/variables.less';
+
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background-color: @content-bg;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

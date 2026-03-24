@@ -1,0 +1,70 @@
+{
+  "name": "agent-chat",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,less,css}'",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.3.0",
+    "@antv/g2": "^5.1.7",
+    "@antv/s2": "^2.0.0",
+    "@antv/s2-react": "^2.0.0",
+    "@tanstack/react-virtual": "^3.2.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "antd": "^5.14.0",
+    "axios": "^1.6.7",
+    "dayjs": "^1.11.10",
+    "mock-socket": "^9.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.1",
+    "react-router-dom": "^6.22.0",
+    "react-syntax-highlighter": "^16.1.1",
+    "remark-gfm": "^4.0.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^25.5.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^1.4.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "husky": "^9.0.11",
+    "jsdom": "^24.0.0",
+    "less": "^4.2.0",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.0",
+    "vitest": "^1.4.0"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.{less,css}": [
+      "prettier --write"
+    ]
+  }
+}

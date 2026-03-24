@@ -1,0 +1,107 @@
+@import '@/styles/variables.less';
+
+// 会话列表单条目
+.item {
+  display: flex;
+  align-items: center;
+  gap: @spacing-sm;
+  padding: 8px 10px;
+  border-radius: @border-radius;
+  cursor: pointer;
+  transition: background-color @transition-base;
+  position: relative;
+  min-height: 44px;
+
+  &:hover {
+    background-color: @sidebar-hover-bg;
+  }
+}
+
+// 激活态（当前会话）
+.itemActive {
+  background-color: @sidebar-active-bg !important;
+
+  .title {
+    color: @sidebar-active-text;
+  }
+
+  .icon {
+    color: @sidebar-active-text;
+  }
+}
+
+// 消息图标
+.icon {
+  font-size: 14px;
+  color: @sidebar-text-secondary;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+// 标题与摘要容器
+.titleArea {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+// 会话标题
+.title {
+  color: @sidebar-text;
+  font-size: @font-size-base;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+// 最后一条消息摘要
+.lastMessage {
+  color: @sidebar-text-secondary;
+  font-size: @font-size-sm;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+// 内联重命名输入框
+.renameInput {
+  // 覆盖 Ant Design 默认样式，适配深色背景
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: @sidebar-text !important;
+  font-size: @font-size-base;
+
+  &:focus {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.2) !important;
+  }
+}
+
+// 操作菜单按钮（三点）
+.menuBtn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: @border-radius-sm;
+  background: transparent;
+  color: @sidebar-text-secondary;
+  cursor: pointer;
+  transition:
+    background-color @transition-base,
+    color @transition-base;
+  padding: 0;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: @sidebar-text;
+  }
+}

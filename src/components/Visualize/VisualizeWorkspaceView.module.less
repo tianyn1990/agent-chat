@@ -1,0 +1,49 @@
+@import '@/styles/variables.less';
+
+.shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(22, 119, 255, 0.08), transparent 24%),
+    linear-gradient(180deg, #f8fbff 0%, #eef3fb 100%);
+}
+
+.frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: #fff;
+}
+
+.emptyWrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.empty {
+  width: min(840px, 100%);
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+}
+
+.tip {
+  margin-top: 12px;
+  color: #64748b;
+  line-height: 1.7;
+  text-align: left;
+}
+
+.mode {
+  margin-top: 10px;
+  color: #33537c;
+  font-weight: 600;
+}

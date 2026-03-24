@@ -1,0 +1,44 @@
+@import '@/styles/variables.less';
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: @spacing-sm;
+  padding: @spacing-sm @spacing-md;
+  border-radius: @border-radius;
+  cursor: pointer;
+  transition: background-color @transition-base;
+
+  &:hover {
+    background-color: @sidebar-hover-bg;
+  }
+}
+
+.avatar {
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.name {
+  color: @sidebar-text;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.department {
+  color: @sidebar-text-secondary;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+}

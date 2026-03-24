@@ -1,0 +1,25 @@
+@import '@/styles/variables.less';
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: @spacing-sm;
+}
+
+.label {
+  font-size: @font-size-base;
+  color: #666;
+  font-weight: 500;
+}
+
+.tag {
+  font-size: @font-size-base;
+  padding: 4px 12px;
+  border-radius: @border-radius-sm;
+  cursor: pointer;
+  transition: all @transition-base;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}

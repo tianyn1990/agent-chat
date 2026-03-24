@@ -1,0 +1,36 @@
+@import '@/styles/variables.less';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: @spacing-xs;
+  width: 100%;
+}
+
+.image {
+  border-radius: @border-radius-sm;
+  // 高度自适应，但不超过屏幕高度的 60%
+  max-height: 60vh;
+  object-fit: contain;
+}
+
+.previewMask {
+  font-size: @font-size-sm;
+  color: #fff;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: @spacing-xs;
+  border-top: 1px solid #f0f0f0;
+}
+
+.toolBtn {
+  color: #666;
+  font-size: @font-size-sm;
+
+  &:hover {
+    color: @primary-color;
+  }
+}

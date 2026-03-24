@@ -1,0 +1,109 @@
+@import '@/styles/variables.less';
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: @spacing-xl;
+  gap: @spacing-xl;
+}
+
+// 欢迎问候区
+.greeting {
+  text-align: center;
+}
+
+.emoji {
+  font-size: 48px;
+  margin-bottom: @spacing-md;
+  line-height: 1;
+  animation: wave 0.8s ease-in-out;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(20deg);
+  }
+  40% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(15deg);
+  }
+  80% {
+    transform: rotate(-5deg);
+  }
+}
+
+.title {
+  font-size: @font-size-3xl;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 @spacing-sm;
+}
+
+.subtitle {
+  font-size: @font-size-lg;
+  color: #666;
+  margin: 0;
+}
+
+// 快捷提问建议卡片网格
+.suggestions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: @spacing-md;
+  width: 100%;
+  max-width: 560px;
+}
+
+.suggestionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: @spacing-xs;
+  padding: @spacing-md;
+  background-color: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: @border-radius-lg;
+  cursor: pointer;
+  text-align: left;
+  transition: all @transition-base;
+  box-shadow: @shadow-sm;
+
+  &:hover {
+    border-color: @primary-color;
+    box-shadow: 0 2px 8px rgba(22, 119, 255, 0.12);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.cardLabel {
+  font-size: @font-size-sm;
+  font-weight: 600;
+  color: @primary-color;
+  background-color: rgba(22, 119, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: @border-radius-sm;
+}
+
+.cardText {
+  font-size: @font-size-base;
+  color: #444;
+  line-height: 1.5;
+  // 超过两行省略
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

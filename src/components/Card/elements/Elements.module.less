@@ -1,0 +1,160 @@
+@import '@/styles/variables.less';
+
+// ===========================
+// DivElement - 文本块
+// ===========================
+
+.divEl {
+  font-size: @font-size-base;
+  line-height: 1.6;
+  color: #262626;
+  padding: 2px 0;
+
+  // Markdown 内部样式
+  strong {
+    font-weight: 600;
+  }
+  em {
+    font-style: italic;
+  }
+  code {
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-size: 0.9em;
+    font-family: monospace;
+  }
+  a {
+    color: @primary-color;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// 段落（覆盖 ReactMarkdown 的 <p> 标签）
+.divParagraph {
+  display: inline;
+}
+
+// 文字主题
+.textPrimary {
+  color: @primary-color;
+  font-weight: 500;
+}
+.textSecondary {
+  color: #8c8c8c;
+}
+.textDanger {
+  color: #ff4d4f;
+}
+
+// ===========================
+// ActionElement - 操作区
+// ===========================
+
+.actionEl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @spacing-sm;
+  padding: 4px 0;
+}
+
+.actionHorizontal {
+  flex-direction: row;
+  align-items: center;
+}
+
+.actionVertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+// ===========================
+// FormElement - 表单块
+// ===========================
+
+.formEl {
+  padding: 4px 0;
+
+  // 收紧表单项间距
+  :global(.ant-form-item) {
+    margin-bottom: 12px;
+  }
+
+  :global(.ant-form-item-label) {
+    padding-bottom: 2px;
+
+    > label {
+      font-size: @font-size-sm;
+      color: #595959;
+    }
+  }
+}
+
+// ===========================
+// NoteElement - 备注提示
+// ===========================
+
+.noteEl {
+  display: flex;
+  align-items: flex-start;
+  gap: @spacing-xs;
+  padding: 6px 10px;
+  border-radius: @border-radius-sm;
+  font-size: @font-size-sm;
+  line-height: 1.5;
+}
+
+.noteIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 13px;
+}
+
+.noteText {
+  flex: 1;
+}
+
+// 四种提示样式
+.noteInfo {
+  background-color: #e6f4ff;
+  border: 1px solid #91caff;
+  color: #003eb3;
+
+  .noteIcon {
+    color: #1677ff;
+  }
+}
+
+.noteWarning {
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+  color: #874d00;
+
+  .noteIcon {
+    color: #faad14;
+  }
+}
+
+.noteSuccess {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #237804;
+
+  .noteIcon {
+    color: #52c41a;
+  }
+}
+
+.noteError {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #a8071a;
+
+  .noteIcon {
+    color: #ff4d4f;
+  }
+}

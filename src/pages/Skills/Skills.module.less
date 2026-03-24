@@ -1,0 +1,72 @@
+@import '@/styles/variables.less';
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: @content-bg;
+}
+
+.header {
+  padding: @spacing-lg @spacing-xl;
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: @spacing-md;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: @spacing-lg @spacing-xl;
+}
+
+.section {
+  margin-bottom: @spacing-xl;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: @spacing-md;
+  display: flex;
+  align-items: center;
+  gap: @spacing-xs;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: @spacing-lg;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: @spacing-xl 0;
+  color: #999;
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: @spacing-md;
+}
+
+.emptyText {
+  font-size: @font-size-base;
+}

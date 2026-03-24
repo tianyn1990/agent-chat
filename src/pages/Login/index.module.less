@@ -1,0 +1,67 @@
+@import '@/styles/variables.less';
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e1e2e 0%, #313244 50%, #1e1e2e 100%);
+}
+
+.card {
+  width: 400px;
+  padding: 48px 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: @border-radius-xl;
+  backdrop-filter: blur(20px);
+  text-align: center;
+  box-shadow: @shadow-lg;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.logoIcon {
+  font-size: 40px;
+}
+
+.logoText {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: @font-size-base;
+  margin: 0 0 40px;
+}
+
+.loginArea {
+  margin-bottom: 32px;
+}
+
+.hint {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: @font-size-base;
+  margin-bottom: 16px;
+}
+
+.loginBtn {
+  height: 46px;
+  font-size: 16px;
+  border-radius: @border-radius !important;
+}
+
+.footer {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: @font-size-sm;
+  margin: 0;
+}

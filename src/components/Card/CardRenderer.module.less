@@ -1,0 +1,57 @@
+@import '@/styles/variables.less';
+
+// 卡片容器：撑满父级宽度，宽度由消息行容器控制
+.card {
+  border: 1px solid #e8e8e8;
+  border-radius: @border-radius-lg;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow: @shadow-sm;
+  width: 100%;
+  position: relative;
+  transition: opacity @transition-base;
+}
+
+// 过期态整体降色
+.cardExpired {
+  opacity: 0.75;
+}
+
+// 内容区
+.body {
+  padding: @spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// 图片容器
+.imageWrapper {
+  text-align: center;
+
+  img {
+    border-radius: @border-radius-sm;
+  }
+}
+
+// 已提交覆盖提示（卡片底部）
+.expiredOverlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: @spacing-xs;
+  padding: 8px @spacing-md;
+  background-color: #f6ffed;
+  border-top: 1px solid #b7eb8f;
+}
+
+.expiredIcon {
+  color: #52c41a;
+  font-size: 14px;
+}
+
+.expiredText {
+  color: #237804;
+  font-size: @font-size-sm;
+  font-weight: 500;
+}

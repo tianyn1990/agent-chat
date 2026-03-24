@@ -1,0 +1,75 @@
+@import '@/styles/variables.less';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: @spacing-xs;
+  width: 100%;
+  transition: all @transition-slow;
+}
+
+// 全屏模式：fixed 覆盖视口
+.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: #fff;
+  padding: @spacing-md;
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: @spacing-xs;
+
+  .fullscreen & {
+    // 全屏时工具栏固定在顶部
+    flex-shrink: 0;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: @spacing-sm;
+  }
+}
+
+.toolBtn {
+  color: #666;
+  &:hover {
+    color: @primary-color;
+  }
+}
+
+// iframe 容器（相对定位，用于遮罩层定位）
+.iframeWrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: @border-radius-sm;
+  border: 1px solid #e8e8e8;
+
+  .fullscreen & {
+    flex: 1;
+    height: auto !important;
+  }
+}
+
+// 加载中蒙层
+.loadingMask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 1;
+}
+
+.iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}

@@ -1,0 +1,47 @@
+@import '@/styles/variables.less';
+
+// 对话页面主容器：垂直布局（消息区 + 输入区）
+.container {
+  display: flex;
+  height: 100%;
+  background-color: @content-bg;
+  min-width: 0;
+}
+
+.chatColumn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+// 消息滚动区域（占据剩余高度）
+.messageArea {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+// 底部输入区域
+.inputArea {
+  flex-shrink: 0;
+  padding: @spacing-sm @spacing-lg @spacing-md;
+  background-color: @content-bg;
+  border-top: 1px solid #ebebeb;
+}
+
+// 无会话时的提示文字
+.noSessionTip {
+  text-align: center;
+  color: #999;
+  font-size: @font-size-sm;
+  padding-bottom: @spacing-xs;
+}
+
+@media (max-width: 1100px) {
+  .container {
+    flex-direction: column;
+  }
+}
