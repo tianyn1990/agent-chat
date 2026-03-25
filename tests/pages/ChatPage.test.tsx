@@ -17,6 +17,7 @@ function renderChatPage(initialEntry = '/chat') {
         <Routes>
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:sessionId" element={<ChatPage />} />
+          <Route path="/visualize/:sessionId" element={<div>工作台路由</div>} />
         </Routes>
       </MemoryRouter>
     </App>,
@@ -52,11 +53,17 @@ describe('ChatPage', () => {
       panelMessageId: null,
       isWorkbenchVisible: false,
       workbenchSessionId: null,
+      workbenchCacheSessionIds: [],
+      workbenchLifecycleBySession: {},
       runtimeBySession: {},
       openPanel: useVisualizeStore.getState().openPanel,
       closePanel: useVisualizeStore.getState().closePanel,
+      ensureWorkbenchSession: useVisualizeStore.getState().ensureWorkbenchSession,
       openWorkbench: useVisualizeStore.getState().openWorkbench,
       hideWorkbench: useVisualizeStore.getState().hideWorkbench,
+      markWorkbenchLoading: useVisualizeStore.getState().markWorkbenchLoading,
+      markWorkbenchReady: useVisualizeStore.getState().markWorkbenchReady,
+      markWorkbenchError: useVisualizeStore.getState().markWorkbenchError,
       setSessionRuntime: useVisualizeStore.getState().setSessionRuntime,
       clearSessionRuntime: useVisualizeStore.getState().clearSessionRuntime,
     });
@@ -83,7 +90,9 @@ describe('ChatPage', () => {
     fireEvent.click(screen.getByRole('button', { name: '数据分析' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('textbox')).toHaveValue('帮我分析一份销售数据，找出关键趋势');
+      const textbox = screen.getByRole('textbox');
+      expect(textbox).toHaveValue('帮我分析一份销售数据，找出关键趋势');
+      expect(textbox).toHaveFocus();
     }, { timeout: 2000 });
   });
 
@@ -124,7 +133,7 @@ describe('ChatPage', () => {
     }, { timeout: 2000 });
   });
 
-  it('执行态会让右上角状态胶囊进入运行样式', async () => {
+  it('执行态会让会话级执行状态入口进入运行样式', async () => {
     const sessionId = 'session-running';
 
     useChatStore.setState({
@@ -155,8 +164,39 @@ describe('ChatPage', () => {
     renderChatPage(`/chat/${sessionId}`);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('当前执行状态：执行中')).toHaveAttribute('data-running', 'true');
+      expect(screen.getByRole('button', { name: '查看当前会话执行状态' })).toHaveAttribute(
+        'data-busy',
+        'true',
+      );
+      expect(screen.getByText('工作台处理中')).toBeInTheDocument();
     });
+  });
+
+  it('点击头部执行状态入口会直接进入沉浸式工作台', async () => {
+    const user = userEvent.setup();
+    const sessionId = 'session-open-workbench';
+
+    useChatStore.setState({
+      sessions: [
+        {
+          id: sessionId,
+          title: '工作台入口测试',
+          createdAt: Date.now(),
+        },
+      ],
+      currentSessionId: sessionId,
+      messages: {
+        [sessionId]: [],
+      },
+    });
+
+    renderChatPage(`/chat/${sessionId}`);
+
+    await user.click(screen.getByRole('button', { name: '查看当前会话执行状态' }));
+
+    expect(useVisualizeStore.getState().isWorkbenchVisible).toBe(true);
+    expect(useVisualizeStore.getState().workbenchSessionId).toBe(sessionId);
+    expect(await screen.findByText('工作台路由')).toBeInTheDocument();
   });
 
   it('当前会话处理中时仍可编辑输入框，但不可发送', async () => {

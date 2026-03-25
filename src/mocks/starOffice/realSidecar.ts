@@ -180,6 +180,99 @@ export function rewriteStarOfficeIndexHtml(html: string, sessionBasePath: string
 
       return originalFetch(resource, init);
     };
+
+    /**
+     * 将上游完整主舞台按比例缩放进 iframe 视口。
+     *
+     * 设计原因：
+     * - 当前沉浸式路由已经拥有完整视口，因此可以展示 Star-Office 原生的“办公室 + 底部面板”布局
+     * - 之前只裁出办公室区域，会让用户误以为下方内容丢失
+     * - 这里保留原始主舞台，只隐藏装修抽屉等旁支区域，并把完整主舞台居中缩放到可视区
+     */
+    function applyEmbeddedStageMode() {
+      var root = document.documentElement;
+      var body = document.body;
+      if (!root || !body) {
+        return;
+      }
+
+      root.classList.add('oc-embedded-office');
+      body.classList.add('oc-embedded-office-body');
+
+      var mainStage = document.getElementById('main-stage');
+      if (mainStage) {
+        mainStage.classList.add('oc-embedded-main-stage');
+      }
+
+      var gameContainer = document.getElementById('game-container');
+      if (gameContainer) {
+        gameContainer.classList.add('oc-embedded-game-container');
+      }
+
+      var hiddenRegionIds = [
+        'asset-drawer-backdrop',
+        'asset-drawer',
+        'asset-highlight',
+        'room-loading-overlay',
+      ];
+      for (var index = 0; index < hiddenRegionIds.length; index += 1) {
+        var hiddenRegion = document.getElementById(hiddenRegionIds[index]);
+        if (hiddenRegion) {
+          hiddenRegion.classList.add('oc-embedded-hidden');
+        }
+      }
+
+      fitEmbeddedStage();
+    }
+
+    /**
+     * 动态计算完整主舞台的缩放比，避免 1280x 办公室加底部面板在较矮视口中被裁切。
+     */
+    function fitEmbeddedStage() {
+      var root = document.documentElement;
+      var mainStage = document.getElementById('main-stage');
+      if (!root || !mainStage) {
+        return;
+      }
+
+      var stageWidth = Math.max(mainStage.scrollWidth, 1280);
+      var stageHeight = Math.max(mainStage.scrollHeight, 1040);
+      var scale = Math.min(window.innerWidth / stageWidth, window.innerHeight / stageHeight);
+
+      if (!isFinite(scale) || scale <= 0) {
+        scale = 1;
+      }
+
+      scale = Math.min(scale, 1);
+      root.style.setProperty('--oc-embedded-stage-scale', String(scale));
+      root.style.setProperty('--oc-embedded-stage-width', stageWidth + 'px');
+      root.style.setProperty('--oc-embedded-stage-height', stageHeight + 'px');
+    }
+
+    var embeddedStyle = document.createElement('style');
+    embeddedStyle.setAttribute('data-star-office-embedded-style', 'true');
+    embeddedStyle.textContent = [
+      'html.oc-embedded-office { width: 100%; height: 100%; overflow: hidden; background: #0f1118; }',
+      'body.oc-embedded-office-body { position: relative; margin: 0 !important; padding: 0 !important; min-height: 100vh; width: 100vw; height: 100vh; overflow: hidden; background: #0f1118 !important; }',
+      '#main-stage.oc-embedded-main-stage { position: absolute; top: 50%; left: 50%; width: var(--oc-embedded-stage-width, 1280px) !important; max-width: none !important; transform: translate(-50%, -50%) scale(var(--oc-embedded-stage-scale, 1)) !important; transform-origin: center center !important; transition: none !important; will-change: transform; }',
+      'body.drawer-open #main-stage.oc-embedded-main-stage { transform: translate(-50%, -50%) scale(var(--oc-embedded-stage-scale, 1)) !important; }',
+      '#game-container.oc-embedded-game-container { margin: 0 auto !important; }',
+      '#game-container.oc-embedded-game-container #status-text { bottom: 16px; left: 16px; max-width: calc(100% - 32px); }',
+      '.oc-embedded-hidden { display: none !important; }',
+    ].join('\\n');
+    document.head.appendChild(embeddedStyle);
+
+    window.addEventListener('resize', fitEmbeddedStage);
+    window.addEventListener('load', function () {
+      applyEmbeddedStageMode();
+      window.requestAnimationFrame(applyEmbeddedStageMode);
+      window.setTimeout(applyEmbeddedStageMode, 180);
+      window.setTimeout(applyEmbeddedStageMode, 900);
+    });
+
+    new MutationObserver(function () {
+      applyEmbeddedStageMode();
+    }).observe(document.documentElement, { childList: true, subtree: true });
   })();
 </script>`;
 

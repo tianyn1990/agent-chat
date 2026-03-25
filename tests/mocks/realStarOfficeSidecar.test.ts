@@ -36,11 +36,15 @@ describe('realStarOfficeSidecar helpers', () => {
     });
   });
 
-  it('rewriteStarOfficeIndexHtml 会注入 fetch bridge 并改写静态资源路径', () => {
+  it('rewriteStarOfficeIndexHtml 会注入 fetch bridge、缩放完整主舞台并改写静态资源路径', () => {
     const html = `
       <html>
         <head></head>
         <body>
+          <div id="main-stage">
+            <div id="game-container"></div>
+            <div id="bottom-panels"></div>
+          </div>
           <script src="/static/vendor/phaser.js"></script>
         </body>
       </html>
@@ -49,6 +53,11 @@ describe('realStarOfficeSidecar helpers', () => {
     const rewritten = rewriteStarOfficeIndexHtml(html, '/star-office/session/session_2');
     expect(rewritten).toContain('window.__STAR_OFFICE_SESSION_BASE__');
     expect(rewritten).toContain('/star-office/session/session_2/static/vendor/phaser.js');
+    expect(rewritten).toContain('oc-embedded-hidden');
+    expect(rewritten).toContain('--oc-embedded-stage-scale');
+    expect(rewritten).toContain("window.addEventListener('resize', fitEmbeddedStage)");
+    expect(rewritten).toContain('#main-stage.oc-embedded-main-stage');
+    expect(rewritten).toContain('#game-container.oc-embedded-game-container');
   });
 
   it('buildStarOfficeIdleStatusResponse 返回可直接渲染的 idle 结构', () => {

@@ -12,7 +12,7 @@ import { useVisualizeStore } from '@/stores/useVisualizeStore';
 import { mockWsService } from '@/mocks/websocket';
 import { localStarOfficeBridge } from '@/mocks/starOffice/bridge';
 import { wsService } from '@/services/websocket';
-import { ClockCircleOutlined, CommentOutlined, Loading3QuartersOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, CommentOutlined } from '@ant-design/icons';
 import {
   IS_MOCK_ENABLED,
   ROUTES,
@@ -21,8 +21,6 @@ import {
   STAR_OFFICE_URL,
 } from '@/constants';
 import { prefixedId } from '@/utils/id';
-import { VISUALIZE_STATE_LABELS } from '@/types/visualize';
-import type { VisualizeRuntimeState } from '@/types/visualize';
 import type {
   WsMessageChunk,
   WsCardMessage,
@@ -36,6 +34,7 @@ import MessageList from '@/components/Chat/MessageList';
 import MessageInput from '@/components/Chat/MessageInput';
 import WelcomeScreen from '@/components/Chat/WelcomeScreen';
 import VisualizePanel from '@/components/Visualize/VisualizePanel';
+import SessionWorkbenchEntry from '@/components/Visualize/SessionWorkbenchEntry';
 import type { SelectedFile } from '@/components/Chat/FileUploadButton';
 import styles from './Chat.module.less';
 
@@ -44,16 +43,6 @@ import styles from './Chat.module.less';
  * 使用 Intl API 代替零散的 toLocaleDateString，便于未来统一处理地区与时区策略。
  */
 const CHAT_DATE_FORMATTER = new Intl.DateTimeFormat('zh-CN');
-
-/**
- * 判断当前可视化状态是否处于“活跃执行”阶段。
- * 只有真正代表 Agent 正在工作的状态才触发旋转，避免右上角状态胶囊长期抢占注意力。
- */
-function isRuntimeActive(state?: VisualizeRuntimeState): boolean {
-  return (
-    state === 'researching' || state === 'writing' || state === 'executing' || state === 'syncing'
-  );
-}
 
 /**
  * 对话页面（主容器）
@@ -101,6 +90,15 @@ export default function ChatPage() {
   const [pendingFiles, setPendingFiles] = useState<SelectedFile[]>([]);
   /** 无当前会话时的临时草稿，保证欢迎页输入区仍可直接编辑。 */
   const [landingDraft, setLandingDraft] = useState('');
+  /**
+   * 输入区聚焦版本号。
+   *
+   * 设计原因：
+   * - 欢迎页快捷模块、技能跳转和草稿桥接都可能先触发会话切换，再注入文案
+   * - 仅依赖 sessionId 切换聚焦，容易出现“先闪一下再失焦”
+   * - 显式维护一个 focus version，可以在草稿真正写入后再请求一次稳定聚焦
+   */
+  const [composerFocusVersion, setComposerFocusVersion] = useState(0);
   /**
    * 待注入到目标会话输入框的草稿。
    *
@@ -355,6 +353,11 @@ export default function ChatPage() {
     ws.send({ type: 'create_session', requestId, title: '新对话' });
   }, [navigate, ws]);
 
+  /** 统一触发输入区重新聚焦，避免多个入口各自维护不同的焦点逻辑。 */
+  const requestComposerFocus = useCallback(() => {
+    setComposerFocusVersion((value) => value + 1);
+  }, []);
+
   // ===========================
   // 路由参数与当前会话同步
   // ===========================
@@ -390,7 +393,8 @@ export default function ChatPage() {
 
     setDraft(currentSessionId, pendingDraftInjection);
     setPendingDraftInjection(null);
-  }, [pendingDraftInjection, currentSessionId, setDraft]);
+    requestComposerFocus();
+  }, [pendingDraftInjection, currentSessionId, requestComposerFocus, setDraft]);
 
   /**
    * 兼容从技能详情等入口通过 `?skill=` 打开对话页的场景。
@@ -421,6 +425,7 @@ export default function ChatPage() {
     }
 
     setDraft(currentSessionId, nextDraft);
+    requestComposerFocus();
 
     const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.delete('skill');
@@ -431,6 +436,7 @@ export default function ChatPage() {
     sessions.length,
     pendingDraftInjection,
     handleNewChat,
+    requestComposerFocus,
     setDraft,
     setSearchParams,
   ]);
@@ -618,8 +624,9 @@ export default function ChatPage() {
         return;
       }
       setDraft(currentSessionId, text);
+      requestComposerFocus();
     },
-    [currentSessionId, handleNewChat, setDraft],
+    [currentSessionId, handleNewChat, requestComposerFocus, setDraft],
   );
 
   // ===========================
@@ -690,11 +697,6 @@ export default function ChatPage() {
   const stageSummary = showWelcome
     ? '从左侧档案架恢复历史协作，或直接在下方开始新的任务。'
     : currentRuntime?.detail || '围绕当前会话继续推进分析、写作、代码与执行动作。';
-  const currentStateLabel = currentRuntime
-    ? VISUALIZE_STATE_LABELS[currentRuntime.state]
-    : '待命中';
-  const isRuntimeBusy = isRuntimeActive(currentRuntime?.state);
-
   return (
     <div className={styles.container}>
       <div className={styles.chatColumn}>
@@ -709,15 +711,8 @@ export default function ChatPage() {
           </div>
 
           <div className={styles.headerMeta} aria-label="会话摘要信息">
-            <div
-              className={styles.metaCard}
-              data-running={isRuntimeBusy ? 'true' : 'false'}
-              aria-label={`当前执行状态：${currentStateLabel}`}
-            >
-              <Loading3QuartersOutlined
-                className={`${styles.metaIcon} ${isRuntimeBusy ? styles.metaIconSpinning : ''}`}
-              />
-              <span className={styles.metaValue}>{currentStateLabel}</span>
+            <div className={styles.workbenchEntryWrap}>
+              <SessionWorkbenchEntry sessionId={currentSessionId} runtime={currentRuntime} />
             </div>
             <div className={styles.metaCard}>
               <CommentOutlined className={styles.metaIcon} />
@@ -772,7 +767,7 @@ export default function ChatPage() {
               onSend={handleSend}
               disabled={false}
               sendDisabled={currentSessionSending || isComposerBootstrapping}
-              focusKey={currentSessionId ?? 'no-session'}
+              focusKey={`${currentSessionId ?? 'no-session'}:${composerFocusVersion}`}
               placeholder={
                 !currentSessionId
                   ? '输入你的下一步目标、问题或要执行的动作…'

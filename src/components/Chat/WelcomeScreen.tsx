@@ -39,6 +39,13 @@ export default function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps)
             <button
               key={item.label}
               className={styles.quickChip}
+              onMouseDown={(event) => {
+                /**
+                 * 欢迎页快捷模块本质上只是“草稿注入器”，不应该抢走输入区焦点。
+                 * 阻止按钮在按下时获得 focus，可减少点击后闪一下又失焦的情况。
+                 */
+                event.preventDefault();
+              }}
               onClick={() => onSuggestionClick(item.text)}
             >
               {item.label}
@@ -51,6 +58,12 @@ export default function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps)
             <button
               key={item.label}
               className={styles.suggestionCard}
+              onMouseDown={(event) => {
+                /**
+                 * 卡片与 quick chip 保持一致的焦点策略，避免进入会话后焦点残留在已卸载按钮上。
+                 */
+                event.preventDefault();
+              }}
               onClick={() => onSuggestionClick(item.text)}
             >
               <span className={styles.cardIndex}>0{index + 1}</span>

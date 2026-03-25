@@ -18,6 +18,8 @@ describe('VisualizeSummaryView', () => {
       panelMessageId: null,
       isWorkbenchVisible: false,
       workbenchSessionId: null,
+      workbenchCacheSessionIds: [],
+      workbenchLifecycleBySession: {},
       runtimeBySession: {},
     });
   });

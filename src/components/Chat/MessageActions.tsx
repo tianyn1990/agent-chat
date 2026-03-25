@@ -1,20 +1,21 @@
 import { App, Button } from 'antd';
-import { CopyOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import type { Message } from '@/types/message';
-import { ROUTES } from '@/constants';
-import { useVisualizeStore } from '@/stores/useVisualizeStore';
+import { CopyOutlined } from '@ant-design/icons';
 import styles from './MessageActions.module.less';
 
 interface MessageActionsProps {
-  message: Message;
   copyText?: string;
 }
 
-export default function MessageActions({ message, copyText }: MessageActionsProps) {
+/**
+ * 消息操作区。
+ *
+ * 当前阶段说明：
+ * - “执行状态”已经收敛为会话级主入口，不再从消息级重复暴露
+ * - 因此消息级操作区只保留与当前消息直接相关的动作，例如复制
+ * - 用户消息与助手消息都允许复制，避免长输入、Prompt 模板和复盘内容只能手动选中
+ */
+export default function MessageActions({ copyText }: MessageActionsProps) {
   const { message: messageApi } = App.useApp();
-  const navigate = useNavigate();
-  const openWorkbench = useVisualizeStore((state) => state.openWorkbench);
 
   /**
    * 使用兼容性更强的复制流程。
@@ -64,31 +65,8 @@ export default function MessageActions({ message, copyText }: MessageActionsProp
     }
   };
 
-  /**
-   * 直接进入沉浸式执行状态工作台。
-   *
-   * 说明：
-   * - 当前交互已从“先开摘要侧栏，再二次进入工作台”收敛为单击直达
-   * - 进入前先把当前会话写入全局可视化 store，保证路由切换与工作台保活状态同步
-   */
-  const handleOpenWorkbench = () => {
-    openWorkbench(message.sessionId, message.id);
-    navigate(`${ROUTES.VISUALIZE}/${message.sessionId}`);
-  };
-
   return (
     <div className={styles.actions}>
-      <Button
-        type="text"
-        size="small"
-        icon={<DeploymentUnitOutlined />}
-        className={styles.btn}
-        onClick={handleOpenWorkbench}
-        aria-label="查看执行状态"
-      >
-        查看执行状态
-      </Button>
-
       {copyText ? (
         <Button
           type="text"

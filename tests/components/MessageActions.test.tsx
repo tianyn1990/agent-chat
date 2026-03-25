@@ -1,40 +1,12 @@
 import { App } from 'antd';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MessageActions from '@/components/Chat/MessageActions';
-import { useVisualizeStore } from '@/stores/useVisualizeStore';
-import type { Message } from '@/types/message';
-
-function LocationProbe() {
-  const location = useLocation();
-  return <div data-testid="location-probe">{location.pathname}</div>;
-}
-
-function makeMessage(): Message {
-  return {
-    id: 'msg_action_1',
-    sessionId: 'session_action_1',
-    role: 'assistant',
-    contentType: 'text',
-    content: { text: '执行状态测试消息' },
-    status: 'done',
-    timestamp: Date.now(),
-  };
-}
 
 describe('MessageActions', () => {
   beforeEach(() => {
-    useVisualizeStore.setState({
-      isPanelOpen: false,
-      panelSessionId: null,
-      panelMessageId: null,
-      isWorkbenchVisible: false,
-      workbenchSessionId: null,
-      runtimeBySession: {},
-    });
-
     vi.restoreAllMocks();
   });
 
@@ -51,7 +23,7 @@ describe('MessageActions', () => {
     render(
       <App>
         <MemoryRouter>
-          <MessageActions message={makeMessage()} copyText="可复制内容" />
+          <MessageActions copyText="可复制内容" />
         </MemoryRouter>
       </App>,
     );
@@ -82,7 +54,7 @@ describe('MessageActions', () => {
     render(
       <App>
         <MemoryRouter>
-          <MessageActions message={makeMessage()} copyText="可复制内容" />
+          <MessageActions copyText="可复制内容" />
         </MemoryRouter>
       </App>,
     );
@@ -94,31 +66,16 @@ describe('MessageActions', () => {
     expect(await screen.findByText('已复制消息内容')).toBeInTheDocument();
   });
 
-  it('点击查看执行状态后直接进入沉浸式工作台', async () => {
-    const user = userEvent.setup();
-
+  it('消息级操作区不再展示执行状态主入口', () => {
     render(
       <App>
-        <MemoryRouter initialEntries={['/chat/session_action_1']}>
-          <Routes>
-            <Route
-              path="*"
-              element={
-                <>
-                  <MessageActions message={makeMessage()} copyText="可复制内容" />
-                  <LocationProbe />
-                </>
-              }
-            />
-          </Routes>
+        <MemoryRouter>
+          <MessageActions copyText="可复制内容" />
         </MemoryRouter>
       </App>,
     );
 
-    await user.click(screen.getByRole('button', { name: '查看执行状态' }));
-
-    expect(useVisualizeStore.getState().isWorkbenchVisible).toBe(true);
-    expect(useVisualizeStore.getState().workbenchSessionId).toBe('session_action_1');
-    expect(screen.getByTestId('location-probe')).toHaveTextContent('/visualize/session_action_1');
+    expect(screen.queryByRole('button', { name: '查看执行状态' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument();
   });
 });

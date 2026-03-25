@@ -3,7 +3,9 @@ import { HolderOutlined, ReloadOutlined, RollbackOutlined } from '@ant-design/ic
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
+import { useChatStore } from '@/stores/useChatStore';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
+import { VISUALIZE_STATE_LABELS } from '@/types/visualize';
 import VisualizeWorkspaceView from './VisualizeWorkspaceView';
 import styles from './VisualizeWorkbenchFrame.module.less';
 
@@ -11,6 +13,17 @@ interface VisualizeWorkbenchFrameProps {
   sessionId: string | null;
   visible: boolean;
 }
+
+type FrameLoadState = 'idle' | 'loading' | 'ready' | 'error' | 'unavailable';
+
+/**
+ * iframe 首开超时时间。
+ *
+ * 设计原因：
+ * - iframe 网络错误缺少稳定的原生 `error` 事件
+ * - 因此需要在宿主层给出“加载过慢/疑似失败”的明确反馈，避免长时间白屏
+ */
+const FRAME_LOAD_TIMEOUT = 9000;
 
 /**
  * 沉浸式执行状态工作台外壳。
@@ -25,14 +38,28 @@ export default function VisualizeWorkbenchFrame({
   visible,
 }: VisualizeWorkbenchFrameProps) {
   const MIN_TOOLBAR_LEFT = 12;
-  const MIN_TOOLBAR_TOP = 62;
+  const MIN_TOOLBAR_TOP = 88;
   const TOOLBAR_KEYBOARD_STEP = 16;
   const TOOLBAR_KEYBOARD_STEP_FAST = 48;
   const navigate = useNavigate();
+  const sessionTitle = useChatStore((state) =>
+    sessionId
+      ? (state.sessions.find((session) => session.id === sessionId)?.title ?? sessionId)
+      : '',
+  );
+  const runtime = useVisualizeStore((state) =>
+    sessionId ? (state.runtimeBySession[sessionId] ?? null) : null,
+  );
   const hideWorkbench = useVisualizeStore((state) => state.hideWorkbench);
+  const markWorkbenchLoading = useVisualizeStore((state) => state.markWorkbenchLoading);
+  const markWorkbenchReady = useVisualizeStore((state) => state.markWorkbenchReady);
+  const markWorkbenchError = useVisualizeStore((state) => state.markWorkbenchError);
   const [refreshVersion, setRefreshVersion] = useState(0);
-  const [toolbarPosition, setToolbarPosition] = useState({ left: 18, top: 68 });
+  const [toolbarPosition, setToolbarPosition] = useState({ left: 18, top: 94 });
+  const [frameLoadState, setFrameLoadState] = useState<FrameLoadState>('idle');
+  const [frameLoadError, setFrameLoadError] = useState('');
   const toolbarRef = useRef<HTMLElement | null>(null);
+  const loadTimeoutRef = useRef<number | null>(null);
   const dragStateRef = useRef<{
     pointerId: number;
     startX: number;
@@ -49,6 +76,61 @@ export default function VisualizeWorkbenchFrame({
     return `${sessionId}-${refreshVersion}`;
   }, [refreshVersion, sessionId]);
 
+  const clearFrameLoadTimeout = useCallback(() => {
+    if (loadTimeoutRef.current) {
+      window.clearTimeout(loadTimeoutRef.current);
+      loadTimeoutRef.current = null;
+    }
+  }, []);
+
+  /**
+   * 统一处理工作台 iframe 的加载生命周期。
+   *
+   * 设计原因：
+   * - 预热、首开遮罩和缓存命中都依赖这组状态
+   * - 将状态机收敛到宿主层后，外层按钮、恢复提示和工作台封面可以共享同一事实来源
+   */
+  const handleWorkspaceLoadStateChange = useCallback(
+    (nextState: 'loading' | 'ready' | 'unavailable') => {
+      if (!sessionId) {
+        return;
+      }
+
+      if (nextState === 'loading') {
+        clearFrameLoadTimeout();
+        setFrameLoadError('');
+        setFrameLoadState('loading');
+        markWorkbenchLoading(sessionId);
+
+        loadTimeoutRef.current = window.setTimeout(() => {
+          setFrameLoadState('error');
+          setFrameLoadError('工作台加载时间较长，请稍后重试或点击右上角刷新。');
+          markWorkbenchError(sessionId, '工作台加载超时');
+        }, FRAME_LOAD_TIMEOUT);
+        return;
+      }
+
+      clearFrameLoadTimeout();
+
+      if (nextState === 'ready') {
+        setFrameLoadError('');
+        setFrameLoadState('ready');
+        markWorkbenchReady(sessionId);
+        return;
+      }
+
+      setFrameLoadState('unavailable');
+      setFrameLoadError('');
+    },
+    [
+      clearFrameLoadTimeout,
+      markWorkbenchError,
+      markWorkbenchLoading,
+      markWorkbenchReady,
+      sessionId,
+    ],
+  );
+
   const handleBack = () => {
     if (!sessionId) {
       return;
@@ -59,6 +141,13 @@ export default function VisualizeWorkbenchFrame({
   };
 
   const handleRefresh = () => {
+    /**
+     * 主动刷新代表用户希望重新拉起同一会话的办公室 iframe。
+     * 这里先清空当前 ready/error 视觉状态，再通过 key 变化强制重建 iframe。
+     */
+    clearFrameLoadTimeout();
+    setFrameLoadState('idle');
+    setFrameLoadError('');
     setRefreshVersion((value) => value + 1);
   };
 
@@ -166,9 +255,30 @@ export default function VisualizeWorkbenchFrame({
     };
   }, [clampToolbarPosition, visible]);
 
+  useEffect(() => {
+    return () => {
+      clearFrameLoadTimeout();
+    };
+  }, [clearFrameLoadTimeout]);
+
   if (!sessionId) {
     return null;
   }
+
+  const coverStatusLabel =
+    frameLoadState === 'error'
+      ? '连接异常'
+      : frameLoadState === 'loading' || frameLoadState === 'idle'
+        ? '进入中'
+        : runtime
+          ? VISUALIZE_STATE_LABELS[runtime.state]
+          : '待命中';
+  const coverDetail =
+    frameLoadState === 'error'
+      ? frameLoadError
+      : runtime?.detail || '正在进入当前会话的沉浸式工作台…';
+  const showLoadingCover =
+    visible && frameLoadState !== 'ready' && frameLoadState !== 'unavailable';
 
   return (
     <section
@@ -177,7 +287,34 @@ export default function VisualizeWorkbenchFrame({
     >
       <div className={styles.stage}>
         {/* 使用稳定的 sessionId 保持 iframe 常驻；仅当用户主动刷新时才强制重建。 */}
-        <VisualizeWorkspaceView key={iframeKey} sessionId={sessionId} />
+        <VisualizeWorkspaceView
+          key={iframeKey}
+          sessionId={sessionId}
+          onLoadStateChange={handleWorkspaceLoadStateChange}
+        />
+
+        {showLoadingCover ? (
+          <div className={styles.loadingCover} role="status" aria-live="polite">
+            <div className={styles.loadingPanel}>
+              <p className={styles.loadingEyebrow}>Workspace</p>
+              <h2 className={styles.loadingTitle}>{sessionTitle}</h2>
+              <div className={styles.loadingMeta}>
+                <span
+                  className={`${styles.loadingBadge} ${
+                    frameLoadState === 'error' ? styles.loadingBadgeError : ''
+                  }`}
+                >
+                  {coverStatusLabel}
+                </span>
+                <span className={styles.loadingSession}>会话：{sessionId}</span>
+              </div>
+              <p className={styles.loadingDetail}>{coverDetail}</p>
+              <div className={styles.loadingRail} aria-hidden="true">
+                <span className={styles.loadingRailActive} />
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {/* 工具控件退到边缘窄坞，优先保证真实像素办公室的可视面积。 */}

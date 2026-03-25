@@ -16,8 +16,124 @@
 }
 
 .stage {
+  position: relative;
   width: 100%;
   height: 100%;
+}
+
+.loadingCover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 48%),
+    linear-gradient(180deg, rgba(10, 12, 15, 0.16), rgba(10, 12, 15, 0.48));
+  backdrop-filter: blur(10px);
+}
+
+.loadingPanel {
+  width: min(420px, calc(100vw - 80px));
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid @panel-border;
+  background: @surface-floating-strong;
+  box-shadow: @shadow-md;
+}
+
+.loadingEyebrow {
+  margin: 0 0 6px;
+  color: @accent-color;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.loadingTitle {
+  margin: 0;
+  color: @text-primary;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.loadingMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.loadingBadge,
+.loadingSession {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.loadingBadge {
+  color: @feedback-info-tag-text;
+  border: 1px solid @feedback-info-tag-border;
+  background: @feedback-info-tag-bg;
+}
+
+.loadingBadgeError {
+  color: @feedback-danger-tag-text;
+  border-color: @feedback-danger-tag-border;
+  background: @feedback-danger-tag-bg;
+}
+
+.loadingSession {
+  color: @text-secondary;
+  border: 1px solid @panel-border;
+  background: @frame-surface-subtle;
+}
+
+.loadingDetail {
+  margin: 12px 0 0;
+  color: @text-secondary;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.loadingRail {
+  position: relative;
+  height: 6px;
+  margin-top: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: @frame-surface-elevated;
+}
+
+.loadingRailActive {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 36%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, @accent-color, @primary-color);
+  animation: loading-rail-shift 1.45s ease-in-out infinite;
+}
+
+@keyframes loading-rail-shift {
+  0% {
+    transform: translateX(-28%);
+  }
+
+  50% {
+    transform: translateX(92%);
+  }
+
+  100% {
+    transform: translateX(-28%);
+  }
 }
 
 .toolbar {
@@ -108,9 +224,24 @@
 }
 
 @media (max-width: 768px) {
+  .loadingPanel {
+    width: min(100%, calc(100vw - 32px));
+    padding: 16px 16px 14px;
+  }
+
+  .loadingTitle {
+    font-size: 18px;
+  }
+
   .toolbar {
-    top: 62px;
+    top: 88px;
     left: 12px;
     gap: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loadingRailActive {
+    animation: none;
   }
 }

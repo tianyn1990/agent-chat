@@ -1,18 +1,58 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import VisualizeWorkbenchFrame from '@/components/Visualize/VisualizeWorkbenchFrame';
+import { useChatStore } from '@/stores/useChatStore';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
+
+vi.mock('@/utils/starOffice', () => ({
+  resolveStarOfficeIframeUrl: (sessionId: string) => `/__mock/star-office/app?sessionId=${sessionId}`,
+}));
 
 describe('VisualizeWorkbenchFrame', () => {
   beforeEach(() => {
+    vi.useRealTimers();
+    useChatStore.setState({
+      sessions: [
+        {
+          id: 'session_frame',
+          title: '执行状态测试会话',
+          createdAt: Date.now(),
+        },
+        {
+          id: 'session_keepalive',
+          title: '保活工作台会话',
+          createdAt: Date.now(),
+        },
+        {
+          id: 'session_back',
+          title: '返回测试会话',
+          createdAt: Date.now(),
+        },
+        {
+          id: 'session_keyboard',
+          title: '键盘拖拽测试会话',
+          createdAt: Date.now(),
+        },
+      ],
+      currentSessionId: null,
+      messages: {},
+      streamingBuffer: {},
+      isConnected: false,
+      isSending: false,
+      sendingSessionIds: {},
+      drafts: {},
+    });
+
     useVisualizeStore.setState({
       isPanelOpen: false,
       panelSessionId: null,
       panelMessageId: null,
       isWorkbenchVisible: false,
       workbenchSessionId: null,
+      workbenchCacheSessionIds: [],
+      workbenchLifecycleBySession: {},
       runtimeBySession: {},
     });
   });
@@ -29,7 +69,24 @@ describe('VisualizeWorkbenchFrame', () => {
     expect(screen.getByRole('button', { name: '返回聊天' })).toHaveTextContent('返回聊天');
     expect(screen.getByRole('button', { name: '刷新' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '收起' })).not.toBeInTheDocument();
-    expect(screen.getByLabelText('执行状态工作台工具栏')).toHaveStyle({ top: '68px' });
+    expect(screen.getByLabelText('执行状态工作台工具栏')).toHaveStyle({ top: '94px' });
+  });
+
+  it('首开时展示加载封面，iframe ready 后切换到真实工作台', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/visualize/session_frame']}>
+        <VisualizeWorkbenchFrame sessionId="session_frame" visible />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText(/正在进入当前会话的沉浸式工作台/)).toBeInTheDocument();
+
+    const iframe = container.querySelector('iframe');
+    expect(iframe).toBeInTheDocument();
+
+    fireEvent.load(iframe!);
+
+    expect(screen.queryByText(/正在进入当前会话的沉浸式工作台/)).not.toBeInTheDocument();
   });
 
   it('隐藏时保留已挂载的 iframe，再次显示时复用同一节点', () => {
@@ -96,11 +153,27 @@ describe('VisualizeWorkbenchFrame', () => {
     fireEvent.keyDown(dragHandle, { key: 'ArrowLeft' });
     fireEvent.keyDown(dragHandle, { key: 'ArrowUp' });
 
-    expect(toolbar).toHaveStyle({ left: '12px', top: '62px' });
+    expect(toolbar).toHaveStyle({ left: '12px', top: '88px' });
 
     fireEvent.keyDown(dragHandle, { key: 'ArrowRight', shiftKey: true });
     fireEvent.keyDown(dragHandle, { key: 'ArrowDown', shiftKey: true });
 
-    expect(toolbar).toHaveStyle({ left: '60px', top: '110px' });
+    expect(toolbar).toHaveStyle({ left: '60px', top: '136px' });
+  });
+
+  it('加载超时后展示明确的工作台异常提示', () => {
+    vi.useFakeTimers();
+
+    render(
+      <MemoryRouter initialEntries={['/visualize/session_frame']}>
+        <VisualizeWorkbenchFrame sessionId="session_frame" visible />
+      </MemoryRouter>,
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(9000);
+    });
+
+    expect(screen.getByText('工作台加载时间较长，请稍后重试或点击右上角刷新。')).toBeInTheDocument();
   });
 });

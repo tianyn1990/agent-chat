@@ -61,7 +61,8 @@ const MessageBubble = memo(function MessageBubble({
   // 图表/卡片消息需要更宽的展示区域，突破普通气泡的 max-width 限制
   const isWide = message.contentType === 'chart' || message.contentType === 'card';
   const copyText = getMessageCopyText(message, streamingText);
-  const showActions = !isUser && message.status !== 'streaming' && message.contentType !== 'error';
+  const showActions =
+    Boolean(copyText) && message.status !== 'streaming' && message.contentType !== 'error';
 
   return (
     <div className={`${styles.row} ${isUser ? styles.rowUser : styles.rowAssistant}`}>
@@ -84,7 +85,7 @@ const MessageBubble = memo(function MessageBubble({
           onCardExpire={onCardExpire}
         />
 
-        {showActions ? <MessageActions message={message} copyText={copyText} /> : null}
+        {showActions ? <MessageActions copyText={copyText} /> : null}
 
         {/* 时间戳 */}
         <div className={`${styles.time} ${isUser ? styles.timeRight : styles.timeLeft}`}>

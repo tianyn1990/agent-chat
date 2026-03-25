@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { render as rtlRender, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { App } from 'antd';
 import MessageBubble from '@/components/Chat/MessageBubble';
 import type { Message } from '@/types/message';
 
@@ -27,7 +28,11 @@ function makeMessage(overrides: Partial<Message> = {}): Message {
  * - 因此测试环境需要始终提供最小 Router 包装
  */
 function render(ui: ReactElement) {
-  return rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
+  return rtlRender(
+    <App>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </App>,
+  );
 }
 
 const originalMatchMedia = window.matchMedia;
@@ -54,6 +59,11 @@ describe('MessageBubble', () => {
     it('渲染用户文本消息', () => {
       render(<MessageBubble message={makeMessage({ content: { text: '你好世界' } })} />);
       expect(screen.getByText('你好世界')).toBeInTheDocument();
+    });
+
+    it('用户文本消息也展示复制动作', () => {
+      render(<MessageBubble message={makeMessage({ content: { text: '可复制的用户输入' } })} />);
+      expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument();
     });
 
     it('用户消息无 Markdown 特征时使用 <pre> 纯文本渲染', () => {
@@ -306,7 +316,7 @@ describe('MessageBubble', () => {
       const { container } = render(
         <MessageBubble message={makeMessage({ role: 'user' })} />,
       );
-      const row = container.firstChild as HTMLElement;
+      const row = container.querySelector('[class*="row"]') as HTMLElement;
       expect(row.className).toMatch(/rowUser/);
     });
 
@@ -314,13 +324,13 @@ describe('MessageBubble', () => {
       const { container } = render(
         <MessageBubble message={makeMessage({ role: 'assistant' })} />,
       );
-      const row = container.firstChild as HTMLElement;
+      const row = container.querySelector('[class*="row"]') as HTMLElement;
       expect(row.className).toMatch(/rowAssistant/);
     });
 
     it('用户消息头像位于消息内容右侧', () => {
       const { container } = render(<MessageBubble message={makeMessage({ role: 'user' })} />);
-      const row = container.firstChild as HTMLElement;
+      const row = container.querySelector('[class*="row"]') as HTMLElement;
 
       expect(row.children[0]?.className).toMatch(/content/);
       expect(row.children[1]?.className).toMatch(/avatar/);

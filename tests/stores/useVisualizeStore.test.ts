@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useVisualizeStore } from '@/stores/useVisualizeStore';
+import { MAX_WORKBENCH_CACHE_SIZE, useVisualizeStore } from '@/stores/useVisualizeStore';
 
 describe('useVisualizeStore', () => {
   beforeEach(() => {
@@ -9,6 +9,8 @@ describe('useVisualizeStore', () => {
       panelMessageId: null,
       isWorkbenchVisible: false,
       workbenchSessionId: null,
+      workbenchCacheSessionIds: [],
+      workbenchLifecycleBySession: {},
       runtimeBySession: {},
     });
   });
@@ -50,6 +52,7 @@ describe('useVisualizeStore', () => {
     expect(state.isWorkbenchVisible).toBe(true);
     expect(state.workbenchSessionId).toBe('session_4');
     expect(state.panelSessionId).toBe('session_4');
+    expect(state.workbenchCacheSessionIds).toEqual(['session_4']);
   });
 
   it('hideWorkbench 只隐藏工作台，不清理已保活会话', () => {
@@ -61,5 +64,37 @@ describe('useVisualizeStore', () => {
     expect(state.workbenchSessionId).toBe('session_5');
     expect(state.isPanelOpen).toBe(true);
     expect(state.panelSessionId).toBe('session_5');
+  });
+
+  it('ensureWorkbenchSession 会按 LRU=2 维护最近使用会话缓存', () => {
+    useVisualizeStore.getState().ensureWorkbenchSession('session_A');
+    useVisualizeStore.getState().ensureWorkbenchSession('session_B');
+    useVisualizeStore.getState().ensureWorkbenchSession('session_C');
+
+    const state = useVisualizeStore.getState();
+    expect(MAX_WORKBENCH_CACHE_SIZE).toBe(2);
+    expect(state.workbenchCacheSessionIds).toEqual(['session_B', 'session_C']);
+    expect(state.workbenchLifecycleBySession.session_A).toBeUndefined();
+  });
+
+  it('markWorkbenchLoading / Ready / Error 会更新会话生命周期', () => {
+    useVisualizeStore.getState().ensureWorkbenchSession('session_lifecycle');
+    useVisualizeStore.getState().markWorkbenchLoading('session_lifecycle');
+    expect(useVisualizeStore.getState().workbenchLifecycleBySession.session_lifecycle?.status).toBe(
+      'warming',
+    );
+
+    useVisualizeStore.getState().markWorkbenchReady('session_lifecycle');
+    expect(useVisualizeStore.getState().workbenchLifecycleBySession.session_lifecycle?.status).toBe(
+      'ready',
+    );
+
+    useVisualizeStore.getState().markWorkbenchError('session_lifecycle', 'timeout');
+    expect(useVisualizeStore.getState().workbenchLifecycleBySession.session_lifecycle).toMatchObject(
+      {
+        status: 'error',
+        errorMessage: 'timeout',
+      },
+    );
   });
 });

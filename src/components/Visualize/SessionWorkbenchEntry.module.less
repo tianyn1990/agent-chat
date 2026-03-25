@@ -1,0 +1,323 @@
+@import '@/styles/variables.less';
+
+.entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 32px;
+  padding: 5px 9px 5px 6px;
+  border-radius: 11px;
+  border: 1px solid @panel-border;
+  background: @frame-surface-subtle;
+  color: @text-primary;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.entry:hover:not(:disabled),
+.entry:focus-visible {
+  background: @frame-surface-elevated;
+  border-color: @control-border-hover;
+}
+
+.entry:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.entry:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.entry:focus-visible {
+  outline: 2px solid @focus-outline;
+  outline-offset: 2px;
+}
+
+.entry[data-tone='running'] {
+  border-color: @visualize-toolbar-primary-border;
+  background: @primary-soft;
+  box-shadow: inset 0 0 0 1px @visualize-toolbar-primary-border;
+}
+
+.entry[data-tone='error'] {
+  border-color: @feedback-danger-tag-border;
+  background: @feedback-danger-tag-bg;
+}
+
+.entry[data-tone='disabled'] {
+  color: @text-secondary;
+}
+
+.iconShell {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.monitorWrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.monitorWrap::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: scale(0.92);
+  background: radial-gradient(circle at center, @primary-soft 0%, transparent 72%);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.monitorSvg {
+  position: relative;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  display: block;
+  shape-rendering: crispEdges;
+}
+
+.monitorFrame {
+  fill: @frame-surface-elevated;
+  stroke: @text-secondary;
+  stroke-width: 1;
+}
+
+.monitorScreen {
+  fill: #101723;
+}
+
+.monitorTopBar {
+  fill: #2a3446;
+}
+
+.monitorStand,
+.monitorBase {
+  fill: @text-secondary;
+}
+
+.monitorWindowRed {
+  fill: #d46d6d;
+}
+
+.monitorWindowAmber {
+  fill: #d4a85e;
+}
+
+.monitorWindowGreen {
+  fill: #73bd84;
+}
+
+.monitorPixelPrimary {
+  fill: #75c6ff;
+}
+
+.monitorPixelAccent {
+  fill: #85efc1;
+}
+
+.monitorPixelSecondary {
+  fill: #7b91ff;
+}
+
+.monitorPixelWarm {
+  fill: #f5c46b;
+}
+
+.monitorScanline {
+  position: absolute;
+  top: 5px;
+  left: 4px;
+  z-index: 2;
+  width: 11px;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    @primary-soft 18%,
+    @primary-color 50%,
+    @primary-soft 82%,
+    transparent 100%
+  );
+}
+
+.glyphDot {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: @text-tertiary;
+  box-shadow: 0 0 0 2px @paper-bg;
+}
+
+.entry[data-busy='true'] .iconShell {
+  background: transparent;
+  box-shadow: none;
+}
+
+.entry[data-busy='true'] .monitorFrame {
+  fill: @primary-soft;
+  stroke: @primary-color;
+}
+
+.entry[data-busy='true'] .monitorScreen {
+  fill: #122232;
+}
+
+.entry[data-busy='true'] .monitorPixelPrimary,
+.entry[data-busy='true'] .monitorPixelSecondary,
+.entry[data-busy='true'] .monitorStand,
+.entry[data-busy='true'] .monitorBase {
+  fill: @primary-color;
+}
+
+.entry[data-busy='true'] .monitorPixelAccent {
+  fill: @success-color;
+}
+
+.entry[data-busy='true'] .monitorPixelWarm {
+  fill: @accent-color;
+}
+
+.entry[data-busy='true'] .monitorTopBar,
+.entry[data-busy='true'] .monitorWindowGreen {
+  fill: @primary-hover;
+}
+
+.entry[data-busy='true'] .monitorScanline {
+  opacity: 1;
+  animation: monitor-scan 1.6s steps(4, end) infinite;
+}
+
+.entry[data-busy='true'] .monitorWrap::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.entry[data-busy='true'] .glyphDot {
+  background: @primary-color;
+  animation: glyph-pulse 1.15s ease-in-out infinite;
+}
+
+.entry[data-tone='error'] .monitorFrame {
+  fill: @feedback-danger-tag-bg;
+  stroke: @danger-color;
+}
+
+.entry[data-tone='error'] .monitorScreen {
+  fill: @feedback-danger-tag-bg;
+}
+
+.entry[data-tone='error'] .monitorPixelPrimary,
+.entry[data-tone='error'] .monitorPixelSecondary,
+.entry[data-tone='error'] .monitorPixelAccent,
+.entry[data-tone='error'] .monitorPixelWarm,
+.entry[data-tone='error'] .monitorStand,
+.entry[data-tone='error'] .monitorBase {
+  fill: @danger-color;
+}
+
+.entry[data-tone='error'] .monitorTopBar,
+.entry[data-tone='error'] .monitorWindowRed,
+.entry[data-tone='error'] .monitorWindowAmber,
+.entry[data-tone='error'] .monitorWindowGreen {
+  fill: @danger-color;
+}
+
+.glyphDot[data-tone='error'] {
+  background: @danger-color;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  min-width: 6.8em;
+  color: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.entry[data-tone='error'] .label {
+  color: @feedback-danger-tag-text;
+}
+
+@keyframes glyph-pulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+@keyframes monitor-scan {
+  0%,
+  12% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(2px);
+  }
+
+  88%,
+  100% {
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry {
+    transition: none;
+  }
+
+  .entry[data-busy='true'] .glyphDot,
+  .entry[data-busy='true'] .monitorScanline {
+    animation: none;
+  }
+
+  .entry[data-busy='true'] .monitorScanline {
+    opacity: 0.72;
+  }
+}
+
+@media (max-width: 768px) {
+  .entry {
+    padding-right: 8px;
+  }
+}

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Result } from 'antd';
 import { DeploymentUnitOutlined } from '@ant-design/icons';
 import {
@@ -11,6 +12,7 @@ import styles from './VisualizeWorkspaceView.module.less';
 
 interface VisualizeWorkspaceViewProps {
   sessionId: string;
+  onLoadStateChange?: (state: 'loading' | 'ready' | 'unavailable') => void;
 }
 
 /**
@@ -21,13 +23,32 @@ interface VisualizeWorkspaceViewProps {
  * - 非必要说明信息不再占据独立大块布局空间
  * - 空态仍需给出明确的本地联调与部署提示
  */
-export default function VisualizeWorkspaceView({ sessionId }: VisualizeWorkspaceViewProps) {
+export default function VisualizeWorkspaceView({
+  sessionId,
+  onLoadStateChange,
+}: VisualizeWorkspaceViewProps) {
   const themeMode = useThemeStore((state) => state.mode);
 
   // iframe 地址统一由工具函数计算，并显式透传主题模式，避免独立承载页出现皮肤断层。
   const iframeUrl = resolveStarOfficeIframeUrl(sessionId, { themeMode });
   const isUsingLocalMock = !STAR_OFFICE_URL && STAR_OFFICE_MOCK_ENABLED;
   const isUsingRealDev = !STAR_OFFICE_URL && STAR_OFFICE_REAL_DEV_ENABLED;
+
+  /**
+   * 将 iframe 生命周期透传给外层宿主。
+   *
+   * 设计原因：
+   * - 冷启动遮罩、首开承接与预热状态都由工作台壳层统一管理
+   * - 内层视图只负责告诉宿主“当前是 loading / ready / unavailable”
+   */
+  useEffect(() => {
+    if (!iframeUrl) {
+      onLoadStateChange?.('unavailable');
+      return;
+    }
+
+    onLoadStateChange?.('loading');
+  }, [iframeUrl, onLoadStateChange]);
 
   return (
     <section className={styles.shell}>
@@ -61,6 +82,9 @@ export default function VisualizeWorkspaceView({ sessionId }: VisualizeWorkspace
           src={iframeUrl}
           title="Star-Office-UI"
           sandbox="allow-scripts allow-same-origin allow-forms"
+          onLoad={() => {
+            onLoadStateChange?.('ready');
+          }}
         />
       )}
     </section>
