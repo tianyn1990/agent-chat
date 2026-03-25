@@ -3,10 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 import Sidebar from '@/components/Layout/Sidebar';
+import { useThemeStore } from '@/stores/useThemeStore';
 import { useUserStore } from '@/stores/useUserStore';
 
 describe('Sidebar', () => {
   beforeEach(() => {
+    localStorage.clear();
+    useThemeStore.getState().setMode('dark');
     useUserStore.setState({
       token: 'test-token',
       userInfo: {
@@ -46,5 +49,21 @@ describe('Sidebar', () => {
 
     expect(screen.queryByRole('button', { name: '收起档案面板' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '展开档案面板' })).not.toBeInTheDocument();
+  });
+
+  it('提供全局主题切换入口，并会更新根节点主题状态', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={['/chat/session_sidebar']}>
+        <Sidebar extra={<div>会话插槽内容</div>} />
+      </MemoryRouter>,
+    );
+
+    const toggleButton = screen.getByRole('button', { name: '切换到明亮皮肤' });
+    await user.click(toggleButton);
+
+    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(screen.getByRole('button', { name: '切换到深色皮肤' })).toBeInTheDocument();
   });
 });

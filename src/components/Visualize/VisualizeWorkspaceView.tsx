@@ -5,6 +5,7 @@ import {
   STAR_OFFICE_REAL_DEV_ENABLED,
   STAR_OFFICE_URL,
 } from '@/constants';
+import { useThemeStore } from '@/stores/useThemeStore';
 import { resolveStarOfficeIframeUrl } from '@/utils/starOffice';
 import styles from './VisualizeWorkspaceView.module.less';
 
@@ -21,8 +22,10 @@ interface VisualizeWorkspaceViewProps {
  * - 空态仍需给出明确的本地联调与部署提示
  */
 export default function VisualizeWorkspaceView({ sessionId }: VisualizeWorkspaceViewProps) {
-  // iframe 地址统一由工具函数计算，保证真实地址与本地 mock 的选择逻辑一致。
-  const iframeUrl = resolveStarOfficeIframeUrl(sessionId);
+  const themeMode = useThemeStore((state) => state.mode);
+
+  // iframe 地址统一由工具函数计算，并显式透传主题模式，避免独立承载页出现皮肤断层。
+  const iframeUrl = resolveStarOfficeIframeUrl(sessionId, { themeMode });
   const isUsingLocalMock = !STAR_OFFICE_URL && STAR_OFFICE_MOCK_ENABLED;
   const isUsingRealDev = !STAR_OFFICE_URL && STAR_OFFICE_REAL_DEV_ENABLED;
 

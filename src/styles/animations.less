@@ -1,3 +1,5 @@
+@import './variables.less';
+
 // ===========================
 // 动画定义
 // ===========================
@@ -90,7 +92,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #999;
+  background-color: @text-tertiary;
   animation: dotPulse 1.4s ease-in-out infinite;
 
   &:nth-child(1) {
@@ -106,7 +108,12 @@
 
 // 骨架屏
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(
+    90deg,
+    @frame-surface-subtle 25%,
+    @frame-surface-elevated 50%,
+    @frame-surface-subtle 75%
+  );
   background-size: 200% 100%;
   animation: skeletonShimmer 1.5s infinite;
   border-radius: 4px;

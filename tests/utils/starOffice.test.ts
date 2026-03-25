@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   appendSessionIdToUrl,
+  appendQueryParamsToUrl,
   buildRealStarOfficeFacadeUrl,
   buildLocalStarOfficeMockAppUrl,
   normalizeStarOfficeMockBase,
@@ -24,15 +25,36 @@ describe('starOffice utils', () => {
     );
   });
 
+  it('appendQueryParamsToUrl 会同时保留已有查询参数与 hash', () => {
+    expect(
+      appendQueryParamsToUrl('/star-office/?from=visualize#stage', {
+        sessionId: 'session_theme',
+        themeMode: 'light',
+      }),
+    ).toBe('/star-office/?from=visualize&sessionId=session_theme&themeMode=light#stage');
+  });
+
   it('buildLocalStarOfficeMockAppUrl 生成本地 mock 页面地址', () => {
     expect(buildLocalStarOfficeMockAppUrl('session_3', '/__mock/star-office')).toBe(
       '/__mock/star-office/app?sessionId=session_3',
     );
   });
 
+  it('buildLocalStarOfficeMockAppUrl 支持透传主题模式', () => {
+    expect(buildLocalStarOfficeMockAppUrl('session_light', '/__mock/star-office', 'light')).toBe(
+      '/__mock/star-office/app?sessionId=session_light&themeMode=light',
+    );
+  });
+
   it('buildRealStarOfficeFacadeUrl 按会话级 facade 生成真实地址', () => {
     expect(buildRealStarOfficeFacadeUrl('session_4', '/star-office')).toBe(
       '/star-office/session/session_4/',
+    );
+  });
+
+  it('buildRealStarOfficeFacadeUrl 支持透传主题模式', () => {
+    expect(buildRealStarOfficeFacadeUrl('session_4', '/star-office', 'light')).toBe(
+      '/star-office/session/session_4/?themeMode=light',
     );
   });
 
@@ -70,6 +92,19 @@ describe('starOffice utils', () => {
         mockBase: '/__mock/star-office',
       }),
     ).toBe('/__mock/star-office/app?sessionId=session_5');
+  });
+
+  it('resolveStarOfficeIframeUrl 会把主题模式透传给最终 iframe 地址', () => {
+    expect(
+      resolveStarOfficeIframeUrl('session_5', {
+        starOfficeUrl: '',
+        realDevEnabled: false,
+        realDevBase: '/star-office',
+        mockEnabled: true,
+        mockBase: '/__mock/star-office',
+        themeMode: 'light',
+      }),
+    ).toBe('/__mock/star-office/app?sessionId=session_5&themeMode=light');
   });
 
   it('resolveStarOfficeIframeUrl 在全部关闭时返回空字符串', () => {

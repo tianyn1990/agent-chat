@@ -13,7 +13,7 @@
   inset: 0;
   z-index: 1000;
   padding: @spacing-md;
-  background: rgba(15, 19, 25, 0.98);
+  background: @surface-floating-strong;
 }
 
 .chartContainer {
@@ -21,7 +21,7 @@
   min-width: min(720px, 100%);
   overflow: hidden;
   border-radius: @border-radius-sm;
-  background: rgba(255, 255, 255, 0.02);
+  background: @frame-surface-subtle;
 
   .fullscreen & {
     flex: 1;
@@ -38,9 +38,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: @frame-surface-elevated;
   border-radius: @border-radius-sm;
-  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border: 1px dashed @button-default-border;
 
   .fullscreen & {
     min-height: 100%;
@@ -64,7 +64,7 @@
   justify-content: flex-end;
   gap: @spacing-xs;
   padding-top: @spacing-xs;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid @panel-border;
 
   .fullscreen & {
     flex-shrink: 0;

@@ -6,10 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background:
-    radial-gradient(circle at top left, rgba(123, 145, 255, 0.12), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(199, 155, 101, 0.08), transparent 22%),
-    linear-gradient(180deg, #090b0f 0%, #10141a 48%, #151a22 100%);
+  background: @app-background;
 }
 
 .shell {
@@ -26,8 +23,8 @@
   justify-content: center;
   padding: 30px 32px;
   border-radius: 18px;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(160deg, @frame-surface-elevated, @frame-surface-subtle);
+  border: 1px solid @panel-border;
   box-shadow: @shadow-sm;
 }
 
@@ -66,8 +63,8 @@
 .card {
   width: 100%;
   padding: 28px 26px;
-  background: rgba(18, 22, 29, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: @surface-floating;
+  border: 1px solid @panel-border;
   border-radius: 18px;
   backdrop-filter: blur(14px);
   text-align: center;
@@ -90,7 +87,7 @@
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  background: linear-gradient(135deg, rgba(199, 155, 101, 0.18), rgba(123, 145, 255, 0.16));
+  background: linear-gradient(135deg, @accent-soft, @primary-soft);
 }
 
 .logoText {

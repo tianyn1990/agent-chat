@@ -11,11 +11,10 @@ export function PageLoading() {
         alignItems: 'center',
         justifyContent: 'center',
         /**
-         * 懒加载占位需要延续主应用的 graphite 工作台基调，
-         * 避免在路由切换时突然退回旧的高反差大面板背景。
+         * 懒加载占位直接消费根节点主题背景。
+         * 这样 dark / light 切换时，路由 fallback 不会再暴露上一套主题残留。
          */
-        background:
-          'radial-gradient(circle at top left, rgba(123,145,255,0.08), transparent 20%), radial-gradient(circle at bottom right, rgba(199,155,101,0.06), transparent 18%), linear-gradient(180deg, #0a0c10 0%, #0f1319 100%)',
+        background: 'var(--app-background)',
       }}
     >
       <Spin size="large" />

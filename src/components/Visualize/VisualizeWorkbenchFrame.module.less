@@ -4,7 +4,7 @@
   position: fixed;
   inset: 0;
   z-index: 1400;
-  background: #11161d;
+  background: @visualize-shell-bg;
 }
 
 .visible {
@@ -29,7 +29,7 @@
   gap: 8px;
   padding: 4px;
   border-radius: 999px;
-  background: rgba(11, 16, 22, 0.28);
+  background: @toolbar-bg;
   user-select: none;
 }
 
@@ -40,9 +40,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(248, 243, 234, 0.8);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: @visualize-toolbar-text;
+  background: @visualize-toolbar-button-bg;
+  border: 1px solid @visualize-toolbar-button-border;
   cursor: grab;
   touch-action: none;
   padding: 0;
@@ -53,7 +53,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid rgba(123, 145, 255, 0.48);
+    outline: 2px solid @focus-outline;
     outline-offset: 2px;
   }
 }
@@ -62,18 +62,18 @@
   height: 34px;
   padding-inline: 10px !important;
   border-radius: 999px !important;
-  color: #f8f3ea !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  background: rgba(16, 22, 30, 0.56) !important;
+  color: @visualize-toolbar-text !important;
+  border-color: @visualize-toolbar-primary-border !important;
+  background: @visualize-toolbar-primary-bg !important;
   box-shadow: none;
   backdrop-filter: blur(10px);
 }
 
 .primaryAction:hover,
 .primaryAction:focus-visible {
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.24) !important;
-  background: rgba(22, 29, 39, 0.8) !important;
+  color: @text-primary !important;
+  border-color: @control-border-hover !important;
+  background: @visualize-toolbar-primary-hover-bg !important;
 }
 
 .secondaryActions {
@@ -89,22 +89,22 @@
 }
 
 .secondaryActions :global(.ant-btn) {
-  color: #f8f3ea;
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  color: @visualize-toolbar-text;
+  border-color: @visualize-toolbar-button-border;
+  background: @visualize-toolbar-button-bg;
   width: 30px;
   height: 30px;
 }
 
 .secondaryActions :global(.ant-btn.ant-btn-text) {
-  background: rgba(255, 255, 255, 0.03);
+  background: @visualize-toolbar-button-bg;
 }
 
 .secondaryActions :global(.ant-btn:hover),
 .secondaryActions :global(.ant-btn:focus-visible) {
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.1);
+  color: @text-primary;
+  border-color: @control-border-hover;
+  background: @visualize-toolbar-button-hover-bg;
 }
 
 @media (max-width: 768px) {

@@ -9,6 +9,7 @@ import {
   buildStarOfficeSessionFacadeUrl,
   normalizeStarOfficeRealDevBase,
 } from '@/mocks/starOffice/realSidecar';
+import type { ThemeMode } from '@/theme/palette';
 
 interface ResolveStarOfficeIframeUrlOptions {
   starOfficeUrl?: string;
@@ -16,6 +17,7 @@ interface ResolveStarOfficeIframeUrlOptions {
   realDevBase?: string;
   mockEnabled?: boolean;
   mockBase?: string;
+  themeMode?: ThemeMode;
 }
 
 /**
@@ -41,18 +43,45 @@ export function normalizeStarOfficeMockBase(base: string): string {
  * - 但前端始终带上它，可以保证本地 mock 与未来服务端适配层口径一致
  */
 export function appendSessionIdToUrl(url: string, sessionId: string): string {
+  return appendQueryParamsToUrl(url, { sessionId });
+}
+
+/**
+ * 为地址统一追加查询参数。
+ *
+ * 设计原因：
+ * - `sessionId`、`themeMode` 等参数需要同时兼容相对地址、绝对地址与 hash
+ * - 将拼接逻辑集中后，可以避免不同入口分别处理导致参数丢失或顺序不一致
+ */
+export function appendQueryParamsToUrl(
+  url: string,
+  params: Record<string, string | undefined>,
+): string {
   const trimmedUrl = url.trim();
   if (!trimmedUrl) return '';
 
   if (/^https?:\/\//.test(trimmedUrl)) {
     const parsed = new URL(trimmedUrl);
-    parsed.searchParams.set('sessionId', sessionId);
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        parsed.searchParams.set(key, value);
+      }
+    });
     return parsed.toString();
   }
 
   const [pathWithoutHash, hash = ''] = trimmedUrl.split('#');
-  const separator = pathWithoutHash.includes('?') ? '&' : '?';
-  const urlWithQuery = `${pathWithoutHash}${separator}sessionId=${encodeURIComponent(sessionId)}`;
+  const [pathname, query = ''] = pathWithoutHash.split('?');
+  const searchParams = new URLSearchParams(query);
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) {
+      searchParams.set(key, value);
+    }
+  });
+
+  const nextQuery = searchParams.toString();
+  const urlWithQuery = nextQuery ? `${pathname}?${nextQuery}` : pathname;
 
   return hash ? `${urlWithQuery}#${hash}` : urlWithQuery;
 }
@@ -63,8 +92,12 @@ export function appendSessionIdToUrl(url: string, sessionId: string): string {
 export function buildLocalStarOfficeMockAppUrl(
   sessionId: string,
   mockBase = STAR_OFFICE_MOCK_BASE,
+  themeMode?: ThemeMode,
 ): string {
-  return appendSessionIdToUrl(`${normalizeStarOfficeMockBase(mockBase)}/app`, sessionId);
+  return appendQueryParamsToUrl(`${normalizeStarOfficeMockBase(mockBase)}/app`, {
+    sessionId,
+    themeMode,
+  });
 }
 
 /**
@@ -77,8 +110,11 @@ export function buildLocalStarOfficeMockAppUrl(
 export function buildRealStarOfficeFacadeUrl(
   sessionId: string,
   baseUrl = STAR_OFFICE_URL || STAR_OFFICE_REAL_DEV_BASE,
+  themeMode?: ThemeMode,
 ): string {
-  return buildStarOfficeSessionFacadeUrl(baseUrl, sessionId);
+  return appendQueryParamsToUrl(buildStarOfficeSessionFacadeUrl(baseUrl, sessionId), {
+    themeMode,
+  });
 }
 
 /**
@@ -99,17 +135,22 @@ export function resolveStarOfficeIframeUrl(
   const realDevBase = options.realDevBase ?? STAR_OFFICE_REAL_DEV_BASE;
   const mockEnabled = options.mockEnabled ?? STAR_OFFICE_MOCK_ENABLED;
   const mockBase = options.mockBase ?? STAR_OFFICE_MOCK_BASE;
+  const themeMode = options.themeMode;
 
   if (starOfficeUrl.trim()) {
-    return buildRealStarOfficeFacadeUrl(sessionId, starOfficeUrl);
+    return buildRealStarOfficeFacadeUrl(sessionId, starOfficeUrl, themeMode);
   }
 
   if (realDevEnabled) {
-    return buildRealStarOfficeFacadeUrl(sessionId, normalizeStarOfficeRealDevBase(realDevBase));
+    return buildRealStarOfficeFacadeUrl(
+      sessionId,
+      normalizeStarOfficeRealDevBase(realDevBase),
+      themeMode,
+    );
   }
 
   if (mockEnabled) {
-    return buildLocalStarOfficeMockAppUrl(sessionId, mockBase);
+    return buildLocalStarOfficeMockAppUrl(sessionId, mockBase, themeMode);
   }
 
   return '';

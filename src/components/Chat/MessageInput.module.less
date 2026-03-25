@@ -3,25 +3,24 @@
 .container {
   border: 1px solid @frame-divider;
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent), rgba(14, 17, 22, 0.9);
+  background: linear-gradient(180deg, @frame-surface-elevated, transparent), @overlay-canvas-strong;
   padding: 10px 12px 10px 10px;
   transition:
     border-color @transition-base,
     box-shadow @transition-base;
 
   &:focus-within {
-    border-color: rgba(123, 145, 255, 0.28);
-    box-shadow: 0 0 0 3px rgba(123, 145, 255, 0.08);
+    border-color: @button-primary-hover-border;
+    box-shadow: @control-focus-shadow;
   }
 }
 
 .disabled {
-  background: rgba(255, 255, 255, 0.02);
+  background: @frame-surface-subtle;
   cursor: not-allowed;
 
   &:focus-within {
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: @panel-border;
     box-shadow: none;
   }
 }
@@ -93,9 +92,9 @@
 
   &:disabled,
   &[disabled] {
-    color: rgba(237, 242, 251, 0.44) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-    background: rgba(255, 255, 255, 0.08) !important;
+    color: @button-disabled-text !important;
+    border-color: @button-disabled-border !important;
+    background: @button-disabled-bg !important;
     opacity: 1 !important;
   }
 }

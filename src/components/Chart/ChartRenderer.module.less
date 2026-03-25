@@ -5,9 +5,8 @@
   flex-direction: column;
   width: 100%;
   min-width: min(720px, 100%);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)), @paper-bg;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, @frame-surface-elevated, @frame-surface-subtle), @paper-bg;
+  border: 1px solid @panel-border;
   border-radius: 14px;
   padding: 14px 16px 12px;
   box-shadow: none;
@@ -32,7 +31,7 @@
   background-color: @card-yellow-bg;
   border: 1px dashed @card-yellow-border;
   border-radius: @border-radius-sm;
-  color: #845b20;
+  color: @warning-color;
   font-size: @font-size-sm;
 }
 

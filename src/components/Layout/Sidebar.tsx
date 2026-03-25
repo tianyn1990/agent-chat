@@ -6,9 +6,12 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   MessageOutlined,
+  MoonOutlined,
   PlusOutlined,
+  SunOutlined,
 } from '@ant-design/icons';
 import { ROUTES } from '@/constants';
+import { useThemeStore } from '@/stores/useThemeStore';
 import UserInfo from './UserInfo';
 import styles from './Sidebar.module.less';
 
@@ -48,6 +51,8 @@ interface SidebarProps {
 export default function Sidebar({ extra, activeKey }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const themeMode = useThemeStore((state) => state.mode);
+  const toggleTheme = useThemeStore((state) => state.toggleMode);
 
   // 根据当前路径计算激活菜单
   const currentKey =
@@ -90,6 +95,21 @@ export default function Sidebar({ extra, activeKey }: SidebarProps) {
         </div>
 
         <div className={styles.railBottom}>
+          <Tooltip
+            title={themeMode === 'dark' ? '切换到明亮皮肤' : '切换到深色皮肤'}
+            placement="right"
+          >
+            {/* 主题切换入口放在 rail 底部，便于全局可发现，同时不打断聊天主舞台。 */}
+            <button
+              type="button"
+              className={styles.railAction}
+              onClick={toggleTheme}
+              aria-label={themeMode === 'dark' ? '切换到明亮皮肤' : '切换到深色皮肤'}
+            >
+              {themeMode === 'dark' ? <SunOutlined /> : <MoonOutlined />}
+            </button>
+          </Tooltip>
+
           {canShowExtra ? (
             <Tooltip title={showExtra ? '收起档案面板' : '展开档案面板'} placement="right">
               {/* rail 只负责触发二级上下文，避免主舞台长期被宽侧栏锁死。 */}

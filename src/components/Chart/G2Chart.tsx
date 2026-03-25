@@ -3,6 +3,7 @@ import { Chart } from '@antv/g2';
 import { Button, Tooltip, Spin } from 'antd';
 import { DownloadOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
 import type { G2ChartPayload } from '@/types/chart';
+import { useThemeStore } from '@/stores/useThemeStore';
 import styles from './G2Chart.module.less';
 
 /** 图表最小高度（px） */
@@ -54,6 +55,7 @@ function getFullscreenHeight(baseHeight: number) {
  *   - 组件卸载时 chart.destroy() 释放资源
  */
 export default function G2Chart({ payload }: G2ChartProps) {
+  const themeMode = useThemeStore((state) => state.mode);
   const shellRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<Chart | null>(null);
@@ -98,7 +100,8 @@ export default function G2Chart({ payload }: G2ChartProps) {
 
         // 合并用户传入的 spec 与基础配置
         chart.options({
-          theme: 'classicDark',
+          // G2 内置主题需要跟随主应用模式，否则 light 皮肤下轴线和标注会继续残留 dark 配色。
+          theme: themeMode === 'dark' ? 'classicDark' : 'classic',
           /**
            * 为结果区图表提供更宽松的默认留白。
            *
@@ -141,7 +144,7 @@ export default function G2Chart({ payload }: G2ChartProps) {
     };
     // spec 用 JSON 序列化比较，避免对象引用变化导致不必要的重渲染
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(payload.spec), displayHeight]);
+  }, [JSON.stringify(payload.spec), displayHeight, themeMode]);
 
   useEffect(() => {
     /**

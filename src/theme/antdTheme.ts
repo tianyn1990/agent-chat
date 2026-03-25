@@ -1,163 +1,164 @@
 import type { ThemeConfig } from 'antd';
+import { darkPalette, lightPalette, themePalettes, type ThemeMode } from './palette';
 
 /**
- * Graphite Console 调色板。
- * 这里集中维护 Ant Design 主题使用的关键颜色，避免全局样式与组件 token 漂移。
+ * 向外暴露 dark palette，兼容现有测试与少量历史引用。
+ * 这里保留 `graphitePalette` 名称，是为了减少双主题改造阶段不必要的接口破坏。
  */
-const graphitePalette = {
-  primary: '#7b91ff',
-  primaryHover: '#92a5ff',
-  primaryActive: '#6278db',
-  success: '#70b38c',
-  warning: '#d2a65c',
-  danger: '#d87b7b',
-  textPrimary: '#edf2fb',
-  textSecondary: '#a7b0bf',
-  textTertiary: '#7d8796',
-  bgBase: '#0d0f13',
-  bgContainer: '#151922',
-  bgSpotlight: '#1b212b',
-  border: 'rgba(255, 255, 255, 0.08)',
-  borderSoft: 'rgba(255, 255, 255, 0.06)',
-  fill: 'rgba(255, 255, 255, 0.06)',
-  fillSecondary: 'rgba(255, 255, 255, 0.04)',
-  fillTertiary: 'rgba(255, 255, 255, 0.03)',
-  fillQuaternary: 'rgba(255, 255, 255, 0.02)',
-  mask: 'rgba(8, 10, 14, 0.72)',
-} as const;
+export const graphitePalette = darkPalette;
+
+/** Light 主题调色板导出，便于测试与文档引用。 */
+export const ivoryPalette = lightPalette;
 
 /**
- * Ant Design 主题配置。
- * 目标是让 AntD 组件在没有命中局部 less 覆写时，也能自然继承当前 Graphite Console 视觉系统。
+ * 根据主题模式生成 Ant Design 主题配置。
+ *
+ * 设计原因：
+ * - Ant Design portal 组件无法只依赖 CSS vars，需要 JS token 参与
+ * - dark / light 都由同一 palette 生成，可以避免 CSS 与 AntD 组件出现两套颜色体系
  */
-export const antdTheme: ThemeConfig = {
-  token: {
-    colorPrimary: graphitePalette.primary,
-    colorInfo: graphitePalette.primary,
-    colorSuccess: graphitePalette.success,
-    colorWarning: graphitePalette.warning,
-    colorError: graphitePalette.danger,
-    colorLink: graphitePalette.primary,
-    colorLinkHover: graphitePalette.primaryHover,
-    colorLinkActive: graphitePalette.primaryActive,
-    colorTextBase: graphitePalette.textPrimary,
-    colorText: graphitePalette.textPrimary,
-    colorTextSecondary: graphitePalette.textSecondary,
-    colorTextTertiary: graphitePalette.textTertiary,
-    colorTextQuaternary: 'rgba(237, 242, 251, 0.36)',
-    colorTextDescription: graphitePalette.textSecondary,
-    colorTextPlaceholder: graphitePalette.textTertiary,
-    colorIcon: graphitePalette.textSecondary,
-    colorIconHover: graphitePalette.textPrimary,
-    colorBgBase: graphitePalette.bgBase,
-    colorBgLayout: graphitePalette.bgBase,
-    colorBgContainer: graphitePalette.bgContainer,
-    colorBgElevated: graphitePalette.bgContainer,
-    colorBgSpotlight: graphitePalette.bgSpotlight,
-    colorBgMask: graphitePalette.mask,
-    colorBorder: graphitePalette.border,
-    colorBorderSecondary: graphitePalette.borderSoft,
-    colorSplit: graphitePalette.borderSoft,
-    colorFill: graphitePalette.fill,
-    colorFillSecondary: graphitePalette.fillSecondary,
-    colorFillTertiary: graphitePalette.fillTertiary,
-    colorFillQuaternary: graphitePalette.fillQuaternary,
-    controlOutline: 'rgba(123, 145, 255, 0.14)',
-    boxShadow: 'none',
-    boxShadowSecondary: 'none',
-    borderRadius: 12,
-    fontFamily: "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif",
-  },
-  components: {
-    Button: {
-      // 按钮统一保持低饱和、扁平化，避免局部操作重新出现默认蓝白按钮。
-      fontWeight: 500,
-      defaultShadow: 'none',
-      primaryShadow: 'none',
-      dangerShadow: 'none',
-      defaultColor: graphitePalette.textPrimary,
-      defaultBg: graphitePalette.fillTertiary,
-      defaultBorderColor: graphitePalette.border,
-      defaultHoverBg: graphitePalette.fillSecondary,
-      defaultHoverColor: graphitePalette.textPrimary,
-      defaultHoverBorderColor: 'rgba(255, 255, 255, 0.18)',
-      defaultActiveBg: graphitePalette.fill,
-      defaultActiveColor: graphitePalette.textPrimary,
-      defaultActiveBorderColor: 'rgba(255, 255, 255, 0.22)',
-      primaryColor: graphitePalette.textPrimary,
-      dangerColor: '#f0caca',
-      borderColorDisabled: graphitePalette.border,
-      defaultGhostColor: graphitePalette.textPrimary,
-      defaultGhostBorderColor: graphitePalette.border,
-      ghostBg: 'transparent',
-      solidTextColor: graphitePalette.textPrimary,
-      textTextColor: graphitePalette.textSecondary,
-      textTextHoverColor: graphitePalette.textPrimary,
-      textTextActiveColor: graphitePalette.textPrimary,
-      textHoverBg: graphitePalette.fillSecondary,
-      linkHoverBg: graphitePalette.fillSecondary,
-      paddingBlock: 6,
-      paddingBlockSM: 4,
-      paddingBlockLG: 8,
-      paddingInline: 14,
-      paddingInlineSM: 10,
-      paddingInlineLG: 18,
-      groupBorderColor: graphitePalette.border,
-    },
-    Input: {
-      // 输入框与底部 dock 使用同一套 graphite 表面层，避免出现浅底输入框。
-      addonBg: graphitePalette.fillSecondary,
-      hoverBg: graphitePalette.fillSecondary,
-      activeBg: graphitePalette.fillSecondary,
-      hoverBorderColor: 'rgba(255, 255, 255, 0.14)',
-      activeBorderColor: graphitePalette.primary,
-      activeShadow: '0 0 0 3px rgba(123, 145, 255, 0.12)',
-      errorActiveShadow: '0 0 0 3px rgba(216, 123, 123, 0.14)',
-      warningActiveShadow: '0 0 0 3px rgba(210, 166, 92, 0.14)',
-    },
-    Select: {
-      // 下拉选项与选择器必须保持深色容器和稳定对比度，避免 option 回退成浅色态。
-      selectorBg: graphitePalette.fillTertiary,
-      clearBg: graphitePalette.bgContainer,
-      optionActiveBg: graphitePalette.fill,
-      optionSelectedBg: 'rgba(123, 145, 255, 0.12)',
-      optionSelectedColor: graphitePalette.textPrimary,
-      optionSelectedFontWeight: 500,
-      hoverBorderColor: 'rgba(255, 255, 255, 0.14)',
-      activeBorderColor: graphitePalette.primary,
-      activeOutlineColor: 'rgba(123, 145, 255, 0.12)',
-      multipleItemBg: graphitePalette.fill,
-      multipleItemBorderColor: graphitePalette.border,
-      multipleSelectorBgDisabled: graphitePalette.fillQuaternary,
-      multipleItemColorDisabled: 'rgba(237, 242, 251, 0.44)',
-      multipleItemBorderColorDisabled: graphitePalette.borderSoft,
-    },
-    Modal: {
-      // Modal 是最容易露出 AntD 默认浅色 header/footer 的区域，直接在 token 层钉死。
-      headerBg: graphitePalette.bgContainer,
-      contentBg: graphitePalette.bgContainer,
-      footerBg: graphitePalette.bgContainer,
-      titleColor: graphitePalette.textPrimary,
-      titleFontSize: 16,
-    },
-    Message: {
-      // Toast 走 portal 渲染，组件 token 需要和 global.less 一起兜底，避免文字对比度失衡。
-      contentBg: '#1a2028',
-      contentPadding: '10px 14px',
-    },
-    Notification: {
-      // Notification 不做高饱和语义底色，统一回到深色容器，再用图标表达语义。
-      colorSuccessBg: graphitePalette.bgContainer,
-      colorErrorBg: graphitePalette.bgContainer,
-      colorInfoBg: graphitePalette.bgContainer,
-      colorWarningBg: graphitePalette.bgContainer,
-      width: 360,
-    },
-    Drawer: {
-      footerPaddingBlock: 12,
-      footerPaddingInline: 16,
-    },
-  },
-};
+export function createAntdTheme(mode: ThemeMode): ThemeConfig {
+  const palette = themePalettes[mode];
 
-export { graphitePalette };
+  return {
+    token: {
+      colorPrimary: palette.primary,
+      colorInfo: palette.primary,
+      colorSuccess: palette.successColor,
+      colorWarning: palette.warningColor,
+      colorError: palette.dangerColor,
+      colorLink: palette.primary,
+      colorLinkHover: palette.primaryHover,
+      colorLinkActive: palette.primaryActive,
+      colorTextBase: palette.textPrimary,
+      colorText: palette.textPrimary,
+      colorTextSecondary: palette.textSecondary,
+      colorTextTertiary: palette.textTertiary,
+      colorTextQuaternary:
+        mode === 'dark' ? 'rgba(237, 242, 251, 0.36)' : 'rgba(100, 90, 78, 0.42)',
+      colorTextDescription: palette.textSecondary,
+      colorTextPlaceholder: palette.textTertiary,
+      colorIcon: palette.textSecondary,
+      colorIconHover: palette.textPrimary,
+      colorBgBase: palette.contentBg,
+      colorBgLayout: palette.contentBg,
+      colorBgContainer: palette.paperBg,
+      colorBgElevated: palette.paperBg,
+      colorBgSpotlight: palette.paperBgStrong,
+      colorBgMask: mode === 'dark' ? 'rgba(8, 10, 14, 0.72)' : 'rgba(73, 61, 43, 0.22)',
+      colorBorder: palette.panelBorder,
+      colorBorderSecondary: palette.frameDivider,
+      colorSplit: palette.frameDivider,
+      colorFill: palette.frameSurfaceElevated,
+      colorFillSecondary: palette.frameSurfaceSubtle,
+      colorFillTertiary: palette.frameSurfaceSubtle,
+      colorFillQuaternary:
+        mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(115, 93, 64, 0.03)',
+      controlOutline: palette.primarySoft,
+      boxShadow: 'none',
+      boxShadowSecondary: 'none',
+      borderRadius: 12,
+      fontFamily: "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif",
+    },
+    components: {
+      Button: {
+        // 按钮维持统一的扁平化工作台风格，避免 portal 或表单局部回退到默认 AntD 观感。
+        fontWeight: 500,
+        defaultShadow: 'none',
+        primaryShadow: 'none',
+        dangerShadow: 'none',
+        defaultColor: palette.textPrimary,
+        defaultBg: palette.buttonDefaultBg,
+        defaultBorderColor: palette.buttonDefaultBorder,
+        defaultHoverBg: palette.buttonDefaultHoverBg,
+        defaultHoverColor: palette.textPrimary,
+        defaultHoverBorderColor: palette.buttonDefaultHoverBorder,
+        defaultActiveBg: palette.buttonDefaultActiveBg,
+        defaultActiveColor: palette.textPrimary,
+        defaultActiveBorderColor: palette.buttonDefaultActiveBorder,
+        primaryColor: palette.buttonPrimaryText,
+        dangerColor: palette.buttonDangerText,
+        borderColorDisabled: palette.buttonDisabledBorder,
+        defaultGhostColor: palette.textPrimary,
+        defaultGhostBorderColor: palette.buttonDefaultBorder,
+        ghostBg: 'transparent',
+        solidTextColor: palette.textPrimary,
+        textTextColor: palette.textSecondary,
+        textTextHoverColor: palette.textPrimary,
+        textTextActiveColor: palette.textPrimary,
+        textHoverBg: palette.buttonTextHoverBg,
+        linkHoverBg: palette.buttonTextHoverBg,
+        paddingBlock: 6,
+        paddingBlockSM: 4,
+        paddingBlockLG: 8,
+        paddingInline: 14,
+        paddingInlineSM: 10,
+        paddingInlineLG: 18,
+        groupBorderColor: palette.panelBorder,
+      },
+      Input: {
+        // 输入框是聊天 dock 和搜索工具条的核心表面层，需要与自定义 CSS vars 完全一致。
+        addonBg: palette.controlBg,
+        hoverBg: palette.controlBg,
+        activeBg: palette.controlBg,
+        hoverBorderColor: palette.controlBorderHover,
+        activeBorderColor: palette.primary,
+        activeShadow: palette.controlFocusShadow,
+        errorActiveShadow:
+          mode === 'dark'
+            ? '0 0 0 3px rgba(216, 123, 123, 0.14)'
+            : '0 0 0 3px rgba(177, 95, 103, 0.14)',
+        warningActiveShadow:
+          mode === 'dark'
+            ? '0 0 0 3px rgba(210, 166, 92, 0.14)'
+            : '0 0 0 3px rgba(164, 118, 50, 0.14)',
+      },
+      Select: {
+        selectorBg: palette.controlBg,
+        clearBg: palette.paperBg,
+        optionActiveBg: palette.frameSurfaceElevated,
+        optionSelectedBg: palette.primarySoft,
+        optionSelectedColor: palette.textPrimary,
+        optionSelectedFontWeight: 500,
+        hoverBorderColor: palette.controlBorderHover,
+        activeBorderColor: palette.primary,
+        activeOutlineColor: palette.focusRingSoft,
+        multipleItemBg: palette.frameSurfaceElevated,
+        multipleItemBorderColor: palette.panelBorder,
+        multipleSelectorBgDisabled: palette.frameSurfaceSubtle,
+        multipleItemColorDisabled: palette.buttonDisabledText,
+        multipleItemBorderColorDisabled: palette.frameDivider,
+      },
+      Modal: {
+        // Modal/Confirm 很容易暴露默认浅色 header/footer，因此统一由主题层兜底。
+        headerBg: palette.modalBg,
+        contentBg: palette.modalBg,
+        footerBg: palette.modalBg,
+        titleColor: palette.textPrimary,
+        titleFontSize: 16,
+      },
+      Message: {
+        // Toast 通过 portal 渲染，必须与全局 CSS vars 使用同一背景来源。
+        contentBg: palette.messageBg,
+        contentPadding: '10px 14px',
+      },
+      Notification: {
+        colorSuccessBg: palette.paperBg,
+        colorErrorBg: palette.paperBg,
+        colorInfoBg: palette.paperBg,
+        colorWarningBg: palette.paperBg,
+        width: 360,
+      },
+      Drawer: {
+        footerPaddingBlock: 12,
+        footerPaddingInline: 16,
+      },
+    },
+  };
+}
+
+/**
+ * 默认导出 dark 主题，兼容历史导入。
+ * 新代码应优先使用 `createAntdTheme(mode)`。
+ */
+export const antdTheme = createAntdTheme('dark');

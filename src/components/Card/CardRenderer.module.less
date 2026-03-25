@@ -1,10 +1,9 @@
 @import '@/styles/variables.less';
 
 .card {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid @panel-border;
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)), @paper-bg;
+  background: linear-gradient(180deg, @frame-surface-elevated, @frame-surface-subtle), @paper-bg;
   overflow: hidden;
   box-shadow: none;
   width: 100%;
@@ -37,8 +36,8 @@
   justify-content: center;
   gap: @spacing-xs;
   padding: 8px @spacing-md;
-  background-color: rgba(112, 179, 140, 0.12);
-  border-top: 1px solid rgba(112, 179, 140, 0.24);
+  background-color: @feedback-success-tag-bg;
+  border-top: 1px solid @feedback-success-tag-border;
 }
 
 .expiredIcon {
@@ -47,7 +46,7 @@
 }
 
 .expiredText {
-  color: #c9ebd4;
+  color: @feedback-success-tag-text;
   font-size: @font-size-sm;
   font-weight: 500;
 }

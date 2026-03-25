@@ -9,7 +9,7 @@
   padding: 10px 10px 9px;
   border-radius: 12px;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid @session-item-border;
   box-sizing: border-box;
   transition:
     background-color @transition-base,
@@ -20,7 +20,7 @@
 
   &:hover {
     background-color: @sidebar-hover-bg;
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: @session-item-hover-border;
     transform: translateX(1px);
   }
 }
@@ -28,7 +28,7 @@
 // 激活态（当前会话）
 .itemActive {
   background: @sidebar-active-bg !important;
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: @session-item-hover-border;
 
   .title {
     color: @sidebar-active-text;
@@ -39,7 +39,7 @@
   }
 
   .updatedAt {
-    color: rgba(255, 244, 232, 0.75);
+    color: @session-active-meta-text;
   }
 }
 
@@ -54,7 +54,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
+  background: @session-item-icon-bg;
 }
 
 // 标题与摘要容器
@@ -108,16 +108,16 @@
 
 // 内联重命名输入框
 .renameInput {
-  // 覆盖 Ant Design 默认样式，适配深色背景
-  background-color: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.16) !important;
+  // 覆盖 Ant Design 默认样式，保证重命名输入框在双主题下都与会话面板一致。
+  background-color: @session-rename-bg !important;
+  border-color: @session-rename-border !important;
   color: @sidebar-text !important;
   font-size: @font-size-base;
   border-radius: 10px;
 
   &:focus {
     border-color: @primary-color !important;
-    box-shadow: 0 0 0 2px rgba(123, 145, 255, 0.18) !important;
+    box-shadow: @session-rename-focus !important;
   }
 }
 
@@ -140,7 +140,7 @@
   padding: 0;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: @session-item-menu-hover-bg;
     color: @sidebar-text;
   }
 }

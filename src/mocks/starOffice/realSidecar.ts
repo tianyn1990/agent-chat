@@ -7,10 +7,58 @@ export const STAR_OFFICE_SESSION_SEGMENT = 'session';
 /** 真实 Star-Office 缺省的等待文案。 */
 export const STAR_OFFICE_IDLE_DETAIL = '等待该会话的执行状态';
 
+type StarOfficeThemeMode = 'dark' | 'light';
+
 export interface StarOfficeSessionRouteMatch {
   sessionId: string;
   assetPath: string;
 }
+
+interface StarOfficeUnavailableThemePalette {
+  colorScheme: StarOfficeThemeMode;
+  pageBg: string;
+  cardBg: string;
+  cardBorder: string;
+  eyebrow: string;
+  textPrimary: string;
+  textSecondary: string;
+  codeBg: string;
+  codeBorder: string;
+  tipBg: string;
+  tipBorder: string;
+}
+
+const STAR_OFFICE_UNAVAILABLE_THEME_PALETTES: Record<
+  StarOfficeThemeMode,
+  StarOfficeUnavailableThemePalette
+> = {
+  dark: {
+    colorScheme: 'dark',
+    pageBg: '#131622',
+    cardBg: 'linear-gradient(180deg, #1b2032 0%, #111523 100%)',
+    cardBorder: 'rgba(255, 255, 255, 0.08)',
+    eyebrow: '#7fb4ff',
+    textPrimary: '#f3f6ff',
+    textSecondary: '#d6def4',
+    codeBg: 'rgba(255, 255, 255, 0.08)',
+    codeBorder: 'rgba(255, 255, 255, 0.08)',
+    tipBg: 'rgba(127, 180, 255, 0.08)',
+    tipBorder: 'rgba(127, 180, 255, 0.12)',
+  },
+  light: {
+    colorScheme: 'light',
+    pageBg: '#f5efe6',
+    cardBg: 'linear-gradient(180deg, #fffdfa 0%, #f7f0e5 100%)',
+    cardBorder: 'rgba(98, 82, 58, 0.14)',
+    eyebrow: '#5a6fcf',
+    textPrimary: '#2f2a23',
+    textSecondary: '#5d5448',
+    codeBg: 'rgba(98, 82, 58, 0.08)',
+    codeBorder: 'rgba(98, 82, 58, 0.12)',
+    tipBg: 'rgba(90, 111, 207, 0.08)',
+    tipBorder: 'rgba(90, 111, 207, 0.12)',
+  },
+};
 
 /**
  * 规范化真实 Star-Office dev 基础路径。
@@ -149,34 +197,72 @@ export function buildStarOfficeUnavailableHtml(
   title: string,
   detail: string,
   sessionId?: string,
+  themeMode?: string,
 ): string {
+  const normalizedThemeMode = normalizeStarOfficeThemeMode(themeMode);
+  const darkThemeVars = serializeThemePalette(STAR_OFFICE_UNAVAILABLE_THEME_PALETTES.dark);
+  const lightThemeVars = serializeThemePalette(STAR_OFFICE_UNAVAILABLE_THEME_PALETTES.light);
+
   return `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="theme-${normalizedThemeMode}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${escapeHtml(title)}</title>
+    <script>
+      (function () {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var queryMode = params.get('themeMode');
+          var storedMode = window.localStorage.getItem('oc_theme_mode');
+          var nextMode =
+            queryMode === 'light' || queryMode === 'dark'
+              ? queryMode
+              : storedMode === 'light' || storedMode === 'dark'
+                ? storedMode
+                : '${normalizedThemeMode}';
+
+          var root = document.documentElement;
+          root.classList.remove('theme-dark', 'theme-light');
+          root.classList.add('theme-' + nextMode);
+          root.style.colorScheme = nextMode;
+        } catch (error) {
+          document.documentElement.style.colorScheme = '${normalizedThemeMode}';
+        }
+      })();
+    </script>
     <style>
+      .theme-dark {
+        color-scheme: dark;
+        ${darkThemeVars}
+      }
+
+      .theme-light {
+        color-scheme: light;
+        ${lightThemeVars}
+      }
+
       body {
         margin: 0;
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #131622;
-        color: #f3f6ff;
+        background: var(--page-bg);
+        color: var(--text-primary);
         font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
       }
       .card {
         width: min(720px, calc(100vw - 48px));
         padding: 32px;
         border-radius: 20px;
-        background: linear-gradient(180deg, #1b2032 0%, #111523 100%);
+        border: 1px solid var(--card-border);
+        background: var(--card-bg);
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
       }
       .eyebrow {
         margin: 0 0 12px;
-        color: #7fb4ff;
+        color: var(--eyebrow-color);
         font-size: 12px;
         letter-spacing: 0.12em;
         text-transform: uppercase;
@@ -188,19 +274,22 @@ export function buildStarOfficeUnavailableHtml(
       p {
         margin: 0 0 12px;
         line-height: 1.7;
-        color: #d6def4;
+        color: var(--text-secondary);
       }
       code {
         display: inline-block;
         padding: 2px 6px;
         border-radius: 6px;
-        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--code-border);
+        background: var(--code-bg);
+        color: var(--text-primary);
       }
       .tip {
         margin-top: 20px;
         padding: 14px 16px;
         border-radius: 12px;
-        background: rgba(127, 180, 255, 0.08);
+        border: 1px solid var(--tip-border);
+        background: var(--tip-bg);
       }
     </style>
   </head>
@@ -266,4 +355,23 @@ function escapeHtml(text: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function normalizeStarOfficeThemeMode(themeMode: string | undefined): StarOfficeThemeMode {
+  return themeMode === 'light' ? 'light' : 'dark';
+}
+
+function serializeThemePalette(palette: StarOfficeUnavailableThemePalette): string {
+  return [
+    `--page-bg: ${palette.pageBg};`,
+    `--card-bg: ${palette.cardBg};`,
+    `--card-border: ${palette.cardBorder};`,
+    `--eyebrow-color: ${palette.eyebrow};`,
+    `--text-primary: ${palette.textPrimary};`,
+    `--text-secondary: ${palette.textSecondary};`,
+    `--code-bg: ${palette.codeBg};`,
+    `--code-border: ${palette.codeBorder};`,
+    `--tip-bg: ${palette.tipBg};`,
+    `--tip-border: ${palette.tipBorder};`,
+  ].join('\n');
 }

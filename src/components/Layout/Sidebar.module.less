@@ -60,7 +60,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid rgba(123, 145, 255, 0.5);
+    outline: 2px solid @focus-outline;
     outline-offset: 2px;
   }
 }
@@ -100,15 +100,15 @@
   }
 
   &:focus-visible {
-    outline: 2px solid rgba(123, 145, 255, 0.5);
+    outline: 2px solid @focus-outline;
     outline-offset: 2px;
   }
 }
 
 .navItemActive {
-  background: rgba(123, 145, 255, 0.1) !important;
-  border-color: rgba(123, 145, 255, 0.18) !important;
-  color: @sidebar-active-text;
+  background: @nav-active-bg !important;
+  border-color: @nav-active-border !important;
+  color: @nav-active-text;
 }
 
 .navIcon {

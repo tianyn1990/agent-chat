@@ -4,9 +4,9 @@
   min-height: 100vh;
   padding: 24px;
   background:
-    radial-gradient(circle at top left, rgba(123, 145, 255, 0.14), transparent 28%),
-    radial-gradient(circle at top right, rgba(199, 155, 101, 0.1), transparent 24%),
-    linear-gradient(180deg, #0d1015 0%, #141921 100%);
+    radial-gradient(circle at top left, @primary-soft, transparent 28%),
+    radial-gradient(circle at top right, @accent-soft, transparent 24%),
+    linear-gradient(180deg, @content-bg 0%, @content-bg-secondary 100%);
 }
 
 .header {
@@ -36,9 +36,9 @@
 .summaryCard {
   margin-bottom: 20px;
   border-radius: 20px;
-  box-shadow: none;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(22, 27, 34, 0.88) !important;
+  box-shadow: @empty-surface-shadow;
+  border: 1px solid @empty-surface-border;
+  background: @empty-surface-bg !important;
 
   :global(.ant-card-body) {
     padding: 16px 18px;
@@ -52,9 +52,9 @@
   gap: 14px;
   margin-bottom: 20px;
   padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid @panel-border;
   border-radius: 24px;
-  background: linear-gradient(180deg, rgba(22, 27, 34, 0.92) 0%, rgba(16, 20, 27, 0.96) 100%);
+  background: linear-gradient(180deg, @paper-bg 0%, @content-bg-secondary 100%);
   overflow: hidden;
 }
 
@@ -62,8 +62,8 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(transparent 95%, rgba(255, 255, 255, 0.04) 95%),
-    linear-gradient(90deg, transparent 95%, rgba(255, 255, 255, 0.04) 95%);
+    linear-gradient(transparent 95%, @frame-divider 95%),
+    linear-gradient(90deg, transparent 95%, @frame-divider 95%);
   background-size: 36px 36px;
   pointer-events: none;
   opacity: 0.65;
@@ -74,10 +74,10 @@
   z-index: 1;
   min-height: 180px;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid @panel-border;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: inset 0 -10px 18px rgba(0, 0, 0, 0.12);
+  background: @frame-surface-subtle;
+  box-shadow: inset 0 -10px 18px @overlay-canvas;
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -86,10 +86,8 @@
 
 .zoneCardActive {
   transform: translateY(-2px);
-  border-color: rgba(123, 145, 255, 0.34);
-  box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.18),
-    inset 0 -12px 24px rgba(123, 145, 255, 0.08);
+  border-color: @focus-outline;
+  box-shadow: inset 0 -12px 24px @focus-ring-soft;
 }
 
 .zoneHeader {
@@ -129,14 +127,14 @@
   top: 4px;
   max-width: 180px;
   padding: 10px 12px;
-  border: 1px solid rgba(123, 145, 255, 0.2);
+  border: 1px solid @panel-border;
   border-radius: 14px;
-  background: rgba(24, 31, 40, 0.96);
+  background: @surface-floating-strong;
   color: @text-primary;
   font-size: 12px;
   line-height: 1.5;
   transform: translateX(-50%);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  box-shadow: @empty-surface-shadow;
 }
 
 .agentBubble::after {
@@ -146,12 +144,13 @@
   bottom: -8px;
   width: 12px;
   height: 12px;
-  background: rgba(24, 31, 40, 0.96);
-  border-right: 1px solid rgba(123, 145, 255, 0.2);
-  border-bottom: 1px solid rgba(123, 145, 255, 0.2);
+  background: @surface-floating-strong;
+  border-right: 1px solid @panel-border;
+  border-bottom: 1px solid @panel-border;
   transform: translateX(-50%) rotate(45deg);
 }
 
+// 像素角色本体保留较高对比的原始配色，避免切到 light 主题后失去“像素办公室”识别度。
 .pixelAgent {
   position: absolute;
   left: 50%;
@@ -240,9 +239,9 @@
 
 .agentCard {
   border-radius: 18px;
-  box-shadow: none;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(22, 27, 34, 0.88) !important;
+  box-shadow: @empty-surface-shadow;
+  border: 1px solid @empty-surface-border;
+  background: @empty-surface-bg !important;
 
   :global(.ant-card-body) {
     padding: 16px;
@@ -279,7 +278,10 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  background: linear-gradient(180deg, #0d1015 0%, #141921 100%);
+  background:
+    radial-gradient(circle at top left, @primary-soft, transparent 28%),
+    radial-gradient(circle at top right, @accent-soft, transparent 24%),
+    linear-gradient(180deg, @content-bg 0%, @content-bg-secondary 100%);
 }
 
 .resultIcon {
@@ -296,15 +298,15 @@
 }
 
 .statusTagProcessing {
-  border-color: rgba(123, 145, 255, 0.22) !important;
-  background: rgba(123, 145, 255, 0.12) !important;
-  color: #d5ddff !important;
+  border-color: @feedback-info-tag-border !important;
+  background: @feedback-info-tag-bg !important;
+  color: @feedback-info-tag-text !important;
 }
 
 .statusTagError {
-  border-color: rgba(216, 123, 123, 0.22) !important;
-  background: rgba(216, 123, 123, 0.12) !important;
-  color: #f0c2c2 !important;
+  border-color: @feedback-danger-tag-border !important;
+  background: @feedback-danger-tag-bg !important;
+  color: @feedback-danger-tag-text !important;
 }
 
 @keyframes agent-bob {

@@ -5,7 +5,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #151a21 0%, #11161d 100%);
+  background: linear-gradient(180deg, @paper-bg 0%, @visualize-shell-bg 100%);
 }
 
 .frame {
@@ -13,7 +13,7 @@
   height: 100%;
   border: none;
   display: block;
-  background: #fff;
+  background: @visualize-frame-bg;
 }
 
 .emptyWrap {
@@ -29,9 +29,9 @@
   width: min(860px, 100%);
   padding: 22px;
   border-radius: 16px;
-  background: rgba(22, 27, 34, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: @shadow-md;
+  background: @empty-surface-bg;
+  border: 1px solid @empty-surface-border;
+  box-shadow: @empty-surface-shadow;
 }
 
 .emptyIcon {

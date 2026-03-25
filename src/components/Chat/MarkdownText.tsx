@@ -15,7 +15,8 @@ import sql from 'react-syntax-highlighter/dist/esm/languages/prism/sql';
 import tsx from 'react-syntax-highlighter/dist/esm/languages/prism/tsx';
 import typescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
 import yaml from 'react-syntax-highlighter/dist/esm/languages/prism/yaml';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { useThemeStore } from '@/stores/useThemeStore';
 import styles from './MessageBubble.module.less';
 
 interface MarkdownTextProps {
@@ -48,6 +49,7 @@ SyntaxHighlighter.registerLanguage('yaml', yaml);
 SyntaxHighlighter.registerLanguage('yml', yaml);
 
 export default function MarkdownText({ text, isUser }: MarkdownTextProps) {
+  const themeMode = useThemeStore((state) => state.mode);
   const wrapperClassName = isUser
     ? `${styles.bubble} ${styles.bubbleUser} ${styles.bubbleUserMarkdown}`
     : `${styles.bubble} ${styles.bubbleAssistant}`;
@@ -100,7 +102,7 @@ export default function MarkdownText({ text, isUser }: MarkdownTextProps) {
 
             return (
               <SyntaxHighlighter
-                style={oneDark}
+                style={themeMode === 'dark' ? oneDark : oneLight}
                 language={language}
                 PreTag="div"
                 className={styles.codeBlock}

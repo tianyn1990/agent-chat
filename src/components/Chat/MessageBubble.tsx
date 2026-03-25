@@ -64,8 +64,7 @@ const MessageBubble = memo(function MessageBubble({
         <Avatar
           size={32}
           icon={<RobotOutlined />}
-          className={styles.avatar}
-          style={{ backgroundColor: '#2f3c57', flexShrink: 0 }}
+          className={`${styles.avatar} ${styles.avatarAssistant}`}
         />
       )}
 
@@ -92,8 +91,7 @@ const MessageBubble = memo(function MessageBubble({
         <Avatar
           size={32}
           icon={<UserOutlined />}
-          className={styles.avatar}
-          style={{ backgroundColor: '#3f4654', flexShrink: 0 }}
+          className={`${styles.avatar} ${styles.avatarUser}`}
         />
       )}
     </div>

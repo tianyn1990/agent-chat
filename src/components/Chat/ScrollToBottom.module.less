@@ -11,9 +11,9 @@
   align-items: center;
   gap: @spacing-xs;
   padding: 6px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid @panel-border;
   border-radius: 999px;
-  background: rgba(20, 24, 31, 0.92);
+  background: @surface-floating;
   box-shadow: none;
   backdrop-filter: blur(10px);
   color: @text-secondary;
@@ -28,9 +28,9 @@
   pointer-events: auto;
 
   &:hover {
-    background-color: rgba(23, 29, 38, 0.96);
+    background-color: @surface-floating-strong;
     color: @text-primary;
-    border-color: rgba(123, 145, 255, 0.22);
+    border-color: @button-primary-border;
   }
 }
 

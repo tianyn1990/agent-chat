@@ -78,8 +78,8 @@
   gap: 6px;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: @frame-surface-subtle;
+  border: 1px solid @panel-border;
   box-shadow: none;
   min-width: auto;
 }
@@ -132,9 +132,8 @@
   flex-direction: column;
   position: relative;
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 24%), rgba(11, 14, 19, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: linear-gradient(180deg, @frame-surface-subtle, transparent 24%), @overlay-canvas;
+  border: 1px solid @frame-divider;
   overflow: hidden;
 }
 

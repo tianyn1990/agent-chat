@@ -2,43 +2,41 @@
 // 品牌与场景色
 // ===========================
 
-// 主品牌色：在深色 console 中保持清晰识别的靛蓝高亮
-@primary-color: #7b91ff;
-@primary-hover: #92a5ff;
-@primary-active: #6278db;
-@primary-soft: rgba(123, 145, 255, 0.14);
+// 所有颜色变量都通过 CSS custom properties 暴露运行时值。
+// 这里保留 dark fallback，是为了在主题状态尚未同步到 DOM 前仍能稳定显示现有深色界面。
 
-// 辅助强调色：保留 Paper Ops 的铜棕记忆点，但仅作为点缀使用
-@accent-color: #c79b65;
-@accent-soft: rgba(199, 155, 101, 0.16);
+@primary-color: var(--primary-color, #7b91ff);
+@primary-hover: var(--primary-hover, #92a5ff);
+@primary-active: var(--primary-active, #6278db);
+@primary-soft: var(--primary-soft, rgba(123, 145, 255, 0.14));
 
-// 成功 / 警告 / 错误反馈
-@success-color: #70b38c;
-@warning-color: #d2a65c;
-@danger-color: #d87b7b;
+@accent-color: var(--accent-color, #c79b65);
+@accent-soft: var(--accent-soft, rgba(199, 155, 101, 0.16));
+
+@success-color: var(--success-color, #70b38c);
+@warning-color: var(--warning-color, #d2a65c);
+@danger-color: var(--danger-color, #d87b7b);
 
 // ===========================
 // 页面背景与表面层
 // ===========================
 
-// 页面主背景：深 graphite console，主应用优先呈现原生桌面壳层
-@content-bg: #0d0f13;
-@content-bg-secondary: #141821;
-@paper-bg: #171b22;
-@paper-bg-strong: #202630;
-@panel-bg: rgba(23, 27, 34, 0.94);
-@panel-border: rgba(255, 255, 255, 0.08);
-@frame-divider: rgba(255, 255, 255, 0.06);
-@frame-divider-strong: rgba(255, 255, 255, 0.1);
-@frame-surface-subtle: rgba(255, 255, 255, 0.02);
-@frame-surface-elevated: rgba(255, 255, 255, 0.04);
+@content-bg: var(--content-bg, #0d0f13);
+@content-bg-secondary: var(--content-bg-secondary, #141821);
+@paper-bg: var(--paper-bg, #171b22);
+@paper-bg-strong: var(--paper-bg-strong, #202630);
+@panel-bg: var(--panel-bg, rgba(23, 27, 34, 0.94));
+@panel-border: var(--panel-border, rgba(255, 255, 255, 0.08));
+@frame-divider: var(--frame-divider, rgba(255, 255, 255, 0.06));
+@frame-divider-strong: var(--frame-divider-strong, rgba(255, 255, 255, 0.1));
+@frame-surface-subtle: var(--frame-surface-subtle, rgba(255, 255, 255, 0.02));
+@frame-surface-elevated: var(--frame-surface-elevated, rgba(255, 255, 255, 0.04));
 
-// 主文本与辅助文本
-@text-primary: #edf2fb;
-@text-secondary: #a7b0bf;
-@text-tertiary: #7d8796;
-@text-on-dark: rgba(237, 242, 251, 0.94);
-@text-on-dark-secondary: rgba(237, 242, 251, 0.58);
+@text-primary: var(--text-primary, #edf2fb);
+@text-secondary: var(--text-secondary, #a7b0bf);
+@text-tertiary: var(--text-tertiary, #7d8796);
+@text-on-dark: var(--text-on-dark, rgba(237, 242, 251, 0.94));
+@text-on-dark-secondary: var(--text-on-dark-secondary, rgba(237, 242, 251, 0.58));
 
 // ===========================
 // 侧边栏
@@ -47,36 +45,153 @@
 @sidebar-width: 320px;
 @sidebar-collapsed-width: 76px;
 @sidebar-panel-width: 232px;
-@sidebar-bg: #101319;
-@sidebar-surface: rgba(255, 255, 255, 0.04);
-@sidebar-text: @text-on-dark;
-@sidebar-text-secondary: @text-on-dark-secondary;
-@sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-@sidebar-active-bg: linear-gradient(135deg, rgba(199, 155, 101, 0.18), rgba(123, 145, 255, 0.2));
-@sidebar-active-text: #ffffff;
-@sidebar-border: rgba(255, 255, 255, 0.08);
+@sidebar-bg: var(--sidebar-bg, #101319);
+@sidebar-surface: var(--sidebar-surface, rgba(255, 255, 255, 0.04));
+@sidebar-text: var(--sidebar-text, rgba(237, 242, 251, 0.94));
+@sidebar-text-secondary: var(--sidebar-text-secondary, rgba(237, 242, 251, 0.58));
+@sidebar-hover-bg: var(--sidebar-hover-bg, rgba(255, 255, 255, 0.06));
+@sidebar-active-bg: var(
+  --sidebar-active-bg,
+  linear-gradient(135deg, rgba(199, 155, 101, 0.18), rgba(123, 145, 255, 0.2))
+);
+@sidebar-active-text: var(--sidebar-active-text, #ffffff);
+@sidebar-border: var(--sidebar-border, rgba(255, 255, 255, 0.08));
 
 // ===========================
 // 消息与结果容器
 // ===========================
 
-@user-bubble-bg: linear-gradient(135deg, #2c3340 0%, #262d39 100%);
-@user-bubble-text: #f6f8fb;
-@assistant-bubble-bg: rgba(255, 255, 255, 0.03);
-@assistant-bubble-border: rgba(255, 255, 255, 0.06);
-@assistant-bubble-shadow: none;
+@user-bubble-bg: var(--user-bubble-bg, linear-gradient(135deg, #2c3340 0%, #262d39 100%));
+@user-bubble-text: var(--user-bubble-text, #f6f8fb);
+@assistant-bubble-bg: var(--assistant-bubble-bg, rgba(255, 255, 255, 0.03));
+@assistant-bubble-border: var(--assistant-bubble-border, rgba(255, 255, 255, 0.06));
+@assistant-bubble-shadow: var(--assistant-bubble-shadow, none);
 
-// 卡片主题色
-@card-blue-bg: #172333;
-@card-blue-border: #2d4362;
-@card-green-bg: #18271f;
-@card-green-border: #305240;
-@card-yellow-bg: #292113;
-@card-yellow-border: #70562d;
-@card-red-bg: #2b1b1d;
-@card-red-border: #6e3c45;
-@card-grey-bg: #1f2228;
-@card-grey-border: #383d46;
+@card-blue-bg: var(--card-blue-bg, #172333);
+@card-blue-border: var(--card-blue-border, #2d4362);
+@card-green-bg: var(--card-green-bg, #18271f);
+@card-green-border: var(--card-green-border, #305240);
+@card-yellow-bg: var(--card-yellow-bg, #292113);
+@card-yellow-border: var(--card-yellow-border, #70562d);
+@card-red-bg: var(--card-red-bg, #2b1b1d);
+@card-red-border: var(--card-red-border, #6e3c45);
+@card-grey-bg: var(--card-grey-bg, #1f2228);
+@card-grey-border: var(--card-grey-border, #383d46);
+
+// ===========================
+// 运行时主题扩展变量
+// ===========================
+
+@app-background: var(--app-background);
+@app-grid-primary: var(--app-grid-primary);
+@app-grid-secondary: var(--app-grid-secondary);
+@app-grid-mask: var(--app-grid-mask);
+@selection-bg: var(--selection-bg);
+@selection-text: var(--selection-text);
+@scrollbar-thumb: var(--scrollbar-thumb);
+@scrollbar-thumb-hover: var(--scrollbar-thumb-hover);
+@sidebar-scrollbar-thumb: var(--sidebar-scrollbar-thumb);
+@sidebar-scrollbar-thumb-hover: var(--sidebar-scrollbar-thumb-hover);
+@focus-outline: var(--focus-outline);
+@focus-ring: var(--focus-ring);
+@focus-ring-soft: var(--focus-ring-soft);
+@button-primary-border: var(--button-primary-border);
+@button-primary-bg: var(--button-primary-bg);
+@button-primary-hover-border: var(--button-primary-hover-border);
+@button-primary-hover-bg: var(--button-primary-hover-bg);
+@button-primary-active-border: var(--button-primary-active-border);
+@button-primary-active-bg: var(--button-primary-active-bg);
+@button-primary-text: var(--button-primary-text);
+@button-default-border: var(--button-default-border);
+@button-default-bg: var(--button-default-bg);
+@button-default-hover-border: var(--button-default-hover-border);
+@button-default-hover-bg: var(--button-default-hover-bg);
+@button-default-active-border: var(--button-default-active-border);
+@button-default-active-bg: var(--button-default-active-bg);
+@button-text-hover-bg: var(--button-text-hover-bg);
+@button-text-active-bg: var(--button-text-active-bg);
+@button-disabled-text: var(--button-disabled-text);
+@button-disabled-border: var(--button-disabled-border);
+@button-disabled-bg: var(--button-disabled-bg);
+@button-danger-text: var(--button-danger-text);
+@button-danger-border: var(--button-danger-border);
+@button-danger-bg: var(--button-danger-bg);
+@button-danger-hover-text: var(--button-danger-hover-text);
+@button-danger-hover-border: var(--button-danger-hover-border);
+@button-danger-hover-bg: var(--button-danger-hover-bg);
+@button-danger-active-border: var(--button-danger-active-border);
+@button-danger-active-bg: var(--button-danger-active-bg);
+@button-danger-primary-text: var(--button-danger-primary-text);
+@button-danger-primary-border: var(--button-danger-primary-border);
+@button-danger-primary-bg: var(--button-danger-primary-bg);
+@button-danger-primary-hover-text: var(--button-danger-primary-hover-text);
+@button-danger-primary-hover-border: var(--button-danger-primary-hover-border);
+@button-danger-primary-hover-bg: var(--button-danger-primary-hover-bg);
+@button-danger-primary-active-border: var(--button-danger-primary-active-border);
+@button-danger-primary-active-bg: var(--button-danger-primary-active-bg);
+@control-bg: var(--control-bg);
+@control-border: var(--control-border);
+@control-border-hover: var(--control-border-hover);
+@control-focus-shadow: var(--control-focus-shadow);
+@drawer-bg: var(--drawer-bg);
+@modal-bg: var(--modal-bg);
+@tooltip-bg: var(--tooltip-bg);
+@message-bg: var(--message-bg);
+@dropdown-bg: var(--dropdown-bg);
+@nav-active-bg: var(--nav-active-bg);
+@nav-active-border: var(--nav-active-border);
+@nav-active-text: var(--nav-active-text);
+@surface-floating: var(--surface-floating);
+@surface-floating-strong: var(--surface-floating-strong);
+@toolbar-bg: var(--toolbar-bg);
+@toolbar-button-bg: var(--toolbar-button-bg);
+@toolbar-button-hover-bg: var(--toolbar-button-hover-bg);
+@overlay-canvas: var(--overlay-canvas);
+@overlay-canvas-strong: var(--overlay-canvas-strong);
+@table-header-bg: var(--table-header-bg);
+@table-row-bg: var(--table-row-bg);
+@table-row-alt-bg: var(--table-row-alt-bg);
+@table-row-hover-bg: var(--table-row-hover-bg);
+@table-cell-border: var(--table-cell-border);
+@code-inline-bg: var(--code-inline-bg);
+@code-inline-border: var(--code-inline-border);
+@code-inline-text: var(--code-inline-text);
+@blockquote-bg: var(--blockquote-bg);
+@blockquote-border: var(--blockquote-border);
+@card-tone-bg: var(--card-tone-bg);
+@card-tone-text: var(--card-tone-text);
+@session-item-border: var(--session-item-border);
+@session-item-hover-border: var(--session-item-hover-border);
+@session-item-icon-bg: var(--session-item-icon-bg);
+@session-item-menu-hover-bg: var(--session-item-menu-hover-bg);
+@session-rename-bg: var(--session-rename-bg);
+@session-rename-border: var(--session-rename-border);
+@session-rename-focus: var(--session-rename-focus);
+@session-active-meta-text: var(--session-active-meta-text);
+@visualize-shell-bg: var(--visualize-shell-bg);
+@visualize-toolbar-text: var(--visualize-toolbar-text);
+@visualize-toolbar-button-bg: var(--visualize-toolbar-button-bg);
+@visualize-toolbar-button-border: var(--visualize-toolbar-button-border);
+@visualize-toolbar-button-hover-bg: var(--visualize-toolbar-button-hover-bg);
+@visualize-toolbar-primary-bg: var(--visualize-toolbar-primary-bg);
+@visualize-toolbar-primary-border: var(--visualize-toolbar-primary-border);
+@visualize-toolbar-primary-hover-bg: var(--visualize-toolbar-primary-hover-bg);
+@visualize-frame-bg: var(--visualize-frame-bg);
+@empty-surface-bg: var(--empty-surface-bg);
+@empty-surface-border: var(--empty-surface-border);
+@empty-surface-shadow: var(--empty-surface-shadow);
+@feedback-info-tag-bg: var(--feedback-info-tag-bg);
+@feedback-info-tag-border: var(--feedback-info-tag-border);
+@feedback-info-tag-text: var(--feedback-info-tag-text);
+@feedback-success-tag-bg: var(--feedback-success-tag-bg);
+@feedback-success-tag-border: var(--feedback-success-tag-border);
+@feedback-success-tag-text: var(--feedback-success-tag-text);
+@feedback-warning-tag-bg: var(--feedback-warning-tag-bg);
+@feedback-warning-tag-border: var(--feedback-warning-tag-border);
+@feedback-warning-tag-text: var(--feedback-warning-tag-text);
+@feedback-danger-tag-bg: var(--feedback-danger-tag-bg);
+@feedback-danger-tag-border: var(--feedback-danger-tag-border);
+@feedback-danger-tag-text: var(--feedback-danger-tag-text);
 
 // ===========================
 // 尺寸变量
@@ -117,10 +232,10 @@
 // 阴影与边框
 // ===========================
 
-@shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.12);
-@shadow-md: 0 10px 28px rgba(0, 0, 0, 0.2);
-@shadow-lg: 0 18px 42px rgba(0, 0, 0, 0.28);
-@shadow-float: 0 20px 48px rgba(0, 0, 0, 0.32);
+@shadow-sm: var(--shadow-sm, 0 4px 12px rgba(0, 0, 0, 0.12));
+@shadow-md: var(--shadow-md, 0 10px 28px rgba(0, 0, 0, 0.2));
+@shadow-lg: var(--shadow-lg, 0 18px 42px rgba(0, 0, 0, 0.28));
+@shadow-float: var(--shadow-float, 0 20px 48px rgba(0, 0, 0, 0.32));
 
 // ===========================
 // 动画变量

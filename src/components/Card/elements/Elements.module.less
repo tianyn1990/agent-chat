@@ -18,8 +18,8 @@
     font-style: italic;
   }
   code {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: @frame-surface-elevated;
+    border: 1px solid @panel-border;
     border-radius: 3px;
     padding: 1px 4px;
     font-size: 0.9em;
@@ -48,7 +48,7 @@
   color: @text-secondary;
 }
 .textDanger {
-  color: #e8a2a2;
+  color: @feedback-danger-tag-text;
 }
 
 // ===========================
@@ -120,42 +120,42 @@
 
 // 四种提示样式
 .noteInfo {
-  background-color: rgba(123, 145, 255, 0.12);
-  border: 1px solid rgba(123, 145, 255, 0.24);
-  color: #d5ddff;
+  background-color: @feedback-info-tag-bg;
+  border: 1px solid @feedback-info-tag-border;
+  color: @feedback-info-tag-text;
 
   .noteIcon {
-    color: #a8b7ff;
+    color: @primary-color;
   }
 }
 
 .noteWarning {
-  background-color: rgba(210, 166, 92, 0.12);
-  border: 1px solid rgba(210, 166, 92, 0.22);
-  color: #f1d29b;
+  background-color: @feedback-warning-tag-bg;
+  border: 1px solid @feedback-warning-tag-border;
+  color: @feedback-warning-tag-text;
 
   .noteIcon {
-    color: #e3bb73;
+    color: @warning-color;
   }
 }
 
 .noteSuccess {
-  background-color: rgba(112, 179, 140, 0.12);
-  border: 1px solid rgba(112, 179, 140, 0.22);
-  color: #c9ebd4;
+  background-color: @feedback-success-tag-bg;
+  border: 1px solid @feedback-success-tag-border;
+  color: @feedback-success-tag-text;
 
   .noteIcon {
-    color: #8fd2aa;
+    color: @success-color;
   }
 }
 
 .noteError {
-  background-color: rgba(216, 123, 123, 0.12);
-  border: 1px solid rgba(216, 123, 123, 0.22);
-  color: #f0c2c2;
+  background-color: @feedback-danger-tag-bg;
+  border: 1px solid @feedback-danger-tag-border;
+  color: @feedback-danger-tag-text;
 
   .noteIcon {
-    color: #e8a2a2;
+    color: @danger-color;
   }
 }
 
@@ -164,15 +164,15 @@
 }
 
 .actionBtnPrimary {
-  border-color: rgba(123, 145, 255, 0.18) !important;
-  background: rgba(123, 145, 255, 0.14) !important;
-  color: #edf2fb !important;
+  border-color: @button-primary-border !important;
+  background: @button-primary-bg !important;
+  color: @text-primary !important;
 }
 
 .actionBtnDanger {
-  border-color: rgba(216, 123, 123, 0.18) !important;
-  background: rgba(216, 123, 123, 0.14) !important;
-  color: #f3d3d3 !important;
+  border-color: @button-danger-border !important;
+  background: @button-danger-bg !important;
+  color: @button-danger-text !important;
 }
 
 .actionSelect {
@@ -181,7 +181,7 @@
 
 .formSubmitBtn {
   min-width: 92px;
-  border-color: rgba(123, 145, 255, 0.18) !important;
-  background: rgba(123, 145, 255, 0.14) !important;
-  color: #edf2fb !important;
+  border-color: @button-primary-border !important;
+  background: @button-primary-bg !important;
+  color: @text-primary !important;
 }

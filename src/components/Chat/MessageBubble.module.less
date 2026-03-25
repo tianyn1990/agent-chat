@@ -22,6 +22,16 @@
   box-shadow: none;
 }
 
+.avatarAssistant {
+  background-color: var(--feedback-info-tag-bg);
+  color: var(--feedback-info-tag-text);
+}
+
+.avatarUser {
+  background-color: var(--frame-surface-elevated);
+  color: var(--text-primary);
+}
+
 .content {
   display: flex;
   flex-direction: column;
@@ -58,13 +68,13 @@
 .bubbleUser {
   background: @user-bubble-bg;
   color: @user-bubble-text;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid @frame-divider;
   border-radius: 16px 10px 16px 16px;
   align-self: flex-end;
   box-shadow: none;
 
   a {
-    color: rgba(255, 255, 255, 0.9);
+    color: @selection-text;
     text-decoration: underline;
   }
 }
@@ -110,9 +120,9 @@
   blockquote {
     margin: 10px 0;
     padding: 10px 14px;
-    border-left: 3px solid rgba(199, 155, 101, 0.55);
+    border-left: 3px solid @blockquote-border;
     color: @text-secondary;
-    background: rgba(199, 155, 101, 0.08);
+    background: @blockquote-bg;
     border-radius: 0 @border-radius-sm @border-radius-sm 0;
   }
 
@@ -125,19 +135,19 @@
 
   th,
   td {
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid @table-cell-border;
     padding: 7px 10px;
     text-align: left;
   }
 
   th {
-    background-color: rgba(123, 145, 255, 0.08);
+    background-color: @table-header-bg;
     font-weight: 600;
   }
 
   hr {
     border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid @table-cell-border;
     margin: 14px 0;
   }
 
@@ -200,7 +210,7 @@
   }
 
   a {
-    color: rgba(255, 255, 255, 0.92);
+    color: @selection-text;
     text-decoration: underline;
   }
 
@@ -221,13 +231,13 @@
 }
 
 .inlineCode {
-  background-color: rgba(123, 145, 255, 0.12);
-  border: 1px solid rgba(123, 145, 255, 0.16);
+  background-color: @code-inline-bg;
+  border: 1px solid @code-inline-border;
   border-radius: 6px;
   padding: 1px 5px;
   font-family: @font-family-mono;
   font-size: 0.9em;
-  color: #d4ddff;
+  color: @code-inline-text;
 }
 
 .cursor {
@@ -308,8 +318,8 @@
   align-items: flex-start;
   gap: @spacing-sm;
   padding: 10px 12px;
-  background-color: #2b1b1d;
-  border: 1px solid #6e3c45;
+  background-color: @card-red-bg;
+  border: 1px solid @card-red-border;
   border-radius: 12px;
   max-width: min(760px, 78%);
 }

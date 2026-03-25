@@ -17,7 +17,7 @@
 
   &:hover:not(:disabled) {
     color: @text-primary !important;
-    background: rgba(123, 145, 255, 0.1) !important;
+    background: @feedback-info-tag-bg !important;
   }
 }
 
@@ -34,8 +34,8 @@
   align-items: center;
   gap: @spacing-sm;
   padding: 6px 8px 6px 6px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: @frame-surface-elevated;
+  border: 1px solid @panel-border;
   border-radius: 14px;
   max-width: 220px;
   box-shadow: none;
@@ -50,7 +50,7 @@
   justify-content: center;
   border-radius: 9px;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(123, 145, 255, 0.1), rgba(199, 155, 101, 0.1));
+  background: linear-gradient(135deg, @primary-soft, @accent-soft);
 }
 
 .thumbImg {
@@ -104,7 +104,7 @@
     color @transition-base;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: @frame-surface-elevated;
     color: @text-primary;
   }
 }

@@ -18,10 +18,7 @@ body {
   font-family: @font-family-sans;
   font-size: @font-size-base;
   color: @text-primary;
-  background:
-    radial-gradient(circle at top left, rgba(123, 145, 255, 0.1), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(199, 155, 101, 0.08), transparent 22%),
-    linear-gradient(180deg, #0a0c10 0%, @content-bg 36%, @content-bg-secondary 100%);
+  background: @app-background;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -36,10 +33,10 @@ body::before {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(@app-grid-primary 1px, transparent 1px),
+    linear-gradient(90deg, @app-grid-secondary 1px, transparent 1px);
   background-size: 24px 24px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.36), transparent 88%);
+  mask-image: @app-grid-mask;
   opacity: 0.42;
 }
 
@@ -59,8 +56,8 @@ select {
 }
 
 ::selection {
-  background: rgba(123, 145, 255, 0.26);
-  color: #fff;
+  background: @selection-bg;
+  color: @selection-text;
 }
 
 // 自定义滚动条（Webkit）
@@ -74,21 +71,21 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+  background: @scrollbar-thumb;
   border-radius: 999px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.24);
+    background: @scrollbar-thumb-hover;
   }
 }
 
 // 侧边栏内深色滚动条
 .sidebar-scrollbar {
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: @sidebar-scrollbar-thumb;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.22);
+      background: @sidebar-scrollbar-thumb-hover;
     }
   }
 }
@@ -112,42 +109,42 @@ select {
 }
 
 .ant-btn-primary {
-  border-color: rgba(123, 145, 255, 0.18);
+  border-color: @button-primary-border;
   color: @text-primary;
-  background: rgba(123, 145, 255, 0.16);
+  background: @button-primary-bg;
   box-shadow: none;
 }
 
 .ant-btn-primary:hover,
 .ant-btn-primary:focus-visible {
-  border-color: rgba(123, 145, 255, 0.28) !important;
-  color: #ffffff !important;
-  background: rgba(123, 145, 255, 0.24) !important;
+  border-color: @button-primary-hover-border !important;
+  color: @button-primary-text !important;
+  background: @button-primary-hover-bg !important;
 }
 
 .ant-btn-primary:active {
-  border-color: rgba(123, 145, 255, 0.32) !important;
-  background: rgba(123, 145, 255, 0.3) !important;
-  color: #ffffff !important;
+  border-color: @button-primary-active-border !important;
+  background: @button-primary-active-bg !important;
+  color: @button-primary-text !important;
 }
 
 .ant-btn-default {
   color: @text-primary;
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: @button-default-border;
+  background: @button-default-bg;
 }
 
 .ant-btn-default:hover,
 .ant-btn-default:focus-visible {
   color: @text-primary !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
-  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: @button-default-hover-border !important;
+  background: @button-default-hover-bg !important;
 }
 
 .ant-btn-default:active {
   color: @text-primary !important;
-  border-color: rgba(255, 255, 255, 0.22) !important;
-  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: @button-default-active-border !important;
+  background: @button-default-active-bg !important;
 }
 
 .ant-btn-text {
@@ -157,76 +154,76 @@ select {
 .ant-btn-text:hover,
 .ant-btn-text:focus-visible {
   color: @text-primary !important;
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: @button-text-hover-bg !important;
 }
 
 .ant-btn-text:active {
   color: @text-primary !important;
-  background: rgba(255, 255, 255, 0.08) !important;
+  background: @button-text-active-bg !important;
 }
 
 .ant-btn-dangerous.ant-btn-default,
 .ant-btn-dangerous.ant-btn-text {
-  color: #f0caca !important;
-  border-color: rgba(216, 123, 123, 0.2) !important;
-  background: rgba(216, 123, 123, 0.12) !important;
+  color: @button-danger-text !important;
+  border-color: @button-danger-border !important;
+  background: @button-danger-bg !important;
 }
 
 .ant-btn-dangerous.ant-btn-default:hover,
 .ant-btn-dangerous.ant-btn-default:focus-visible,
 .ant-btn-dangerous.ant-btn-text:hover,
 .ant-btn-dangerous.ant-btn-text:focus-visible {
-  color: #f6d9d9 !important;
-  border-color: rgba(216, 123, 123, 0.3) !important;
-  background: rgba(216, 123, 123, 0.18) !important;
+  color: @button-danger-hover-text !important;
+  border-color: @button-danger-hover-border !important;
+  background: @button-danger-hover-bg !important;
 }
 
 .ant-btn-dangerous.ant-btn-default:active,
 .ant-btn-dangerous.ant-btn-text:active {
-  color: #f6d9d9 !important;
-  border-color: rgba(216, 123, 123, 0.34) !important;
-  background: rgba(216, 123, 123, 0.24) !important;
+  color: @button-danger-hover-text !important;
+  border-color: @button-danger-active-border !important;
+  background: @button-danger-active-bg !important;
 }
 
 .ant-btn-primary.ant-btn-dangerous {
-  color: #f3d3d3 !important;
-  border-color: rgba(216, 123, 123, 0.22) !important;
-  background: rgba(216, 123, 123, 0.14) !important;
+  color: @button-danger-primary-text !important;
+  border-color: @button-danger-primary-border !important;
+  background: @button-danger-primary-bg !important;
 }
 
 .ant-btn-primary.ant-btn-dangerous:hover,
 .ant-btn-primary.ant-btn-dangerous:focus-visible {
-  color: #f7dcdc !important;
-  border-color: rgba(216, 123, 123, 0.3) !important;
-  background: rgba(216, 123, 123, 0.2) !important;
+  color: @button-danger-primary-hover-text !important;
+  border-color: @button-danger-primary-hover-border !important;
+  background: @button-danger-primary-hover-bg !important;
 }
 
 .ant-btn-primary.ant-btn-dangerous:active {
-  color: #f7dcdc !important;
-  border-color: rgba(216, 123, 123, 0.34) !important;
-  background: rgba(216, 123, 123, 0.26) !important;
+  color: @button-danger-primary-hover-text !important;
+  border-color: @button-danger-primary-active-border !important;
+  background: @button-danger-primary-active-bg !important;
 }
 
 .ant-btn[disabled],
 .ant-btn:disabled {
-  color: rgba(237, 242, 251, 0.44) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  color: @button-disabled-text !important;
+  border-color: @button-disabled-border !important;
+  background: @button-disabled-bg !important;
   box-shadow: none !important;
   opacity: 1 !important;
 }
 
 .ant-btn-text[disabled],
 .ant-btn-text:disabled {
-  background: rgba(255, 255, 255, 0.03) !important;
+  background: @button-default-bg !important;
 }
 
 .ant-input,
 .ant-input-affix-wrapper,
 .ant-select-selector {
   color: @text-primary !important;
-  background: rgba(255, 255, 255, 0.03) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: @control-bg !important;
+  border-color: @control-border !important;
   box-shadow: none !important;
 }
 
@@ -240,11 +237,11 @@ select {
 .ant-input-affix-wrapper-focused,
 .ant-select-focused .ant-select-selector {
   border-color: @primary-color !important;
-  box-shadow: 0 0 0 3px rgba(123, 145, 255, 0.12) !important;
+  box-shadow: @control-focus-shadow !important;
 }
 
 .ant-card {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: @panel-border;
   box-shadow: none;
 }
 
@@ -252,13 +249,13 @@ select {
 .ant-drawer-body,
 .ant-drawer-footer,
 .ant-drawer-content {
-  background: #151922 !important;
+  background: @drawer-bg !important;
   color: @text-primary !important;
 }
 
 .ant-drawer-header,
 .ant-drawer-footer {
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: @panel-border !important;
 }
 
 .ant-typography,
@@ -276,65 +273,65 @@ select {
 }
 
 .ant-tag {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  border-color: @button-default-border;
+  background: @frame-surface-elevated;
   color: @text-secondary;
 }
 
 .ant-divider {
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: @panel-border !important;
 }
 
 .ant-tag-blue,
 .ant-tag-processing {
-  border-color: rgba(123, 145, 255, 0.22) !important;
-  background: rgba(123, 145, 255, 0.12) !important;
-  color: #d5ddff !important;
+  border-color: @feedback-info-tag-border !important;
+  background: @feedback-info-tag-bg !important;
+  color: @feedback-info-tag-text !important;
 }
 
 .ant-tag-success,
 .ant-tag-green {
-  border-color: rgba(112, 179, 140, 0.22) !important;
-  background: rgba(112, 179, 140, 0.12) !important;
-  color: #c9ebd4 !important;
+  border-color: @feedback-success-tag-border !important;
+  background: @feedback-success-tag-bg !important;
+  color: @feedback-success-tag-text !important;
 }
 
 .ant-tag-warning,
 .ant-tag-gold,
 .ant-tag-orange {
-  border-color: rgba(210, 166, 92, 0.22) !important;
-  background: rgba(210, 166, 92, 0.12) !important;
-  color: #f1d29b !important;
+  border-color: @feedback-warning-tag-border !important;
+  background: @feedback-warning-tag-bg !important;
+  color: @feedback-warning-tag-text !important;
 }
 
 .ant-tag-error,
 .ant-tag-red,
 .ant-tag-volcano {
-  border-color: rgba(216, 123, 123, 0.22) !important;
-  background: rgba(216, 123, 123, 0.12) !important;
-  color: #f0c2c2 !important;
+  border-color: @feedback-danger-tag-border !important;
+  background: @feedback-danger-tag-bg !important;
+  color: @feedback-danger-tag-text !important;
 }
 
 .ant-tag-default {
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: @button-default-border !important;
+  background: @frame-surface-elevated !important;
   color: @text-secondary !important;
 }
 
 .ant-modal-content,
 .ant-modal-header,
 .ant-modal-footer {
-  background: #151922 !important;
+  background: @modal-bg !important;
   color: @text-primary !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: @panel-border !important;
 }
 
 .ant-modal-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom: 1px solid @panel-border !important;
 }
 
 .ant-modal-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: 1px solid @panel-border !important;
 }
 
 .ant-modal-title,
@@ -348,9 +345,9 @@ select {
 }
 
 .ant-tooltip .ant-tooltip-inner {
-  background: #1b212b;
+  background: @tooltip-bg;
   color: @text-primary;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid @panel-border;
   box-shadow: @shadow-sm;
 }
 
@@ -359,13 +356,13 @@ select {
 }
 
 .ant-tooltip .ant-tooltip-arrow::before {
-  background: #1b212b !important;
+  background: @tooltip-bg !important;
 }
 
 .ant-message-notice .ant-message-notice-content {
-  background: #1a2028;
+  background: @message-bg;
   color: @text-primary;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid @panel-border;
   box-shadow: @shadow-sm;
 }
 
@@ -390,8 +387,8 @@ select {
 }
 
 .ant-dropdown .ant-dropdown-menu {
-  background: #151922;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: @dropdown-bg;
+  border: 1px solid @panel-border;
   box-shadow: @shadow-sm;
 }
 
@@ -407,12 +404,12 @@ select {
 
 .ant-dropdown .ant-dropdown-menu-item:hover,
 .ant-dropdown .ant-dropdown-menu-submenu-title:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: @frame-surface-elevated;
 }
 
 .ant-select-dropdown {
-  background: #151922 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: @dropdown-bg !important;
+  border: 1px solid @panel-border !important;
   box-shadow: @shadow-sm !important;
 }
 
@@ -421,8 +418,8 @@ select {
 }
 
 .ant-notification-notice {
-  background: #151922 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: @dropdown-bg !important;
+  border: 1px solid @panel-border !important;
   box-shadow: @shadow-sm !important;
 }
 
@@ -442,11 +439,11 @@ select {
 }
 
 .ant-select-dropdown .ant-select-item-option-active {
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: @frame-surface-elevated !important;
 }
 
 .ant-select-dropdown .ant-select-item-option-selected {
-  background: rgba(123, 145, 255, 0.12) !important;
+  background: @primary-soft !important;
   color: @text-primary !important;
 }
 

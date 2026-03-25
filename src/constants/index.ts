@@ -49,6 +49,7 @@ export const IS_MOCK_ENABLED = import.meta.env.VITE_MOCK_ENABLED === 'true';
 export const STORAGE_KEYS = {
   TOKEN: 'oc_token',
   USER_INFO: 'oc_user_info',
+  THEME: 'oc_theme_mode',
 } as const;
 
 /** WebSocket 配置 */

@@ -69,5 +69,19 @@ describe('realStarOfficeSidecar helpers', () => {
     const html = buildStarOfficeUnavailableHtml('不可用', '缺少上游目录', 'session_diag');
     expect(html).toContain('session_diag');
     expect(html).toContain('缺少上游目录');
+    expect(html).toContain('theme-dark');
+  });
+
+  it('buildStarOfficeUnavailableHtml 支持生成 light 主题诊断页', () => {
+    const html = buildStarOfficeUnavailableHtml(
+      '不可用',
+      '缺少上游目录',
+      'session_light',
+      'light',
+    );
+
+    expect(html).toContain('theme-light');
+    expect(html).toContain('#f5efe6');
+    expect(html).toContain('oc_theme_mode');
   });
 });

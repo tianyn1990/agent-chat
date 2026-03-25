@@ -4,8 +4,8 @@
   width: min(360px, calc(100vw - 32px));
   padding: 12px 12px 10px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(19, 24, 31, 0.92);
+  border: 1px solid @panel-border;
+  background: @surface-floating;
   box-shadow: @shadow-md;
   backdrop-filter: blur(16px);
 }
@@ -51,7 +51,7 @@
   min-height: 28px;
   padding: 0 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
+  background: @frame-surface-elevated;
   color: @text-secondary;
   font-size: @font-size-sm;
 }
@@ -67,15 +67,15 @@
 }
 
 .statusTagProcessing {
-  border-color: rgba(123, 145, 255, 0.22) !important;
-  background: rgba(123, 145, 255, 0.12) !important;
-  color: #d5ddff !important;
+  border-color: @feedback-info-tag-border !important;
+  background: @feedback-info-tag-bg !important;
+  color: @feedback-info-tag-text !important;
 }
 
 .statusTagError {
-  border-color: rgba(216, 123, 123, 0.22) !important;
-  background: rgba(216, 123, 123, 0.12) !important;
-  color: #f0c2c2 !important;
+  border-color: @feedback-danger-tag-border !important;
+  background: @feedback-danger-tag-bg !important;
+  color: @feedback-danger-tag-text !important;
 }
 
 .detail {

@@ -601,7 +601,6 @@ class MockWebSocketService {
           encode: { y: 'value', color: 'category' },
           transform: [{ type: 'stackY' }],
           coordinate: { type: 'theta' },
-          style: { stroke: '#fff', lineWidth: 2 },
           label: {
             position: 'outside',
             text: (d: { category: string; value: number }) => `${d.category}\n${d.value}人`,

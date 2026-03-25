@@ -31,22 +31,22 @@
     border-color @transition-base,
     background-color @transition-base,
     color @transition-base;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid @button-default-border;
+  background: @frame-surface-subtle;
   color: @text-secondary;
   line-height: 1.6;
   user-select: none;
 
   &:hover {
-    border-color: rgba(123, 145, 255, 0.3);
+    border-color: @button-primary-hover-border;
     color: @text-primary;
-    background: rgba(123, 145, 255, 0.08);
+    background: @primary-soft;
   }
 }
 
 // 选中态继续保持可识别，但避免跳回高饱和默认蓝标签。
 :global(.ant-tag-checkable-checked).tag {
-  background: rgba(123, 145, 255, 0.16) !important;
-  border-color: rgba(123, 145, 255, 0.3) !important;
+  background: @button-primary-bg !important;
+  border-color: @button-primary-hover-border !important;
   color: @text-primary !important;
 }

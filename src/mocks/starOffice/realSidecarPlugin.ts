@@ -124,6 +124,7 @@ export function createStarOfficeRealDevPlugin({
       server.middlewares.use(async (req, res, next) => {
         const requestUrl = new URL(req.url ?? '/', 'http://localhost');
         const match = matchStarOfficeSessionRoute(requestUrl.pathname, normalizedBasePath);
+        const requestedThemeMode = requestUrl.searchParams.get('themeMode') ?? undefined;
 
         if (!match) {
           next();
@@ -145,6 +146,7 @@ export function createStarOfficeRealDevPlugin({
               '真实 Star-Office-UI 本地资源不可用',
               `未找到可读取的上游 frontend 目录：${frontendDir || '未配置路径'}`,
               match.sessionId,
+              requestedThemeMode,
             ),
           );
           return;
@@ -258,6 +260,7 @@ export function createStarOfficeRealDevPlugin({
               '真实 Star-Office-UI 资源不存在',
               `未找到资源：${match.assetPath || 'index.html'}`,
               match.sessionId,
+              requestedThemeMode,
             ),
           );
           return;

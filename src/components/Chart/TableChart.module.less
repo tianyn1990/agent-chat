@@ -13,7 +13,7 @@
   }
 
   :global(.ant-table-thead > tr > th) {
-    background-color: rgba(123, 145, 255, 0.08);
+    background-color: @table-header-bg;
     color: @text-primary;
     font-size: @font-size-sm;
     font-weight: 600;
@@ -23,16 +23,16 @@
   :global(.ant-table-tbody > tr > td) {
     padding: 9px 14px;
     font-size: @font-size-sm;
-    background: rgba(255, 255, 255, 0.03);
+    background: @table-row-bg;
     color: @text-primary;
   }
 
   :global(.ant-table-tbody > tr:nth-child(even) > td) {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: @table-row-alt-bg;
   }
 
   :global(.ant-table-tbody > tr:hover > td) {
-    background-color: rgba(123, 145, 255, 0.08) !important;
+    background-color: @table-row-hover-bg !important;
     color: @text-primary;
   }
 
@@ -41,7 +41,7 @@
   }
 
   :global(.ant-table-placeholder .ant-table-cell) {
-    background: rgba(255, 255, 255, 0.02) !important;
+    background: @frame-surface-subtle !important;
     color: @text-secondary !important;
   }
 
@@ -50,8 +50,8 @@
   }
 
   :global(.ant-pagination .ant-pagination-item) {
-    border-color: rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
+    border-color: @panel-border;
+    background: @frame-surface-subtle;
   }
 
   :global(.ant-pagination .ant-pagination-item a) {
@@ -64,8 +64,8 @@
   }
 
   :global(.ant-pagination .ant-pagination-item-active) {
-    border-color: rgba(123, 145, 255, 0.22);
-    background: rgba(123, 145, 255, 0.12);
+    border-color: @feedback-info-tag-border;
+    background: @feedback-info-tag-bg;
   }
 
   :global(.ant-pagination .ant-pagination-item-active a) {
@@ -77,7 +77,7 @@
   display: flex;
   justify-content: flex-end;
   padding-top: @spacing-xs;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid @panel-border;
 }
 
 .toolBtn {

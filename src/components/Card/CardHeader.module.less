@@ -39,7 +39,7 @@
   font-size: @font-size-sm;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.12);
+  background: @frame-surface-elevated;
   color: inherit;
   opacity: 0.82;
   flex-shrink: 0;
@@ -52,44 +52,44 @@
 .templateBlue {
   background-color: @card-blue-bg;
   border-bottom: 1px solid @card-blue-border;
-  color: #d7e3ff;
+  color: @feedback-info-tag-text;
 
   .expiredBadge {
     background-color: @card-blue-border;
-    color: #d7e3ff;
+    color: @feedback-info-tag-text;
   }
 }
 
 .templateGreen {
   background-color: @card-green-bg;
   border-bottom: 1px solid @card-green-border;
-  color: #d0ebd8;
+  color: @feedback-success-tag-text;
 
   .expiredBadge {
     background-color: @card-green-border;
-    color: #d0ebd8;
+    color: @feedback-success-tag-text;
   }
 }
 
 .templateYellow {
   background-color: @card-yellow-bg;
   border-bottom: 1px solid @card-yellow-border;
-  color: #f1d7a2;
+  color: @feedback-warning-tag-text;
 
   .expiredBadge {
     background-color: @card-yellow-border;
-    color: #f1d7a2;
+    color: @feedback-warning-tag-text;
   }
 }
 
 .templateRed {
   background-color: @card-red-bg;
   border-bottom: 1px solid @card-red-border;
-  color: #f0caca;
+  color: @feedback-danger-tag-text;
 
   .expiredBadge {
     background-color: @card-red-border;
-    color: #f0caca;
+    color: @feedback-danger-tag-text;
   }
 }
 
