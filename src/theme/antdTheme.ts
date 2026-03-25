@@ -35,7 +35,7 @@ export function createAntdTheme(mode: ThemeMode): ThemeConfig {
       colorTextSecondary: palette.textSecondary,
       colorTextTertiary: palette.textTertiary,
       colorTextQuaternary:
-        mode === 'dark' ? 'rgba(237, 242, 251, 0.36)' : 'rgba(100, 90, 78, 0.42)',
+        mode === 'dark' ? 'rgba(237, 242, 251, 0.36)' : 'rgba(104, 116, 136, 0.42)',
       colorTextDescription: palette.textSecondary,
       colorTextPlaceholder: palette.textTertiary,
       colorIcon: palette.textSecondary,
@@ -45,7 +45,8 @@ export function createAntdTheme(mode: ThemeMode): ThemeConfig {
       colorBgContainer: palette.paperBg,
       colorBgElevated: palette.paperBg,
       colorBgSpotlight: palette.paperBgStrong,
-      colorBgMask: mode === 'dark' ? 'rgba(8, 10, 14, 0.72)' : 'rgba(73, 61, 43, 0.22)',
+      // Light 主题的 mask 改为更中性的 slate 灰，避免弹层一打开就把全局色温重新拉黄。
+      colorBgMask: mode === 'dark' ? 'rgba(8, 10, 14, 0.72)' : 'rgba(68, 78, 95, 0.18)',
       colorBorder: palette.panelBorder,
       colorBorderSecondary: palette.frameDivider,
       colorSplit: palette.frameDivider,
@@ -53,7 +54,7 @@ export function createAntdTheme(mode: ThemeMode): ThemeConfig {
       colorFillSecondary: palette.frameSurfaceSubtle,
       colorFillTertiary: palette.frameSurfaceSubtle,
       colorFillQuaternary:
-        mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(115, 93, 64, 0.03)',
+        mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(104, 116, 136, 0.03)',
       controlOutline: palette.primarySoft,
       boxShadow: 'none',
       boxShadowSecondary: 'none',

@@ -90,7 +90,7 @@ describe('realStarOfficeSidecar helpers', () => {
     );
 
     expect(html).toContain('theme-light');
-    expect(html).toContain('#f5efe6');
+    expect(html).toContain('#f3f6fa');
     expect(html).toContain('oc_theme_mode');
   });
 });

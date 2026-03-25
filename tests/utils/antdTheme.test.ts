@@ -20,7 +20,7 @@ describe('antdTheme', () => {
     expect(lightTheme.token?.colorBgBase).toBe(ivoryPalette.contentBg);
     expect(lightTheme.token?.colorBgContainer).toBe(ivoryPalette.paperBg);
     expect(lightTheme.token?.colorText).toBe(ivoryPalette.textPrimary);
-    expect(lightTheme.token?.colorBgMask).toBe('rgba(73, 61, 43, 0.22)');
+    expect(lightTheme.token?.colorBgMask).toBe('rgba(68, 78, 95, 0.18)');
     expect(lightTheme.components?.Message?.contentBg).toBe(ivoryPalette.messageBg);
   });
 

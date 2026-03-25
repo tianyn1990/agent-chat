@@ -32,7 +32,7 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 ## 前端 UI 规则（长期生效）
 
 - 当任务涉及页面视觉、组件样式、交互层级或新增前端模块时，必须先阅读 [docs/UI-视觉系统指南.md](/Users/hetao/Documents/github/agent-chat/docs/UI-视觉系统指南.md)。
-- 新增页面或组件默认继承当前双主题视觉系统：`dark` 为 `Paper Ops / Graphite Console`，`light` 为 `Ivory Editorial / Paper Console`；不得回退到通用蓝白后台风。
+- 新增页面或组件默认继承当前双主题视觉系统：`dark` 为 `Paper Ops / Graphite Console`，`light` 为 `Ivory Editorial / Porcelain Console`；不得回退到通用蓝白后台风。
 - 优先复用 `src/styles/variables.less` 中的 token，不要无必要写死新的颜色、圆角、阴影和间距。
 - 涉及主题能力时，优先复用 `src/theme/palette.ts`、`src/theme/antdTheme.ts` 与 `src/stores/useThemeStore.ts`，不要在组件中单独维护一套 `dark/light` 常量。
 - 主应用框架优先采用“线性分隔工作台”策略：避免重新引入左右双大壳体；框架级区域尽量用分隔线、留白和弱表面层表达，内容级主舞台再保留必要容器。
