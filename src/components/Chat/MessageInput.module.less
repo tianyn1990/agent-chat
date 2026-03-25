@@ -30,7 +30,11 @@
 
 .inputRow {
   display: flex;
-  align-items: flex-end;
+  /**
+   * 单行空态时优先保证光标与占位文案处在输入 dock 的中轴线上，
+   * 避免视觉上出现“文本区域整体偏下”的感觉。
+   */
+  align-items: center;
   gap: 8px;
   min-width: 0;
 }
@@ -71,7 +75,7 @@
   align-items: center;
   gap: @spacing-sm;
   flex-shrink: 0;
-  align-self: flex-end;
+  align-self: center;
 }
 
 .charCount {
