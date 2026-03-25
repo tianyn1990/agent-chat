@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { App } from 'antd';
+import userEvent from '@testing-library/user-event';
 import ChatPage from '@/pages/Chat';
 import { useChatStore } from '@/stores/useChatStore';
 import { useSidebarStore } from '@/stores/useSidebarStore';
@@ -25,6 +26,9 @@ function renderChatPage(initialEntry = '/chat') {
 describe('ChatPage', () => {
   beforeEach(() => {
     mockWsService.reset();
+    URL.createObjectURL = vi.fn(() => 'blob:chat-attachment');
+    URL.revokeObjectURL = vi.fn();
+    HTMLElement.prototype.scrollTo = vi.fn();
 
     useChatStore.setState({
       sessions: [],
@@ -83,6 +87,33 @@ describe('ChatPage', () => {
     }, { timeout: 2000 });
   });
 
+  it('无会话时输入框仍可编辑，发送后会自动创建新对话并提交消息', async () => {
+    const user = userEvent.setup();
+    renderChatPage('/chat');
+
+    const input = screen.getByRole('textbox');
+    expect(input).not.toBeDisabled();
+
+    await user.type(input, '直接从欢迎页发起任务');
+    await user.click(screen.getByRole('button', { name: '发送消息' }));
+
+    await waitFor(() => {
+      expect(useChatStore.getState().sessions.length).toBeGreaterThan(0);
+      const nextSessionId = useChatStore.getState().currentSessionId;
+      expect(nextSessionId).toBeTruthy();
+
+      const nextMessages = nextSessionId ? useChatStore.getState().messages[nextSessionId] ?? [] : [];
+      expect(
+        nextMessages.some(
+          (message) =>
+            message.contentType === 'text' &&
+            'text' in message.content &&
+            message.content.text === '直接从欢迎页发起任务',
+        ),
+      ).toBe(true);
+    });
+  });
+
   it('通过 skill 查询参数进入时会自动创建会话并预填技能引导文案', async () => {
     renderChatPage('/chat?skill=数据分析师');
 
@@ -125,6 +156,85 @@ describe('ChatPage', () => {
 
     await waitFor(() => {
       expect(screen.getByLabelText('当前执行状态：执行中')).toHaveAttribute('data-running', 'true');
+    });
+  });
+
+  it('当前会话处理中时仍可编辑输入框，但不可发送', async () => {
+    const sessionId = 'session-editable-while-busy';
+
+    useChatStore.setState({
+      sessions: [
+        {
+          id: sessionId,
+          title: '处理中会话',
+          createdAt: Date.now(),
+        },
+      ],
+      currentSessionId: sessionId,
+      messages: {
+        [sessionId]: [],
+      },
+      drafts: {
+        [sessionId]: '等待期间继续准备下一条',
+      },
+      sendingSessionIds: {
+        [sessionId]: true,
+      },
+    });
+
+    renderChatPage(`/chat/${sessionId}`);
+
+    await waitFor(() => {
+      expect(screen.getByRole('textbox')).not.toBeDisabled();
+      expect(screen.getByRole('button', { name: '发送消息' })).toBeDisabled();
+    });
+  });
+
+  it('发送图片附件后会在会话消息中保留附件消息', async () => {
+    const sessionId = 'session-file-send';
+
+    useChatStore.setState({
+      sessions: [
+        {
+          id: sessionId,
+          title: '附件会话',
+          createdAt: Date.now(),
+        },
+      ],
+      currentSessionId: sessionId,
+      messages: {
+        [sessionId]: [],
+      },
+      drafts: {
+        [sessionId]: '',
+      },
+    });
+
+    const { container } = renderChatPage(`/chat/${sessionId}`);
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const imageFile = new File(['image-bytes'], 'evidence.png', { type: 'image/png' });
+
+    fireEvent.change(fileInput, {
+      target: {
+        files: [imageFile],
+      },
+    });
+
+    expect(screen.getByRole('button', { name: '发送消息' })).not.toBeDisabled();
+
+    fireEvent.click(screen.getByRole('button', { name: '发送消息' }));
+
+    await waitFor(() => {
+      expect(screen.queryByLabelText('已选附件列表')).not.toBeInTheDocument();
+      const sessionMessages = useChatStore.getState().messages[sessionId] ?? [];
+      expect(
+        sessionMessages.some(
+          (message) =>
+            message.contentType === 'file' &&
+            'fileName' in message.content &&
+            message.content.fileName === 'evidence.png',
+        ),
+      ).toBe(true);
     });
   });
 });

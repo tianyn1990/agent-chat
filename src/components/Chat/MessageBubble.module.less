@@ -9,11 +9,15 @@
 }
 
 .rowUser {
-  flex-direction: row-reverse;
+  justify-content: flex-end;
 }
 
 .rowAssistant {
   flex-direction: row;
+}
+
+.rowUser .avatar {
+  margin-left: 2px;
 }
 
 .avatar {
@@ -297,20 +301,95 @@
   display: block;
 }
 
+.imagePreviewButton {
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
 .fileCard {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  min-width: 240px;
+}
+
+.fileCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fileCardIcon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: @frame-surface-elevated;
+  color: @text-secondary;
+}
+
+.fileCardText {
+  display: flex;
+  flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .fileName {
   font-size: @font-size-base;
   font-weight: 500;
+  word-break: break-word;
 }
 
 .fileSize {
   font-size: @font-size-sm;
   opacity: 0.75;
+}
+
+.fileToolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.fileDownload {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: @text-primary;
+  background: @frame-surface-elevated;
+  border: 1px solid @frame-divider;
+  transition:
+    background-color @transition-base,
+    border-color @transition-base,
+    color @transition-base;
+
+  &:hover {
+    color: @text-primary;
+    border-color: @nav-active-border;
+    background: @surface-floating-strong;
+  }
+}
+
+.previewModalImage {
+  display: block;
+  width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+  border-radius: @border-radius-sm;
+}
+
+.previewDownload {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: @text-primary;
 }
 
 .errorBubble {

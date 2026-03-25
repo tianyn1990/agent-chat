@@ -22,6 +22,8 @@ export interface FileContent {
   fileType: string;
   fileSize: number;
   previewUrl?: string;
+  /** 本地或远端可下载地址，用于发送后继续下载附件 */
+  downloadUrl?: string;
 }
 
 /** 错误内容 */

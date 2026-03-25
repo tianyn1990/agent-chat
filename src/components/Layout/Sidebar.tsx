@@ -3,11 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Divider, Tooltip } from 'antd';
 import {
   AppstoreOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
+  LeftOutlined,
   MessageOutlined,
   MoonOutlined,
   PlusOutlined,
+  RightOutlined,
   SunOutlined,
 } from '@ant-design/icons';
 import { ROUTES } from '@/constants';
@@ -110,23 +110,24 @@ export default function Sidebar({ extra, activeKey }: SidebarProps) {
             </button>
           </Tooltip>
 
-          {canShowExtra ? (
-            <Tooltip title={showExtra ? '收起档案面板' : '展开档案面板'} placement="right">
-              {/* rail 只负责触发二级上下文，避免主舞台长期被宽侧栏锁死。 */}
-              <button
-                type="button"
-                className={styles.railAction}
-                onClick={() => setShowExtra((value) => !value)}
-                aria-label={showExtra ? '收起档案面板' : '展开档案面板'}
-              >
-                {showExtra ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-              </button>
-            </Tooltip>
-          ) : null}
-
           <UserInfo compact />
         </div>
       </div>
+
+      {canShowExtra ? (
+        <Tooltip title={showExtra ? '收起档案面板' : '展开档案面板'} placement="right">
+          {/* panel 开关贴在 rail 与二级分区的边界上，让结构语义与交互触点保持一致。 */}
+          <button
+            type="button"
+            className={`${styles.seamToggle} ${showExtra ? styles.seamToggleExpanded : ''}`}
+            onClick={() => setShowExtra((value) => !value)}
+            aria-label={showExtra ? '收起档案面板' : '展开档案面板'}
+          >
+            {/* 使用更轻的方向箭头，降低 seam toggle 对整体 chrome 的视觉侵入。 */}
+            {showExtra ? <LeftOutlined /> : <RightOutlined />}
+          </button>
+        </Tooltip>
+      ) : null}
 
       {canShowExtra ? (
         <section className={`${styles.panel} ${showExtra ? '' : styles.panelHidden}`}>

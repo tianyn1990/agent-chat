@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
 import VisualizeSummaryView from './VisualizeSummaryView';
 import styles from './VisualizePanel.module.less';
@@ -10,7 +10,7 @@ import styles from './VisualizePanel.module.less';
  * - 需要给用户一个“当前工作台仍可恢复”的短暂反馈
  * - 但不应长期遮挡聊天界面
  */
-const PANEL_AUTO_CLOSE_DELAY = 2200;
+const PANEL_AUTO_CLOSE_DELAY = 5600;
 
 /**
  * 聊天页中的轻量执行状态提示容器。
@@ -22,29 +22,47 @@ const PANEL_AUTO_CLOSE_DELAY = 2200;
 export default function VisualizePanel() {
   const activeSessionId = useVisualizeStore((state) => state.panelSessionId);
   const closePanel = useVisualizeStore((state) => state.closePanel);
+  const timerRef = useRef<number | null>(null);
+
+  const clearAutoCloseTimer = useCallback(() => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const startAutoCloseTimer = useCallback(() => {
+    clearAutoCloseTimer();
+    timerRef.current = window.setTimeout(() => {
+      closePanel();
+    }, PANEL_AUTO_CLOSE_DELAY);
+  }, [clearAutoCloseTimer, closePanel]);
 
   useEffect(() => {
     if (!activeSessionId) {
+      clearAutoCloseTimer();
       return undefined;
     }
 
     /**
      * 轻量提示只作为短暂恢复入口使用。
-     * 定时自动关闭，避免用户从沉浸式工作台返回后一直看到悬浮弹窗。
+     * 这里延长驻留时间，并允许 hover 暂停，给用户足够时间理解这是“恢复工作台”入口。
      */
-    const timerId = window.setTimeout(() => {
-      closePanel();
-    }, PANEL_AUTO_CLOSE_DELAY);
+    startAutoCloseTimer();
 
     return () => {
-      window.clearTimeout(timerId);
+      clearAutoCloseTimer();
     };
-  }, [activeSessionId, closePanel]);
+  }, [activeSessionId, clearAutoCloseTimer, startAutoCloseTimer]);
 
   if (!activeSessionId) return null;
 
   return (
-    <aside className={styles.panel}>
+    <aside
+      className={styles.panel}
+      onMouseEnter={clearAutoCloseTimer}
+      onMouseLeave={startAutoCloseTimer}
+    >
       <VisualizeSummaryView sessionId={activeSessionId} closable onClose={closePanel} />
     </aside>
   );

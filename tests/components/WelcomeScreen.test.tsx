@@ -31,6 +31,8 @@ describe('WelcomeScreen', () => {
     expect(screen.getByRole('button', { name: '写作助手' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '代码助手' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '常用功能' })).toBeInTheDocument();
+    expect(screen.getByText('01')).toBeInTheDocument();
+    expect(screen.getByText('04')).toBeInTheDocument();
   });
 
   it('点击建议卡片触发回调并传入对应文本', () => {

@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
-import { describe, it, expect } from 'vitest';
-import { render as rtlRender, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { render as rtlRender, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import MessageBubble from '@/components/Chat/MessageBubble';
 import type { Message } from '@/types/message';
@@ -29,6 +29,25 @@ function makeMessage(overrides: Partial<Message> = {}): Message {
 function render(ui: ReactElement) {
   return rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 }
+
+const originalMatchMedia = window.matchMedia;
+
+beforeAll(() => {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })) as typeof window.matchMedia;
+});
+
+afterAll(() => {
+  window.matchMedia = originalMatchMedia;
+});
 
 describe('MessageBubble', () => {
   describe('文本消息', () => {
@@ -234,6 +253,54 @@ describe('MessageBubble', () => {
     });
   });
 
+  describe('附件消息', () => {
+    it('图片附件支持查看大图和下载图片', async () => {
+      const msg = makeMessage({
+        contentType: 'file',
+        content: {
+          fileId: 'file_image_1',
+          fileName: 'office.png',
+          fileType: 'image/png',
+          fileSize: 2048,
+          previewUrl: 'blob:office-image',
+          downloadUrl: 'blob:office-image',
+        } as Message['content'],
+      });
+
+      render(<MessageBubble message={msg} />);
+
+      fireEvent.click(screen.getByRole('button', { name: '查看大图 office.png' }));
+
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+      expect(screen.getAllByAltText('office.png').length).toBeGreaterThan(0);
+      expect(screen.getByRole('link', { name: '下载图片 office.png' })).toHaveAttribute(
+        'download',
+        'office.png',
+      );
+    });
+
+    it('普通文件附件在发送后支持下载', () => {
+      const msg = makeMessage({
+        contentType: 'file',
+        content: {
+          fileId: 'file_doc_1',
+          fileName: 'report.pdf',
+          fileType: 'application/pdf',
+          fileSize: 4096,
+          downloadUrl: 'blob:report-file',
+        } as Message['content'],
+      });
+
+      render(<MessageBubble message={msg} />);
+
+      expect(screen.getByText('report.pdf')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: '下载文件 report.pdf' })).toHaveAttribute(
+        'download',
+        'report.pdf',
+      );
+    });
+  });
+
   describe('消息布局', () => {
     it('用户消息靠右排列', () => {
       const { container } = render(
@@ -249,6 +316,14 @@ describe('MessageBubble', () => {
       );
       const row = container.firstChild as HTMLElement;
       expect(row.className).toMatch(/rowAssistant/);
+    });
+
+    it('用户消息头像位于消息内容右侧', () => {
+      const { container } = render(<MessageBubble message={makeMessage({ role: 'user' })} />);
+      const row = container.firstChild as HTMLElement;
+
+      expect(row.children[0]?.className).toMatch(/content/);
+      expect(row.children[1]?.className).toMatch(/avatar/);
     });
 
     it('显示时间戳', () => {

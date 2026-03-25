@@ -99,6 +99,8 @@ export default function ChatPage() {
 
   /** 当前输入框待发送的文件列表 */
   const [pendingFiles, setPendingFiles] = useState<SelectedFile[]>([]);
+  /** 无当前会话时的临时草稿，保证欢迎页输入区仍可直接编辑。 */
+  const [landingDraft, setLandingDraft] = useState('');
   /**
    * 待注入到目标会话输入框的草稿。
    *
@@ -108,6 +110,17 @@ export default function ChatPage() {
    * - 使用本地桥接态可以避免用户必须点击第二次才能看到预填内容
    */
   const [pendingDraftInjection, setPendingDraftInjection] = useState<string | null>(null);
+  /**
+   * 无会话状态下点击发送后的桥接提交。
+   *
+   * 设计原因：
+   * - 用户在欢迎页直接输入并点击发送时，系统需要先创建会话再真正发出消息
+   * - 使用桥接 payload 可以避免“先手动新建，再输入一次”的二次操作
+   */
+  const [pendingSessionSubmission, setPendingSessionSubmission] = useState<{
+    text: string;
+    files: SelectedFile[];
+  } | null>(null);
 
   // 根据 Mock/真实模式选择 WS 服务
   const ws = IS_MOCK_ENABLED ? mockWsService : wsService;
@@ -353,12 +366,19 @@ export default function ChatPage() {
       if (target) {
         setCurrentSession(routeSessionId);
       }
-    } else if (sessions.length > 0 && !currentSessionId) {
+    } else if (sessions.length > 0 && !currentSessionId && !pendingSessionSubmission) {
       // URL 无 sessionId 但有历史会话：自动切换到最近一个
       setCurrentSession(sessions[0].id);
       navigate(`${ROUTES.CHAT}/${sessions[0].id}`, { replace: true });
     }
-  }, [routeSessionId, sessions, currentSessionId, setCurrentSession, navigate]);
+  }, [
+    routeSessionId,
+    sessions,
+    currentSessionId,
+    pendingSessionSubmission,
+    setCurrentSession,
+    navigate,
+  ]);
 
   /**
    * 当新会话创建完成或切换到可复用空白会话后，将桥接草稿注入输入框。
@@ -434,78 +454,156 @@ export default function ChatPage() {
     ? (sendingSessionIds[currentSessionId] ?? false)
     : false;
 
-  const handleSend = useCallback(() => {
-    const draft = currentSessionId ? (drafts[currentSessionId] ?? '') : '';
-    const text = draft.trim();
+  const submitMessage = useCallback(
+    (targetSessionId: string, draftText: string, filesToSend: SelectedFile[]) => {
+      const text = draftText.trim();
+      const hasFiles = filesToSend.length > 0;
 
-    if (!text || !currentSessionId) return;
-    if (currentSessionSending) return;
+      if (!text && !hasFiles) return;
+      if (sendingSessionIds[targetSessionId]) return;
 
-    const requestId = prefixedId('req');
+      const existingMessages = useChatStore.getState().messages[targetSessionId] ?? [];
+      const now = Date.now();
+      const requestId = prefixedId('req');
 
-    // 构建文件附件信息
-    const files = pendingFiles.map((f) => ({
-      fileId: f.fileId,
-      fileName: f.file.name,
-      fileType: f.file.type,
-    }));
+      // 构建文件附件信息
+      const files = filesToSend.map((f) => ({
+        fileId: f.fileId,
+        fileName: f.file.name,
+        fileType: f.file.type,
+      }));
 
-    // 乐观更新：立即在 UI 显示用户消息
-    const userMsg: Message = {
-      id: prefixedId('msg'),
-      sessionId: currentSessionId,
-      role: 'user',
-      contentType: text ? 'text' : 'file',
-      content: { text },
-      status: 'done',
-      timestamp: Date.now(),
-    };
-    addMessage(userMsg);
-
-    // 更新会话摘要
-    updateSession(currentSessionId, {
-      lastMessage: text.slice(0, 40),
-      lastMessageAt: Date.now(),
-      messageCount: (messages[currentSessionId]?.length ?? 0) + 1,
-    });
-
-    // 清空输入框和文件列表
-    setDraft(currentSessionId, '');
-    setPendingFiles([]);
-
-    // 发送 WebSocket 消息
-    setSessionSending(currentSessionId, true);
-    useVisualizeStore.getState().setSessionRuntime(currentSessionId, {
-      state: 'researching',
-      detail: '等待 OpenClaw 响应',
-      updatedAt: Date.now(),
-      source: 'frontend',
-    });
-    ws.send({
-      type: 'user_message',
-      sessionId: currentSessionId,
-      requestId,
-      content: { text, files: files.length > 0 ? files : undefined },
-    });
-
-    // 若是第一条消息，更新会话标题
-    if ((messages[currentSessionId]?.length ?? 0) === 0) {
-      updateSession(currentSessionId, {
-        title: generateSessionTitle(text),
+      /**
+       * 乐观更新：
+       * - 文本与附件在当前消息模型中分开存储
+       * - 因此发送时要把附件单独落为 file message，确保发送后仍可预览与下载
+       */
+      filesToSend.forEach((file) => {
+        const fileMsg: Message = {
+          id: prefixedId('msg'),
+          sessionId: targetSessionId,
+          role: 'user',
+          contentType: 'file',
+          content: {
+            fileId: file.fileId,
+            fileName: file.file.name,
+            fileType: file.file.type,
+            fileSize: file.file.size,
+            previewUrl: file.previewUrl,
+            downloadUrl: file.downloadUrl,
+          },
+          status: 'done',
+          timestamp: now,
+        };
+        addMessage(fileMsg);
       });
+
+      if (text) {
+        const userMsg: Message = {
+          id: prefixedId('msg'),
+          sessionId: targetSessionId,
+          role: 'user',
+          contentType: 'text',
+          content: { text },
+          status: 'done',
+          timestamp: now,
+        };
+        addMessage(userMsg);
+      }
+
+      const optimisticMessageCount = filesToSend.length + (text ? 1 : 0);
+      const lastMessageSummary = text || filesToSend[0]?.file.name || '';
+
+      updateSession(targetSessionId, {
+        lastMessage: lastMessageSummary.slice(0, 40),
+        lastMessageAt: now,
+        messageCount: existingMessages.length + optimisticMessageCount,
+      });
+
+      // 当前会话发送后清空 store 草稿；欢迎页直接发送则清空 landing draft。
+      if (currentSessionId === targetSessionId) {
+        setDraft(targetSessionId, '');
+      } else {
+        setLandingDraft('');
+      }
+      setPendingFiles([]);
+
+      setSessionSending(targetSessionId, true);
+      useVisualizeStore.getState().setSessionRuntime(targetSessionId, {
+        state: 'researching',
+        detail: '等待 OpenClaw 响应',
+        updatedAt: now,
+        source: 'frontend',
+      });
+      ws.send({
+        type: 'user_message',
+        sessionId: targetSessionId,
+        requestId,
+        content: { text, files: files.length > 0 ? files : undefined },
+      });
+
+      if (existingMessages.length === 0) {
+        updateSession(targetSessionId, {
+          title: generateSessionTitle(lastMessageSummary),
+        });
+      }
+    },
+    [
+      addMessage,
+      currentSessionId,
+      sendingSessionIds,
+      setDraft,
+      setSessionSending,
+      updateSession,
+      ws,
+    ],
+  );
+
+  const handleSend = useCallback(() => {
+    const draft = currentSessionId ? (drafts[currentSessionId] ?? '') : landingDraft;
+    const text = draft.trim();
+    const hasFiles = pendingFiles.length > 0;
+
+    if (!text && !hasFiles) return;
+    if (currentSessionId && currentSessionSending) return;
+
+    if (!currentSessionId) {
+      /**
+       * 欢迎页直接发送时先桥接到待提交状态，再创建/复用会话。
+       * 等 session 确认后会由 effect 自动续发，用户无需再点击第二次。
+       */
+      setPendingSessionSubmission({
+        text: draft,
+        files: pendingFiles,
+      });
+      setLandingDraft('');
+      setPendingFiles([]);
+      handleNewChat();
+      return;
     }
+
+    submitMessage(currentSessionId, draft, pendingFiles);
   }, [
     currentSessionId,
     currentSessionSending,
     drafts,
+    handleNewChat,
+    landingDraft,
     pendingFiles,
-    messages,
-    addMessage,
-    updateSession,
-    setDraft,
-    setSessionSending,
-    ws,
+    submitMessage,
   ]);
+
+  useEffect(() => {
+    if (!pendingSessionSubmission || !currentSessionId) {
+      return;
+    }
+
+    submitMessage(currentSessionId, pendingSessionSubmission.text, pendingSessionSubmission.files);
+    setPendingSessionSubmission(null);
+  }, [currentSessionId, pendingSessionSubmission, submitMessage]);
+
+  const currentDraft = currentSessionId ? (drafts[currentSessionId] ?? '') : landingDraft;
+  const isComposerBootstrapping = !currentSessionId && pendingSessionSubmission !== null;
 
   // ===========================
   // 快捷提问
@@ -576,7 +674,6 @@ export default function ChatPage() {
   // ===========================
 
   const currentMessages = currentSessionId ? (messages[currentSessionId] ?? []) : [];
-  const currentDraft = currentSessionId ? (drafts[currentSessionId] ?? '') : '';
   const currentSession = currentSessionId
     ? (sessions.find((session) => session.id === currentSessionId) ?? null)
     : null;
@@ -655,23 +752,31 @@ export default function ChatPage() {
 
           {/* 输入区重构为底部 dock，让发送动作稳定停靠在主舞台底部。 */}
           <div className={styles.inputArea}>
-            {!currentSessionId ? (
-              <div className={styles.noSessionTip}>点击左侧「新建对话」开始</div>
-            ) : (
-              <div className={styles.composerHint}>
-                Enter 发送，Shift+Enter 换行。结果、图表与执行状态会继续沉淀到当前会话。
-              </div>
-            )}
+            <div className={styles.composerHint}>
+              {!currentSessionId
+                ? 'Enter 发送，Shift+Enter 换行。首次发送会自动创建一个新对话。'
+                : 'Enter 发送，Shift+Enter 换行。结果、图表与执行状态会继续沉淀到当前会话。'}
+            </div>
 
             <MessageInput
               value={currentDraft}
-              onChange={(v) => currentSessionId && setDraft(currentSessionId, v)}
+              onChange={(v) => {
+                if (currentSessionId) {
+                  setDraft(currentSessionId, v);
+                  return;
+                }
+                setLandingDraft(v);
+              }}
               files={pendingFiles}
               onFilesChange={setPendingFiles}
               onSend={handleSend}
-              disabled={!currentSessionId || currentSessionSending}
+              disabled={false}
+              sendDisabled={currentSessionSending || isComposerBootstrapping}
+              focusKey={currentSessionId ?? 'no-session'}
               placeholder={
-                !currentSessionId ? '请先新建一个对话…' : '输入你的下一步目标、问题或要执行的动作…'
+                !currentSessionId
+                  ? '输入你的下一步目标、问题或要执行的动作…'
+                  : '输入你的下一步目标、问题或要执行的动作…'
               }
             />
           </div>

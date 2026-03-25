@@ -51,6 +51,15 @@ select {
   font: inherit;
 }
 
+// 统一 icon-only 控件的垂直节奏，避免按钮内图标出现上边缘留白偏大的现象。
+.anticon {
+  line-height: 1;
+}
+
+.anticon svg {
+  display: block;
+}
+
 #root {
   height: 100%;
 }
@@ -106,6 +115,14 @@ select {
     border-color @transition-base,
     color @transition-base,
     opacity @transition-base;
+}
+
+.ant-btn .anticon,
+.ant-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .ant-btn-primary {

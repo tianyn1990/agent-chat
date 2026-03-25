@@ -55,6 +55,15 @@ export default function MessageList({
 
   /** 用户是否已向上滚动（超出阈值，暂停自动滚底） */
   const [isUserScrolledUp, setIsUserScrolledUp] = useState(false);
+  /**
+   * 同步保存用户是否已上滚。
+   *
+   * 设计原因：
+   * - 流式回复期间会连续触发 effect
+   * - React state 更新存在异步窗口，用户刚上滚时若仍读到旧值，会被自动滚底抢回去
+   * - ref 可让滚动决策直接基于最新滚动位置，消除“我在上滚，列表还在往下吸”的抖动
+   */
+  const isUserScrolledUpRef = useRef(false);
   /** 是否有新消息未读（在非底部时收到新消息） */
   const [hasNewMessage, setHasNewMessage] = useState(false);
 
@@ -102,6 +111,7 @@ export default function MessageList({
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     const atBottom = distanceFromBottom <= AT_BOTTOM_THRESHOLD;
 
+    isUserScrolledUpRef.current = !atBottom;
     setIsUserScrolledUp(!atBottom);
 
     // 用户回到底部后清除"新消息"标记
@@ -121,25 +131,32 @@ export default function MessageList({
 
     if (newCount <= oldCount) return; // 没有新增消息（例如切换会话时重置）
 
-    if (isUserScrolledUp) {
+    if (isUserScrolledUpRef.current) {
       // 用户已上滚：标记有新消息，不强制滚底
       setHasNewMessage(true);
     } else {
-      // 用户在底部：自动滚底
-      scrollToBottom();
+      /**
+       * 用户仍位于底部时，新增消息直接瞬时跟随。
+       *
+       * 设计原因：
+       * - 机器人刚进入 streaming 的第一拍，如果这里使用 smooth，会和用户随后的手动滚动竞争
+       * - 改为 instant 可去掉过渡动画带来的“被拽一下”感
+       */
+      scrollToBottom('instant');
     }
-  }, [messages.length, isUserScrolledUp, scrollToBottom]);
+  }, [messages.length, scrollToBottom]);
 
   // 流式消息更新时，若用户在底部则持续跟随
   useEffect(() => {
-    if (isStreaming && !isUserScrolledUp) {
+    if (isStreaming && !isUserScrolledUpRef.current) {
       scrollToBottom('instant');
     }
-  }, [streamingBuffer, isStreaming, isUserScrolledUp, scrollToBottom]);
+  }, [streamingBuffer, isStreaming, scrollToBottom]);
 
   // 初次进入会话，立即滚底（不需要动画）
   useEffect(() => {
     scrollToBottom('instant');
+    isUserScrolledUpRef.current = false;
     setIsUserScrolledUp(false);
     setHasNewMessage(false);
     prevMsgCountRef.current = messages.length;
@@ -200,6 +217,7 @@ export default function MessageList({
         hasNewMessage={hasNewMessage}
         onClick={() => {
           scrollToBottom();
+          isUserScrolledUpRef.current = false;
           setIsUserScrolledUp(false);
           setHasNewMessage(false);
         }}

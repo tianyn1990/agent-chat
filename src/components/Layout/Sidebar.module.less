@@ -69,6 +69,21 @@
   font-size: 16px;
 }
 
+.railAction :global(.anticon),
+.navItem :global(.anticon),
+.seamToggle :global(.anticon) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.railAction :global(.anticon svg),
+.navItem :global(.anticon svg),
+.seamToggle :global(.anticon svg) {
+  display: block;
+}
+
 .nav {
   width: 100%;
   display: flex;
@@ -129,6 +144,48 @@
   align-items: center;
   gap: 12px;
   padding-bottom: 2px;
+}
+
+.seamToggle {
+  position: absolute;
+  left: calc(@sidebar-collapsed-width - 10px);
+  top: 50%;
+  z-index: 6;
+  width: 20px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid @frame-divider-strong;
+  border-radius: 999px;
+  background: @surface-floating;
+  color: @sidebar-text-secondary;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    color @transition-base,
+    border-color @transition-base,
+    background-color @transition-base;
+
+  &:hover {
+    color: @sidebar-text;
+    border-color: @nav-active-border;
+    background: @surface-floating-strong;
+  }
+
+  &:focus-visible {
+    outline: 2px solid @focus-outline;
+    outline-offset: 2px;
+  }
+
+  :global(.anticon) {
+    font-size: 11px;
+  }
+}
+
+.seamToggleExpanded {
+  color: @sidebar-text;
 }
 
 .panel {

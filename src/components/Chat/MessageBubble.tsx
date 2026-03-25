@@ -1,6 +1,12 @@
-import { memo, useCallback } from 'react';
-import { Avatar } from 'antd';
-import { UserOutlined, RobotOutlined, WarningOutlined } from '@ant-design/icons';
+import { memo, useCallback, useState } from 'react';
+import { Avatar, Modal } from 'antd';
+import {
+  UserOutlined,
+  RobotOutlined,
+  WarningOutlined,
+  DownloadOutlined,
+  FileOutlined,
+} from '@ant-design/icons';
 import type { Message, TextContent, FileContent, ErrorContent } from '@/types/message';
 import type { InteractiveCard } from '@/types/card';
 import type { ChartMessage } from '@/types/chart';
@@ -247,26 +253,90 @@ function TextBubble({ text, isUser, isStreaming }: TextBubbleProps) {
 
 function FileBubble({ file }: { file: FileContent }) {
   const isImage = file.fileType.startsWith('image/');
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   return (
-    <div className={`${styles.bubble} ${styles.bubbleUser}`}>
+    <>
+      <div className={`${styles.bubble} ${styles.bubbleUser}`}>
+        {isImage && file.previewUrl ? (
+          <button
+            type="button"
+            className={styles.imagePreviewButton}
+            onClick={() => setPreviewOpen(true)}
+            aria-label={`查看大图 ${file.fileName}`}
+          >
+            <img
+              src={file.previewUrl}
+              alt={file.fileName}
+              loading="lazy"
+              decoding="async"
+              className={styles.imagePreview}
+            />
+          </button>
+        ) : (
+          <div className={styles.fileCard}>
+            <div className={styles.fileCardMeta}>
+              <FileOutlined className={styles.fileCardIcon} />
+              <div className={styles.fileCardText}>
+                <span className={styles.fileName}>{file.fileName}</span>
+                <span className={styles.fileSize}>{formatFileSize(file.fileSize)}</span>
+              </div>
+            </div>
+
+            {file.downloadUrl ? (
+              <a
+                href={file.downloadUrl}
+                download={file.fileName}
+                className={styles.fileDownload}
+                aria-label={`下载文件 ${file.fileName}`}
+              >
+                <DownloadOutlined />
+                <span>下载文件</span>
+              </a>
+            ) : null}
+          </div>
+        )}
+
+        {isImage && file.downloadUrl ? (
+          <div className={styles.fileToolbar}>
+            <a
+              href={file.downloadUrl}
+              download={file.fileName}
+              className={styles.fileDownload}
+              aria-label={`下载图片 ${file.fileName}`}
+            >
+              <DownloadOutlined />
+              <span>下载图片</span>
+            </a>
+          </div>
+        ) : null}
+      </div>
+
       {isImage && file.previewUrl ? (
-        // 图片类型：直接展示缩略图
-        <img
-          src={file.previewUrl}
-          alt={file.fileName}
-          loading="lazy"
-          decoding="async"
-          className={styles.imagePreview}
-        />
-      ) : (
-        // 其他文件类型：展示文件名和大小
-        <div className={styles.fileCard}>
-          <span className={styles.fileName}>{file.fileName}</span>
-          <span className={styles.fileSize}>{formatFileSize(file.fileSize)}</span>
-        </div>
-      )}
-    </div>
+        <Modal
+          open={previewOpen}
+          onCancel={() => setPreviewOpen(false)}
+          footer={
+            file.downloadUrl ? (
+              <a
+                href={file.downloadUrl}
+                download={file.fileName}
+                className={styles.previewDownload}
+              >
+                <DownloadOutlined />
+                <span>下载图片</span>
+              </a>
+            ) : null
+          }
+          title={file.fileName}
+          centered
+          width="min(92vw, 1080px)"
+          destroyOnHidden
+        >
+          <img src={file.previewUrl} alt={file.fileName} className={styles.previewModalImage} />
+        </Modal>
+      ) : null}
+    </>
   );
 }
 
