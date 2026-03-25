@@ -187,6 +187,16 @@
   overflow-x: hidden;
   min-height: 0;
   padding: 0 10px 2px 14px;
+
+  /**
+   * 二级 panel 中的插槽内容默认需要贴满可用宽度。
+   * 这里统一兜底，避免像会话列表这类纵向容器按内容宽度收缩。
+   */
+  > * {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 1100px) {

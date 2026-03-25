@@ -3,6 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SessionList from '@/components/Chat/SessionList';
 import { useChatStore, createTempSession } from '@/stores/useChatStore';
+import styles from '@/components/Chat/SessionList.module.less';
+import itemStyles from '@/components/Chat/SessionItem.module.less';
 
 function renderWithRouter(ui: React.ReactElement) {
   return render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -81,6 +83,19 @@ describe('SessionList', () => {
     // 找到会话条目（有激活类名）
     const activeItem = container.querySelector('[class*="itemActive"]');
     expect(activeItem).not.toBeNull();
+  });
+
+  it('会话面板结构保留满宽布局所需的容器层级', () => {
+    const session = createTempSession('短标题');
+    useChatStore.setState({ sessions: [session] });
+
+    const { container } = renderWithRouter(<SessionList onNewChat={mockOnNewChat} />);
+
+    // 这几个结构类共同保证二级侧栏中的新建按钮与会话项始终贴满可用宽度。
+    expect(container.querySelector(`.${styles.container}`)).not.toBeNull();
+    expect(container.querySelector(`.${styles.newBtnWrapper}`)).not.toBeNull();
+    expect(container.querySelector(`.${styles.list}`)).not.toBeNull();
+    expect(container.querySelector(`.${itemStyles.item}`)).not.toBeNull();
   });
 
   it('重命名会话后 store 更新', () => {

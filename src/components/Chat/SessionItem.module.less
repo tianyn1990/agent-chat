@@ -4,11 +4,13 @@
 .item {
   display: flex;
   align-items: flex-start;
+  width: 100%;
   gap: @spacing-sm;
   padding: 10px 10px 9px;
   border-radius: 12px;
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.04);
+  box-sizing: border-box;
   transition:
     background-color @transition-base,
     border-color @transition-base,
@@ -67,12 +69,15 @@
 .metaRow {
   display: flex;
   align-items: baseline;
+  min-width: 0;
   gap: @spacing-sm;
   justify-content: space-between;
 }
 
 // 会话标题
 .title {
+  flex: 1;
+  min-width: 0;
   color: @sidebar-text;
   font-size: 13px;
   font-weight: 600;
