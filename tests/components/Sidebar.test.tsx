@@ -61,9 +61,14 @@ describe('Sidebar', () => {
     );
 
     const toggleButton = screen.getByRole('button', { name: '切换到明亮皮肤' });
+    // 图标表达当前主题状态，避免按钮文案和视觉状态出现理解错位。
+    expect(toggleButton.querySelector('[aria-label="moon"]')).toBeInTheDocument();
+
     await user.click(toggleButton);
 
     expect(document.documentElement.dataset.theme).toBe('light');
-    expect(screen.getByRole('button', { name: '切换到深色皮肤' })).toBeInTheDocument();
+    const updatedToggleButton = screen.getByRole('button', { name: '切换到深色皮肤' });
+    expect(updatedToggleButton).toBeInTheDocument();
+    expect(updatedToggleButton.querySelector('[aria-label="sun"]')).toBeInTheDocument();
   });
 });

@@ -106,7 +106,8 @@ export default function Sidebar({ extra, activeKey }: SidebarProps) {
               onClick={toggleTheme}
               aria-label={themeMode === 'dark' ? '切换到明亮皮肤' : '切换到深色皮肤'}
             >
-              {themeMode === 'dark' ? <SunOutlined /> : <MoonOutlined />}
+              {/* 图标展示当前主题状态，tooltip 继续表达点击后的切换动作，两者语义分离后更直觉。 */}
+              {themeMode === 'dark' ? <MoonOutlined /> : <SunOutlined />}
             </button>
           </Tooltip>
 
