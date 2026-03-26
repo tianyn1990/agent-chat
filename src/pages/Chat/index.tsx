@@ -6,28 +6,12 @@ import {
   findReusableDraftSession,
   generateSessionTitle,
 } from '@/stores/useChatStore';
-import { useUserStore } from '@/stores/useUserStore';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
-import { mockWsService } from '@/mocks/websocket';
-import { localStarOfficeBridge } from '@/mocks/starOffice/bridge';
-import { wsService } from '@/services/websocket';
+import { getActiveChatAdapter } from '@/services/chatAdapter';
 import { ClockCircleOutlined, CommentOutlined } from '@ant-design/icons';
-import {
-  IS_MOCK_ENABLED,
-  ROUTES,
-  STAR_OFFICE_MOCK_ENABLED,
-  STAR_OFFICE_REAL_DEV_ENABLED,
-  STAR_OFFICE_URL,
-} from '@/constants';
+import { ROUTES } from '@/constants';
 import { prefixedId } from '@/utils/id';
-import type {
-  WsMessageChunk,
-  WsCardMessage,
-  WsChartMessage,
-  WsSessionCreated,
-  WsError,
-} from '@/types/message';
 import type { Message } from '@/types/message';
 import SessionList from '@/components/Chat/SessionList';
 import MessageList from '@/components/Chat/MessageList';
@@ -43,16 +27,19 @@ import styles from './Chat.module.less';
  * 使用 Intl API 代替零散的 toLocaleDateString，便于未来统一处理地区与时区策略。
  */
 const CHAT_DATE_FORMATTER = new Intl.DateTimeFormat('zh-CN');
+const chatAdapter = getActiveChatAdapter();
 
 /**
  * 对话页面（主容器）
  *
  * 职责：
- * 1. 管理 WebSocket 连接生命周期（连接/断开/重连）
- * 2. 监听服务端消息（流式文本/卡片/图表/错误）并更新 store
- * 3. 处理会话创建、消息发送的用户操作
- * 4. 向侧边栏注入会话列表（通过 useSidebarStore）
- * 5. 渲染消息列表、输入框、欢迎界面
+ * 1. 处理会话创建、消息发送等用户操作
+ * 2. 向侧边栏注入会话列表（通过 useSidebarStore）
+ * 3. 读取全局 runtime/store 渲染消息列表、输入框、欢迎界面
+ *
+ * 说明：
+ * - chat runtime 的连接、事件消费与本地 Star-Office bridge 已提升到 `ChatRuntimeHost`
+ * - 这样在切到沉浸式工作台时，即使页面被卸载，消息和运行态仍会持续推进
  */
 export default function ChatPage() {
   const { message: antMessage } = App.useApp();
@@ -68,18 +55,13 @@ export default function ChatPage() {
     streamingBuffer,
     sendingSessionIds,
     setCurrentSession,
-    addSession,
     addMessage,
-    appendStreamChunk,
-    finalizeStream,
     updateSession,
-    setConnected,
     setSessionSending,
     drafts,
     setDraft,
   } = useChatStore();
 
-  const token = useUserStore((s) => s.token);
   const setExtraContent = useSidebarStore((s) => s.setExtraContent);
   const isVisualizePanelOpen = useVisualizeStore((s) => s.isPanelOpen);
   const currentRuntime = useVisualizeStore((s) =>
@@ -120,238 +102,39 @@ export default function ChatPage() {
     files: SelectedFile[];
   } | null>(null);
 
-  // 根据 Mock/真实模式选择 WS 服务
-  const ws = IS_MOCK_ENABLED ? mockWsService : wsService;
-
-  // ===========================
-  // WebSocket 连接管理
-  // ===========================
-
-  useEffect(() => {
-    // 建立连接（真实模式下 wsService 从 localStorage 自行读取 token）
-    if (IS_MOCK_ENABLED) {
-      mockWsService.connect();
-    } else {
-      wsService.connect();
-    }
-
-    // 监听连接状态变化
-    const unsubStatus = ws.onStatus((connected) => {
-      setConnected(connected);
-    });
-
-    // 监听流式消息块
-    const unsubChunk = ws.on('message_chunk', (msg) => {
-      const chunk = msg as WsMessageChunk;
-
-      if (chunk.done) {
-        // 流结束：将 buffer 写入消息，更新状态为 done
-        finalizeStream(chunk.sessionId, chunk.messageId);
-        setSessionSending(chunk.sessionId, false);
-        useVisualizeStore.getState().setSessionRuntime(chunk.sessionId, {
-          state: 'idle',
-          detail: '本轮回复已完成',
-          updatedAt: Date.now(),
-          source: 'frontend',
-          messageId: chunk.messageId,
-        });
-        // 更新会话的最后消息摘要
-        const fullText = useChatStore.getState().streamingBuffer[chunk.messageId] ?? '';
-        updateSession(chunk.sessionId, {
-          lastMessage: fullText.slice(0, 40),
-          lastMessageAt: Date.now(),
-        });
-      } else {
-        // 中间块：初始化 AI 消息条目（仅第一块时），追加文本
-        const existingMsgs = useChatStore.getState().messages[chunk.sessionId] ?? [];
-        const exists = existingMsgs.some((m) => m.id === chunk.messageId);
-
-        if (!exists) {
-          // 首个 chunk：创建 streaming 状态的消息条目
-          const aiMessage: Message = {
-            id: chunk.messageId,
-            sessionId: chunk.sessionId,
-            role: 'assistant',
-            contentType: 'text',
-            content: { text: '' },
-            status: 'streaming',
-            timestamp: Date.now(),
-          };
-          addMessage(aiMessage);
-        }
-
-        appendStreamChunk(chunk.messageId, chunk.delta);
-        useVisualizeStore.getState().setSessionRuntime(chunk.sessionId, {
-          state: 'writing',
-          detail: '正在生成回复内容',
-          updatedAt: Date.now(),
-          source: 'frontend',
-          messageId: chunk.messageId,
-        });
-      }
-    });
-
-    // 监听卡片消息
-    const unsubCard = ws.on('card', (msg) => {
-      const cardMsg = msg as WsCardMessage;
-      const cardMessage: Message = {
-        id: cardMsg.messageId,
-        sessionId: cardMsg.sessionId,
-        role: 'assistant',
-        contentType: 'card',
-        content: cardMsg.card,
-        status: 'done',
-        timestamp: Date.now(),
-      };
-      addMessage(cardMessage);
-      setSessionSending(cardMsg.sessionId, false);
-      useVisualizeStore.getState().setSessionRuntime(cardMsg.sessionId, {
-        state: 'idle',
-        detail: '已返回交互卡片',
-        updatedAt: Date.now(),
-        source: 'frontend',
-        messageId: cardMsg.messageId,
-      });
-      updateSession(cardMsg.sessionId, {
-        lastMessage: '[卡片消息]',
-        lastMessageAt: Date.now(),
-      });
-    });
-
-    // 监听图表消息
-    const unsubChart = ws.on('chart', (msg) => {
-      const chartMsg = msg as WsChartMessage;
-      const chartMessage: Message = {
-        id: chartMsg.messageId,
-        sessionId: chartMsg.sessionId,
-        role: 'assistant',
-        contentType: 'chart',
-        content: chartMsg.chart,
-        status: 'done',
-        timestamp: Date.now(),
-      };
-      addMessage(chartMessage);
-      setSessionSending(chartMsg.sessionId, false);
-      useVisualizeStore.getState().setSessionRuntime(chartMsg.sessionId, {
-        state: 'idle',
-        detail: '已返回图表结果',
-        updatedAt: Date.now(),
-        source: 'frontend',
-        messageId: chartMsg.messageId,
-      });
-      updateSession(chartMsg.sessionId, {
-        lastMessage: '[图表]',
-        lastMessageAt: Date.now(),
-      });
-    });
-
-    // 监听会话创建成功
-    const unsubSession = ws.on('session_created', (msg) => {
-      const sessionMsg = msg as WsSessionCreated;
-      const { session } = sessionMsg;
-
-      // 检查是否已存在该 session（避免重复添加）
-      const existing = useChatStore.getState().sessions.find((s) => s.id === session.id);
-      if (!existing) {
-        addSession({
-          id: session.id,
-          title: session.title,
-          createdAt: session.createdAt,
-          messageCount: 0,
-        });
-      }
-
-      // 切换到新会话并更新路由
-      setCurrentSession(session.id);
-      navigate(`${ROUTES.CHAT}/${session.id}`, { replace: true });
-    });
-
-    // 监听错误消息
-    const unsubError = ws.on('error', (msg) => {
-      const errorMsg = msg as WsError;
-      antMessage.error(errorMsg.message || '发生未知错误');
-      if (errorMsg.sessionId) {
-        setSessionSending(errorMsg.sessionId, false);
-        useVisualizeStore.getState().setSessionRuntime(errorMsg.sessionId, {
-          state: 'error',
-          detail: errorMsg.message || '发生未知错误',
-          updatedAt: Date.now(),
-          source: 'frontend',
-        });
-      }
-    });
-
-    return () => {
-      // 组件卸载时清理监听器（不断开 WS 连接，保持后台复用）
-      unsubStatus();
-      unsubChunk();
-      unsubCard();
-      unsubChart();
-      unsubSession();
-      unsubError();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
-  // ===========================
-  // 本地 Star-Office adapter 桥接
-  // ===========================
-
-  useEffect(() => {
-    // 本地 adapter 需要覆盖两类场景：
-    // 1. 纯本地 mock 页面
-    // 2. 真实 Star-Office 本地联调模式
-    //
-    // 共同点都是：最终状态都由本地 Vite 中间件中的 adapter store 提供。
-    const shouldUseLocalAdapter =
-      IS_MOCK_ENABLED &&
-      !STAR_OFFICE_URL &&
-      (STAR_OFFICE_MOCK_ENABLED || STAR_OFFICE_REAL_DEV_ENABLED);
-
-    if (!shouldUseLocalAdapter) {
-      return;
-    }
-
-    const previousSignatureBySession = new Map<string, string>();
-
-    const unsubscribe = useVisualizeStore.subscribe((state) => {
-      Object.entries(state.runtimeBySession).forEach(([sessionId, runtime]) => {
-        const signature = JSON.stringify(runtime);
-
-        if (previousSignatureBySession.get(sessionId) === signature) {
-          return;
-        }
-
-        previousSignatureBySession.set(sessionId, signature);
-        localStarOfficeBridge.enqueue(sessionId, runtime);
-      });
-    });
-
-    return () => {
-      unsubscribe();
-      localStarOfficeBridge.reset();
-    };
-  }, []);
-
   // ===========================
   // 新建对话
   // ===========================
 
   const handleNewChat = useCallback(() => {
-    const state = useChatStore.getState();
-    const reusableSession = findReusableDraftSession(state.sessions, state.messages);
+    const createSession = async () => {
+      const state = useChatStore.getState();
+      const reusableSession = findReusableDraftSession(state.sessions, state.messages);
 
-    // 若已经存在未发送任何消息的新会话，则直接复用，避免用户堆积多个空白会话。
-    if (reusableSession) {
-      state.setCurrentSession(reusableSession.id);
-      navigate(`${ROUTES.CHAT}/${reusableSession.id}`);
-      return;
-    }
+      // 若已经存在未发送任何消息的新会话，则直接复用，避免用户堆积多个空白会话。
+      if (reusableSession) {
+        state.setCurrentSession(reusableSession.id);
+        navigate(`${ROUTES.CHAT}/${reusableSession.id}`);
+        return;
+      }
 
-    const requestId = prefixedId('req');
-    // 仅当不存在空白会话时，才请求服务端创建新的 session。
-    ws.send({ type: 'create_session', requestId, title: '新对话' });
-  }, [navigate, ws]);
+      try {
+        // 会话创建职责移动到 adapter 层，页面不再关心底层是旧协议还是 OpenClaw-compatible mock。
+        const session = await chatAdapter.createSession('新对话');
+        const existing = useChatStore.getState().sessions.find((item) => item.id === session.id);
+        if (!existing) {
+          useChatStore.getState().addSession(session);
+        }
+        useChatStore.getState().setCurrentSession(session.id);
+        navigate(`${ROUTES.CHAT}/${session.id}`);
+      } catch (error) {
+        console.error('[ChatPage] 创建会话失败', error);
+        antMessage.error('创建会话失败，请稍后重试');
+      }
+    };
+
+    void createSession();
+  }, [antMessage, navigate]);
 
   /** 统一触发输入区重新聚焦，避免多个入口各自维护不同的焦点逻辑。 */
   const requestComposerFocus = useCallback(() => {
@@ -535,18 +318,17 @@ export default function ChatPage() {
       setPendingFiles([]);
 
       setSessionSending(targetSessionId, true);
-      useVisualizeStore.getState().setSessionRuntime(targetSessionId, {
-        state: 'researching',
-        detail: '等待 OpenClaw 响应',
-        updatedAt: now,
-        source: 'frontend',
-      });
-      ws.send({
-        type: 'user_message',
-        sessionId: targetSessionId,
-        requestId,
-        content: { text, files: files.length > 0 ? files : undefined },
-      });
+      void chatAdapter
+        .sendMessage(targetSessionId, {
+          text,
+          files: files.length > 0 ? files : undefined,
+          requestId,
+        })
+        .catch((error) => {
+          console.error('[ChatPage] 发送消息失败', error);
+          setSessionSending(targetSessionId, false);
+          antMessage.error('发送消息失败，请稍后重试');
+        });
 
       if (existingMessages.length === 0) {
         updateSession(targetSessionId, {
@@ -561,7 +343,7 @@ export default function ChatPage() {
       setDraft,
       setSessionSending,
       updateSession,
-      ws,
+      antMessage,
     ],
   );
 
@@ -634,7 +416,7 @@ export default function ChatPage() {
   // ===========================
 
   /**
-   * 用户操作卡片后，通过 WebSocket 发送 card_action 消息
+   * 用户操作卡片后，通过 chat adapter 回传卡片动作
    * @param cardId  - 被操作的卡片 ID
    * @param key     - 操作标识（button key / form submitKey）
    * @param value   - 操作值（按钮为 null，表单为字段键值对）
@@ -643,16 +425,18 @@ export default function ChatPage() {
   const handleCardAction = useCallback(
     (cardId: string, key: string, value: unknown, tag: 'button' | 'select' | 'form') => {
       if (!currentSessionId) return;
-      const requestId = prefixedId('req');
-      ws.send({
-        type: 'card_action',
-        sessionId: currentSessionId,
-        requestId,
-        cardId,
-        action: { tag, key, value },
-      });
+      void chatAdapter
+        .sendCardAction(currentSessionId, cardId, {
+          tag,
+          key,
+          value,
+        })
+        .catch((error) => {
+          console.error('[ChatPage] 提交卡片操作失败', error);
+          antMessage.error('提交卡片操作失败，请稍后重试');
+        });
     },
-    [currentSessionId, ws],
+    [antMessage, currentSessionId],
   );
 
   /**

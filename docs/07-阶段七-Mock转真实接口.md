@@ -2,6 +2,24 @@
 
 > **当前状态**：⏳ 待实现。本阶段在所有 Mock 功能验证完成后执行，将 Mock 替换为真实的后端调用。
 
+## 0. 当前阶段说明
+
+在进入真实接口联调之前，chat 层已经新增了一轮“协议侧预重构”：
+
+- 本地 mock 已从旧业务型 WebSocket mock 升级为 **OpenClaw-compatible mock**
+- 页面层已通过统一 chat adapter 消费会话、消息与执行状态
+- 像素风办公室继续沿用会话级 runtime，并保留本地 mock / real-dev 承接能力
+
+这意味着当前阶段七不再是“直接从旧 mock 跳到真实接口”，而是继续按以下路线推进：
+
+1. 已完成：本地 mock 协议抽象阶段
+2. 待完成：本地直连真实 OpenClaw
+3. 待完成：公司网关 / BFF 接入
+
+详细总体路线请先阅读：
+
+- [阶段七-OpenClaw协议接入总体方案.md](./阶段七-OpenClaw协议接入总体方案.md)
+
 ## 1. 目标
 - 将飞书 OAuth 登录的 Mock 替换为真实后端接口
 - 将 Mock WebSocket 服务替换为真实 WebSocket 连接

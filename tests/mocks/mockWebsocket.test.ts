@@ -1,117 +1,121 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { WsServerMessage } from '@/types/message';
-import { mockWsService } from '@/mocks/websocket';
+import type { OpenClawChatEventPayload } from '@/types/openclaw';
+import { FIRST_GUIDE_REPLY, mockOpenClawTransport } from '@/mocks/websocket';
 
-/** 将流式消息片段还原为完整文本，便于断言 mock 回复内容。 */
-function collectMessageText(messages: WsServerMessage[]): string {
-  return messages
-    .filter((message): message is Extract<WsServerMessage, { type: 'message_chunk' }> => message.type === 'message_chunk')
-    .map((message) => message.delta)
+/** 收集 chat 事件中的文本增量，并还原为完整回复文本。 */
+function collectMessageText(events: OpenClawChatEventPayload[]): string {
+  return events
+    .filter((event): event is Extract<OpenClawChatEventPayload, { kind: 'message.delta' }> => event.kind === 'message.delta')
+    .map((event) => event.delta)
     .join('');
 }
 
-describe('mockWsService', () => {
-  beforeEach(() => {
+describe('mockOpenClawTransport', () => {
+  beforeEach(async () => {
     vi.useFakeTimers();
-    mockWsService.reset();
-    mockWsService.connect();
+    mockOpenClawTransport.reset();
+    await mockOpenClawTransport.connect();
   });
 
   afterEach(() => {
-    mockWsService.reset();
+    mockOpenClawTransport.reset();
     vi.restoreAllMocks();
     vi.useRealTimers();
   });
 
   it('同一会话首次普通对话固定返回 test 指令引导', async () => {
-    const messages: WsServerMessage[] = [];
-    mockWsService.onAll((message) => messages.push(message));
+    const events: OpenClawChatEventPayload[] = [];
+    mockOpenClawTransport.on('chat', (frame) => {
+      events.push(frame.payload);
+    });
 
-    mockWsService.send({
-      type: 'user_message',
-      sessionId: 'session_first',
-      requestId: 'req_first',
-      content: { text: '你好' },
+    await mockOpenClawTransport.request('chat.send', {
+      sessionKey: 'session_first',
+      idempotencyKey: 'req_first',
+      text: '你好',
     });
 
     await vi.runAllTimersAsync();
 
-    const content = collectMessageText(messages);
-    expect(content).toContain('请优先输入以下测试指令');
-    expect(content).toContain('test card');
-    expect(content).toContain('test iframe');
+    expect(collectMessageText(events)).toContain(FIRST_GUIDE_REPLY.slice(0, 12));
+    expect(collectMessageText(events)).toContain('test card');
+    expect(collectMessageText(events)).toContain('test iframe');
   });
 
   it('同一会话在首轮引导后恢复普通随机回复', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
-    const firstRoundMessages: WsServerMessage[] = [];
-    mockWsService.onAll((message) => firstRoundMessages.push(message));
 
-    mockWsService.send({
-      type: 'user_message',
-      sessionId: 'session_repeat',
-      requestId: 'req_guide',
-      content: { text: '先给我一个提示' },
+    await mockOpenClawTransport.request('chat.send', {
+      sessionKey: 'session_repeat',
+      idempotencyKey: 'req_guide',
+      text: '先给我一个提示',
     });
     await vi.runAllTimersAsync();
 
-    const secondRoundMessages: WsServerMessage[] = [];
-    mockWsService.onAll((message) => secondRoundMessages.push(message));
+    const secondRoundEvents: OpenClawChatEventPayload[] = [];
+    mockOpenClawTransport.on('chat', (frame) => {
+      secondRoundEvents.push(frame.payload);
+    });
 
-    mockWsService.send({
-      type: 'user_message',
-      sessionId: 'session_repeat',
-      requestId: 'req_normal',
-      content: { text: '继续聊聊这个需求' },
+    await mockOpenClawTransport.request('chat.send', {
+      sessionKey: 'session_repeat',
+      idempotencyKey: 'req_normal',
+      text: '继续聊聊这个需求',
     });
     await vi.runAllTimersAsync();
 
-    const content = collectMessageText(secondRoundMessages);
+    const content = collectMessageText(secondRoundEvents);
     expect(content).not.toContain('请优先输入以下测试指令');
     expect(content).toContain('我理解您的问题是关于"继续聊聊这个需求"');
   });
 
   it('不同会话各自拥有独立的首次引导', async () => {
-    const sessionAMessages: WsServerMessage[] = [];
-    mockWsService.onAll((message) => sessionAMessages.push(message));
+    const sessionAEvents: OpenClawChatEventPayload[] = [];
+    mockOpenClawTransport.on('chat', (frame) => {
+      if (frame.payload.sessionKey === 'session_a') {
+        sessionAEvents.push(frame.payload);
+      }
+    });
 
-    mockWsService.send({
-      type: 'user_message',
-      sessionId: 'session_a',
-      requestId: 'req_a',
-      content: { text: '会话 A 首次发言' },
+    await mockOpenClawTransport.request('chat.send', {
+      sessionKey: 'session_a',
+      idempotencyKey: 'req_a',
+      text: '会话 A 首次发言',
     });
     await vi.runAllTimersAsync();
 
-    const sessionBMessages: WsServerMessage[] = [];
-    mockWsService.onAll((message) => sessionBMessages.push(message));
+    const sessionBEvents: OpenClawChatEventPayload[] = [];
+    mockOpenClawTransport.on('chat', (frame) => {
+      if (frame.payload.sessionKey === 'session_b') {
+        sessionBEvents.push(frame.payload);
+      }
+    });
 
-    mockWsService.send({
-      type: 'user_message',
-      sessionId: 'session_b',
-      requestId: 'req_b',
-      content: { text: '会话 B 首次发言' },
+    await mockOpenClawTransport.request('chat.send', {
+      sessionKey: 'session_b',
+      idempotencyKey: 'req_b',
+      text: '会话 B 首次发言',
     });
     await vi.runAllTimersAsync();
 
-    expect(collectMessageText(sessionAMessages)).toContain('请优先输入以下测试指令');
-    expect(collectMessageText(sessionBMessages)).toContain('请优先输入以下测试指令');
+    expect(collectMessageText(sessionAEvents)).toContain('请优先输入以下测试指令');
+    expect(collectMessageText(sessionBEvents)).toContain('请优先输入以下测试指令');
   });
 
-  it('首条消息若直接输入测试指令，仍然返回对应类型消息', async () => {
-    const messages: WsServerMessage[] = [];
-    mockWsService.onAll((message) => messages.push(message));
-
-    mockWsService.send({
-      type: 'user_message',
-      sessionId: 'session_chart',
-      requestId: 'req_chart',
-      content: { text: 'test line' },
+  it('首条消息若直接输入测试指令，仍然返回结构化图表事件', async () => {
+    const events: OpenClawChatEventPayload[] = [];
+    mockOpenClawTransport.on('chat', (frame) => {
+      events.push(frame.payload);
     });
 
+    await mockOpenClawTransport.request('chat.send', {
+      sessionKey: 'session_chart',
+      idempotencyKey: 'req_chart',
+      text: 'test line',
+    });
     await vi.runAllTimersAsync();
 
-    expect(messages.some((message) => message.type === 'chart')).toBe(true);
-    expect(collectMessageText(messages)).toBe('');
+    expect(events.some((event) => event.kind === 'message.chart')).toBe(true);
+    expect(collectMessageText(events)).toBe('');
   });
 });

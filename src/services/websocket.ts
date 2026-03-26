@@ -1,6 +1,6 @@
 import { API_BASE_URL, WS_CONFIG } from '@/constants';
 import { getToken } from '@/utils/token';
-import type { WsClientMessage, WsServerMessage } from '@/types/message';
+import type { WsClientMessage, WsServerMessage } from '@/types/ws';
 
 type MessageHandler = (message: WsServerMessage) => void;
 type StatusHandler = (connected: boolean) => void;

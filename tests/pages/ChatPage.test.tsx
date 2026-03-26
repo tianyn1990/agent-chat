@@ -1,19 +1,21 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { App } from 'antd';
 import userEvent from '@testing-library/user-event';
 import ChatPage from '@/pages/Chat';
+import ChatRuntimeHost from '@/components/Chat/ChatRuntimeHost';
 import { useChatStore } from '@/stores/useChatStore';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
 import { useUserStore } from '@/stores/useUserStore';
-import { mockWsService } from '@/mocks/websocket';
+import { resetMockChatAdapterRuntime } from '@/services/chatAdapter';
 
 function renderChatPage(initialEntry = '/chat') {
   return render(
     <App>
       <MemoryRouter initialEntries={[initialEntry]}>
+        <ChatRuntimeHost />
         <Routes>
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:sessionId" element={<ChatPage />} />
@@ -24,9 +26,32 @@ function renderChatPage(initialEntry = '/chat') {
   );
 }
 
+function VisualizeRouteBackButton() {
+  const navigate = useNavigate();
+  const { sessionId } = useParams<{ sessionId: string }>();
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate(`/chat/${sessionId}`)}
+      aria-label="返回聊天测试"
+    >
+      返回聊天测试
+    </button>
+  );
+}
+
 describe('ChatPage', () => {
   beforeEach(() => {
-    mockWsService.reset();
+    resetMockChatAdapterRuntime();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({}),
+      }),
+    );
     URL.createObjectURL = vi.fn(() => 'blob:chat-attachment');
     URL.revokeObjectURL = vi.fn();
     HTMLElement.prototype.scrollTo = vi.fn();
@@ -81,7 +106,9 @@ describe('ChatPage', () => {
   });
 
   afterEach(() => {
-    mockWsService.reset();
+    resetMockChatAdapterRuntime();
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
   it('首次点击欢迎页快捷建议时会自动创建会话并预填输入内容', async () => {
@@ -276,5 +303,63 @@ describe('ChatPage', () => {
         ),
       ).toBe(true);
     });
+  });
+
+  it('流式回复中进入工作台再返回时不会残留错误的 loading 状态', async () => {
+    vi.useFakeTimers();
+    const sessionId = 'session-workbench-runtime';
+
+    useChatStore.setState({
+      sessions: [
+        {
+          id: sessionId,
+          title: '工作台切换回归',
+          createdAt: Date.now(),
+          messageCount: 0,
+        },
+      ],
+      currentSessionId: sessionId,
+      messages: {
+        [sessionId]: [],
+      },
+      drafts: {
+        [sessionId]: '',
+      },
+    });
+
+    render(
+      <App>
+        <MemoryRouter initialEntries={[`/chat/${sessionId}`]}>
+          <ChatRuntimeHost />
+          <Routes>
+            <Route path="/chat/:sessionId" element={<ChatPage />} />
+            <Route path="/visualize/:sessionId" element={<VisualizeRouteBackButton />} />
+          </Routes>
+        </MemoryRouter>
+      </App>,
+    );
+
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: '请继续处理这个任务' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: '发送消息' }));
+    fireEvent.click(screen.getByRole('button', { name: '查看当前会话执行状态' }));
+
+    expect(screen.getByRole('button', { name: '返回聊天测试' })).toBeInTheDocument();
+
+    await vi.runAllTimersAsync();
+    fireEvent.click(screen.getByRole('button', { name: '返回聊天测试' }));
+
+    expect(useChatStore.getState().sendingSessionIds[sessionId]).toBeUndefined();
+    expect(useVisualizeStore.getState().runtimeBySession[sessionId]?.state).toBe('idle');
+
+    const textbox = screen.getByRole('textbox');
+    expect(textbox).not.toBeDisabled();
+
+    fireEvent.change(textbox, {
+      target: { value: '继续下一轮任务' },
+    });
+
+    expect(screen.getByRole('button', { name: '发送消息' })).not.toBeDisabled();
   });
 });
