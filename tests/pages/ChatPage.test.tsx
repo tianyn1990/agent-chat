@@ -501,4 +501,39 @@ describe('ChatPage', () => {
       expect(screen.getByRole('heading', { name: '保留会话' })).toBeInTheDocument();
     });
   });
+
+  it('删除最后一个会话后，不会在稍后被补回空白占位会话', async () => {
+    const user = userEvent.setup();
+    const session = await (await import('@/services/chatAdapter')).mockOpenClawChatAdapter.createSession(
+      '最后一个会话',
+    );
+
+    useChatStore.setState({
+      sessions: [session],
+      currentSessionId: session.id,
+      messages: {
+        [session.id]: [],
+      },
+    });
+
+    const { container } = renderChatPageWithSidebar(`/chat/${session.id}`);
+
+    const sessionItem = container.querySelector('[class*="itemActive"]') as HTMLElement;
+    const menuButton = container.querySelector('[class*="menuBtn"]') as HTMLElement;
+    fireEvent.mouseEnter(sessionItem);
+    await user.click(menuButton);
+    await user.click(await screen.findByText('删除'));
+    await user.click(await screen.findByRole('button', { name: /删\s*除/ }));
+
+    await waitFor(() => {
+      expect(useChatStore.getState().sessions).toHaveLength(0);
+      expect(useChatStore.getState().currentSessionId).toBeNull();
+    });
+
+    await waitFor(() => {
+      expect(useChatStore.getState().sessions).toHaveLength(0);
+    });
+
+    expect(screen.getByRole('button', { name: '数据分析' })).toBeInTheDocument();
+  });
 });

@@ -116,6 +116,9 @@ export default function ChatPage() {
    * - 通过一个显式的 bootstrap 完成标记，可以只在真正完成初始化后再决定是否展示欢迎态
    */
   const [hasBootstrappedSessions, setHasBootstrappedSessions] = useState(false);
+  const routeSessionExists = routeSessionId
+    ? sessions.some((session) => session.id === routeSessionId)
+    : false;
 
   // ===========================
   // 新建对话
@@ -241,8 +244,28 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (routeSessionId) {
-      // URL 带有 sessionId 时直接切换，真实会话详情由后续 bootstrap 补齐。
-      setCurrentSession(routeSessionId);
+      /**
+       * URL 带有 sessionId 时，先区分“初始化恢复”与“已确认失效的旧路由”。
+       *
+       * 设计原因：
+       * - 刷新真实会话页面时，bootstrap 完成前 store 里可能暂时还没有该 session，需要允许先按路由恢复
+       * - 但删除当前会话后，旧的 routeSessionId 也会短暂保留一拍；若此时继续无条件写回 currentSessionId，
+       *   历史 hydrate 会把这个已删除 session 重新补成一个空白占位会话
+       */
+      if (!hasBootstrappedSessions || routeSessionExists) {
+        setCurrentSession(routeSessionId);
+        return;
+      }
+
+      if (!pendingSessionSubmission) {
+        const fallbackSessionId = sessions[0]?.id ?? null;
+        setCurrentSession(fallbackSessionId);
+        if (fallbackSessionId) {
+          navigate(`${ROUTES.CHAT}/${fallbackSessionId}`, { replace: true });
+        } else {
+          navigate(ROUTES.CHAT, { replace: true });
+        }
+      }
     } else if (sessions.length > 0 && !currentSessionId && !pendingSessionSubmission) {
       // URL 无 sessionId 但有历史会话：自动切换到最近一个
       setCurrentSession(sessions[0].id);
@@ -250,6 +273,8 @@ export default function ChatPage() {
     }
   }, [
     routeSessionId,
+    routeSessionExists,
+    hasBootstrappedSessions,
     sessions,
     currentSessionId,
     pendingSessionSubmission,
@@ -303,6 +328,18 @@ export default function ChatPage() {
    */
   useEffect(() => {
     if (!currentSessionId || loadedHistorySessionIds.includes(currentSessionId)) {
+      return;
+    }
+
+    /**
+     * 已完成 bootstrap 且确认路由 session 不存在时，不再为旧路由补空白占位会话。
+     *
+     * 设计原因：
+     * - 删除当前会话后，路由更新与 store 更新存在短暂竞态
+     * - 若这里继续按旧 routeSessionId hydrate，会重新 add 一个“空新会话”
+     * - 只有在 bootstrap 前的首次恢复阶段，才允许“先补占位，再拉远端历史”
+     */
+    if (hasBootstrappedSessions && routeSessionId === currentSessionId && !routeSessionExists) {
       return;
     }
 
@@ -367,7 +404,16 @@ export default function ChatPage() {
     return () => {
       cancelled = true;
     };
-  }, [addSession, currentSessionId, loadedHistorySessionIds, replaceMessages, updateSession]);
+  }, [
+    addSession,
+    currentSessionId,
+    hasBootstrappedSessions,
+    loadedHistorySessionIds,
+    replaceMessages,
+    routeSessionExists,
+    routeSessionId,
+    updateSession,
+  ]);
 
   /**
    * 当新会话创建完成或切换到可复用空白会话后，将桥接草稿注入输入框。
