@@ -11,6 +11,8 @@
     "format": "prettier --write 'src/**/*.{ts,tsx,less,css}'",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:logic": "vitest run tests/utils tests/stores tests/mocks tests/services",
+    "test:ui": "vitest run tests/components tests/pages src/components",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit",

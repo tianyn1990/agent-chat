@@ -293,6 +293,31 @@ VITE_STAR_OFFICE_URL=/star-office/
 2. `git submodule`
 3. `git subtree`
 
+当前本地落地方案已经采用：
+
+- 仓库内目录：`vendor/Star-Office-UI`
+- 接入方式：`git submodule`
+- 当前固定 commit：`f29c107e9728a72f2635f10b4e8203b29b37221d`
+
+推荐初始化命令：
+
+```bash
+git submodule add https://github.com/ringhyacinth/Star-Office-UI.git vendor/Star-Office-UI
+git -C vendor/Star-Office-UI checkout f29c107e9728a72f2635f10b4e8203b29b37221d
+```
+
+本地 `.env.local` 推荐配置：
+
+```env
+VITE_STAR_OFFICE_REAL_DEV_ENABLED=false
+VITE_STAR_OFFICE_UPSTREAM_DIR=./vendor/Star-Office-UI
+```
+
+说明：
+
+- 默认保持 mock，避免上游目录缺失时影响日常开发
+- 需要真实像素办公室联调时，将 `VITE_STAR_OFFICE_REAL_DEV_ENABLED` 切为 `true` 后重启开发服务
+
 ### 10.2 不建议直接复制源码
 
 原因：

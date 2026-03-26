@@ -10,8 +10,8 @@
 
 ## 2. 上游来源与许可证
 
-- [ ] 确认采用公司 fork、git submodule 还是 git subtree
-- [ ] 固定上游 commit 或 release 版本
+- [x] 确认采用公司 fork、git submodule 还是 git subtree
+- [x] 固定上游 commit 或 release 版本
 - [ ] 明确记录像素素材许可证边界
 - [ ] 在实现前完成商用场景的许可证核查
 
@@ -42,4 +42,4 @@
 - [x] 验证真实 sidecar 可用时，前端优先使用真实服务
 - [x] 验证“未配置真实地址且开启本地 mock”时回退到本地 mock
 - [ ] 验证“已配置真实地址但 sidecar 不可用”时显示明确不可用提示，而不是静默切回 mock
-- [ ] 验证文档、脚本和配置项可支持团队协作
+- [x] 验证文档、脚本和配置项可支持团队协作
