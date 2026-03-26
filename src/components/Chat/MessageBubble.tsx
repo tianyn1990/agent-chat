@@ -15,6 +15,7 @@ import CardRenderer from '@/components/Card/CardRenderer';
 import ChartRenderer from '@/components/Chart/ChartRenderer';
 import MarkdownText from './MarkdownText';
 import MessageActions from './MessageActions';
+import PendingReplyAccessory from './PendingReplyAccessory';
 import styles from './MessageBubble.module.less';
 
 interface MessageBubbleProps {
@@ -22,6 +23,8 @@ interface MessageBubbleProps {
   message: Message;
   /** 流式传输中的实时文本（来自 streamingBuffer） */
   streamingText?: string;
+  /** 是否在当前用户消息下方展示等待回复挂件 */
+  pendingAccessory?: boolean;
   /**
    * 卡片动作回调（按钮点击 / 选择器变更 / 表单提交）
    * 由 ChatPage 注入，通过 WS 回传服务端
@@ -53,6 +56,7 @@ interface MessageBubbleProps {
 const MessageBubble = memo(function MessageBubble({
   message,
   streamingText,
+  pendingAccessory = false,
   onCardAction,
   onCardExpire,
 }: MessageBubbleProps) {
@@ -62,7 +66,10 @@ const MessageBubble = memo(function MessageBubble({
   const isWide = message.contentType === 'chart' || message.contentType === 'card';
   const copyText = getMessageCopyText(message, streamingText);
   const showActions =
-    Boolean(copyText) && message.status !== 'streaming' && message.contentType !== 'error';
+    Boolean(copyText) &&
+    message.status !== 'streaming' &&
+    message.contentType !== 'error' &&
+    !(isUser && pendingAccessory);
 
   return (
     <div className={`${styles.row} ${isUser ? styles.rowUser : styles.rowAssistant}`}>
@@ -84,6 +91,8 @@ const MessageBubble = memo(function MessageBubble({
           onCardAction={onCardAction}
           onCardExpire={onCardExpire}
         />
+
+        {isUser && pendingAccessory ? <PendingReplyAccessory /> : null}
 
         {showActions ? <MessageActions copyText={copyText} /> : null}
 

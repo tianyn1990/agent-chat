@@ -3,17 +3,31 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 10px;
+  gap: 4px;
+  margin-top: 4px;
 }
 
 .btn {
+  width: 20px;
+  min-width: 20px !important;
+  height: 20px;
+  padding: 0 !important;
   color: @text-tertiary !important;
+  border: 1px solid transparent !important;
   border-radius: 999px !important;
-  background: @primary-soft;
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: 0.68;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    opacity 160ms ease;
 
   &:hover {
-    color: @text-primary !important;
-    background: @button-primary-bg !important;
+    color: @text-secondary !important;
+    border-color: transparent !important;
+    background: @button-text-hover-bg !important;
+    opacity: 1;
   }
 }

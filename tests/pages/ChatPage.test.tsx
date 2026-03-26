@@ -3,6 +3,17 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { App } from 'antd';
 import userEvent from '@testing-library/user-event';
+vi.mock('@/services/chatAdapter', async () => {
+  const actual = await vi.importActual<typeof import('@/services/chatAdapter')>(
+    '@/services/chatAdapter',
+  );
+
+  return {
+    ...actual,
+    getActiveChatAdapter: () => actual.mockOpenClawChatAdapter,
+  };
+});
+
 import ChatPage from '@/pages/Chat';
 import ChatRuntimeHost from '@/components/Chat/ChatRuntimeHost';
 import { useChatStore } from '@/stores/useChatStore';
@@ -16,6 +27,27 @@ function renderChatPage(initialEntry = '/chat') {
     <App>
       <MemoryRouter initialEntries={[initialEntry]}>
         <ChatRuntimeHost />
+        <Routes>
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:sessionId" element={<ChatPage />} />
+          <Route path="/visualize/:sessionId" element={<div>工作台路由</div>} />
+        </Routes>
+      </MemoryRouter>
+    </App>,
+  );
+}
+
+function SidebarExtraOutlet() {
+  const extraContent = useSidebarStore((state) => state.extraContent);
+  return <>{extraContent}</>;
+}
+
+function renderChatPageWithSidebar(initialEntry = '/chat') {
+  return render(
+    <App>
+      <MemoryRouter initialEntries={[initialEntry]}>
+        <ChatRuntimeHost />
+        <SidebarExtraOutlet />
         <Routes>
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:sessionId" element={<ChatPage />} />
@@ -158,6 +190,79 @@ describe('ChatPage', () => {
         '请介绍技能「数据分析师」，并告诉我如何在当前工作台中使用它。',
       );
     }, { timeout: 2000 });
+  });
+
+  it('会在路由命中已存在会话时自动补远端历史消息', async () => {
+    vi.useFakeTimers();
+    const { mockOpenClawChatAdapter } = await import('@/services/chatAdapter');
+    await mockOpenClawChatAdapter.connect();
+    const session = await mockOpenClawChatAdapter.createSession('历史恢复会话');
+
+    await mockOpenClawChatAdapter.sendMessage(session.id, {
+      text: '帮我恢复历史',
+      requestId: 'req_bootstrap_history',
+    });
+    await vi.runAllTimersAsync();
+    vi.useRealTimers();
+
+    useChatStore.setState({
+      sessions: [],
+      currentSessionId: null,
+      messages: {},
+      streamingBuffer: {},
+      isConnected: false,
+      isSending: false,
+      sendingSessionIds: {},
+      drafts: {},
+    });
+
+    renderChatPage(`/chat/${session.id}`);
+
+    await waitFor(() => {
+      const sessionMessages = useChatStore.getState().messages[session.id] ?? [];
+      expect(
+        sessionMessages.some(
+          (message) =>
+            message.contentType === 'text' &&
+            'text' in message.content &&
+            message.content.text.includes('帮我恢复历史'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  it('刷新已有会话且历史尚未恢复时，不会短暂闪出欢迎页', async () => {
+    const { mockOpenClawChatAdapter } = await import('@/services/chatAdapter');
+    const session = await mockOpenClawChatAdapter.createSession('刷新恢复会话');
+    const deferredHistory = new Promise<Awaited<ReturnType<typeof mockOpenClawChatAdapter.getHistory>>>(
+      () => {
+        // 保持 pending，用于验证初始化占位态是否生效。
+      },
+    );
+    const getHistorySpy = vi
+      .spyOn(mockOpenClawChatAdapter, 'getHistory')
+      .mockReturnValue(deferredHistory);
+
+    useChatStore.setState({
+      sessions: [session],
+      currentSessionId: null,
+      messages: {},
+      streamingBuffer: {},
+      isConnected: false,
+      isSending: false,
+      sendingSessionIds: {},
+      drafts: {},
+    });
+
+    renderChatPage(`/chat/${session.id}`);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('会话初始化中')).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('button', { name: '数据分析' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '载入会话中' })).toBeInTheDocument();
+
+    getHistorySpy.mockRestore();
   });
 
   it('执行态会让会话级执行状态入口进入运行样式', async () => {
@@ -361,5 +466,39 @@ describe('ChatPage', () => {
     });
 
     expect(screen.getByRole('button', { name: '发送消息' })).not.toBeDisabled();
+  });
+
+  it('删除当前会话后会切换到下一个会话，而不是被旧路由补回来', async () => {
+    const user = userEvent.setup();
+    const sessionA = await (await import('@/services/chatAdapter')).mockOpenClawChatAdapter.createSession(
+      '待删除会话',
+    );
+    const sessionB = await (await import('@/services/chatAdapter')).mockOpenClawChatAdapter.createSession(
+      '保留会话',
+    );
+
+    useChatStore.setState({
+      sessions: [sessionB, sessionA],
+      currentSessionId: sessionA.id,
+      messages: {
+        [sessionA.id]: [],
+        [sessionB.id]: [],
+      },
+    });
+
+    const { container } = renderChatPageWithSidebar(`/chat/${sessionA.id}`);
+
+    const sessionItem = container.querySelector('[class*="itemActive"]') as HTMLElement;
+    const menuButton = container.querySelector('[class*="menuBtn"]') as HTMLElement;
+    fireEvent.mouseEnter(sessionItem);
+    await user.click(menuButton);
+    await user.click(await screen.findByText('删除'));
+    await user.click(await screen.findByRole('button', { name: /删\s*除/ }));
+
+    await waitFor(() => {
+      expect(useChatStore.getState().sessions.some((session) => session.id === sessionA.id)).toBe(false);
+      expect(useChatStore.getState().currentSessionId).toBe(sessionB.id);
+      expect(screen.getByRole('heading', { name: '保留会话' })).toBeInTheDocument();
+    });
   });
 });

@@ -23,12 +23,14 @@ interface ChatState {
 
   // Session Actions
   addSession: (session: Session) => void;
+  upsertSessions: (sessions: Session[]) => void;
   updateSession: (sessionId: string, patch: Partial<Session>) => void;
   removeSession: (sessionId: string) => void;
   setCurrentSession: (sessionId: string | null) => void;
 
   // Message Actions
   addMessage: (message: Message) => void;
+  replaceMessages: (sessionId: string, messages: Message[]) => void;
   updateMessage: (sessionId: string, messageId: string, patch: Partial<Message>) => void;
   /** 追加流式文本块 */
   appendStreamChunk: (messageId: string, delta: string) => void;
@@ -62,6 +64,37 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     set((state) => ({
       sessions: [session, ...state.sessions],
     })),
+
+  /**
+   * 以服务端返回为主更新会话列表，同时保留本地尚未持久化的草稿会话。
+   *
+   * 设计原因：
+   * - direct / proxy 模式下已有会话来自真实 OpenClaw 链路
+   * - 但用户也可能先创建了一个尚未发送的本地草稿会话，这时不能被远端列表直接覆盖掉
+   */
+  upsertSessions: (sessions) =>
+    set((state) => {
+      const nextSessionMap = new Map<string, Session>();
+
+      sessions.forEach((session) => {
+        const existing = state.sessions.find((item) => item.id === session.id);
+        nextSessionMap.set(session.id, existing ? { ...existing, ...session } : session);
+      });
+
+      state.sessions.forEach((session) => {
+        if (!nextSessionMap.has(session.id)) {
+          nextSessionMap.set(session.id, session);
+        }
+      });
+
+      return {
+        sessions: [...nextSessionMap.values()].sort((left, right) => {
+          const leftTime = left.lastMessageAt ?? left.createdAt;
+          const rightTime = right.lastMessageAt ?? right.createdAt;
+          return rightTime - leftTime;
+        }),
+      };
+    }),
 
   updateSession: (sessionId, patch) =>
     set((state) => ({
@@ -102,6 +135,15 @@ export const useChatStore = create<ChatState>()((set, get) => ({
         },
       };
     }),
+
+  /** 用远端历史记录整体替换某个会话的消息列表。 */
+  replaceMessages: (sessionId, messages) =>
+    set((state) => ({
+      messages: {
+        ...state.messages,
+        [sessionId]: messages,
+      },
+    })),
 
   updateMessage: (sessionId, messageId, patch) =>
     set((state) => {
@@ -191,6 +233,24 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 export function generateSessionTitle(firstMessage?: string): string {
   if (!firstMessage) return `对话 ${new Date().toLocaleDateString('zh-CN')}`;
   return firstMessage.slice(0, 20) + (firstMessage.length > 20 ? '...' : '');
+}
+
+/**
+ * 判断一个会话标题是否仍处于“占位/临时”阶段。
+ *
+ * 设计原因：
+ * - 新建会话初始标题通常只是占位文案，真正可读的标题应来自首条消息或用户重命名
+ * - direct 模式下若仍把这类占位 label 持久化到 Gateway，会影响刷新后的标题展示
+ */
+export function isEphemeralSessionTitle(title?: string | null): boolean {
+  const normalizedTitle = title?.trim() ?? '';
+  return (
+    normalizedTitle.length === 0 ||
+    normalizedTitle === '新对话' ||
+    normalizedTitle === 'OpenClaw 会话' ||
+    normalizedTitle === 'New Chat' ||
+    normalizedTitle === 'New chat'
+  );
 }
 
 /** 创建本地临时会话对象（在服务端确认前使用） */

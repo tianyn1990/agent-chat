@@ -1,6 +1,6 @@
 # OpenClaw Web 客户端 - 文档目录
 
-> 最后更新：2026-03-26
+> 最后更新：2026-03-27
 
 ## 📚 文档导航
 
@@ -18,6 +18,8 @@
 - [阶段六-服务端适配层设计.md](./阶段六-服务端适配层设计.md) - 服务端会话适配层详细方案
 - [07-阶段七-Mock转真实接口.md](./07-阶段七-Mock转真实接口.md) - ⏳ 待开始
 - [阶段七-OpenClaw协议接入总体方案.md](./阶段七-OpenClaw协议接入总体方案.md) - OpenClaw 协议接入三阶段总方案（本地 mock / 本地直连 / 公司网关）
+- [阶段七-本地直连OpenClaw开发联调方案.md](./阶段七-本地直连OpenClaw开发联调方案.md) - 第二阶段：浏览器直连本机真实 OpenClaw Gateway 的详细方案
+- [本地OpenClaw联调操作手册.md](./本地OpenClaw联调操作手册.md) - 本地 mock / direct / proxy 三种模式的启动、切换、工作台承接与排障手册
 
 ### 阶段五专项文档
 - [05-阶段五-开发总结.md](./05-阶段五-开发总结.md) - 开发过程总结
@@ -32,6 +34,9 @@
 ### OpenSpec 变更
 - [../openspec/README.md](../openspec/README.md) - OpenSpec 变更索引
 - [../openspec/changes/add-real-star-office-sidecar/proposal.md](../openspec/changes/add-real-star-office-sidecar/proposal.md) - 真实 Star-Office-UI 侧车接入变更提案
+- [../openspec/changes/add-openclaw-direct-dev-runtime/proposal.md](../openspec/changes/add-openclaw-direct-dev-runtime/proposal.md) - 本地直连真实 OpenClaw 开发运行时变更提案
+- [../openspec/changes/add-openclaw-proxy-runtime/proposal.md](../openspec/changes/add-openclaw-proxy-runtime/proposal.md) - 本地 company-gateway / proxy 运行时变更提案
+- [../openspec/changes/stabilize-openclaw-direct-runtime-and-session-boundaries/proposal.md](../openspec/changes/stabilize-openclaw-direct-runtime-and-session-boundaries/proposal.md) - 本地直连稳定化：握手恢复、会话边界与工作台桥接
 - [../openspec/changes/update-visualize-workbench-flow/proposal.md](../openspec/changes/update-visualize-workbench-flow/proposal.md) - 摘要侧栏与沉浸式工作台流程变更提案
 - [../openspec/changes/update-visualize-immersive-entry-flow/proposal.md](../openspec/changes/update-visualize-immersive-entry-flow/proposal.md) - 一键直达沉浸式工作台与 iframe-first 交互变更提案
 
@@ -41,14 +46,14 @@
 
 **最新完成**：阶段五 - 技能市场 ✅
 
-**下一步**：阶段六 - 可视化集成、沉浸式工作台与服务端适配
+**下一步**：阶段七第三阶段 - 对接公司正式网关 / BFF
 
 **协议接入路线**：参考 [阶段七-OpenClaw协议接入总体方案.md](./阶段七-OpenClaw协议接入总体方案.md)
 
 ## 📊 项目统计
 
 - **总代码行数**：约 8,000+ 行
-- **单元测试**：269 个测试用例
+- **单元测试**：322 个测试用例
 - **测试通过率**：100%
 - **文档数量**：17 个
 
@@ -60,6 +65,12 @@ npm install
 
 # 启动开发服务器
 npm run dev
+
+# 启动本地 company-gateway 主联调模式
+npm run dev:openclaw-proxy
+
+# 启动本地直连诊断模式
+npm run dev:openclaw-direct
 
 # 运行测试
 npm run test
@@ -89,6 +100,9 @@ npm run build
 2. 查看代码实现和单元测试
 3. 参考开发总结文档了解技术细节
 4. 如需本地看到真实 Star-Office 像素办公室效果，优先阅读 [阶段六-真实Star-Office-UI侧车接入方案.md](./阶段六-真实Star-Office-UI侧车接入方案.md)
+5. 如需推进真实 OpenClaw 联调，先读 [阶段七-OpenClaw协议接入总体方案.md](./阶段七-OpenClaw协议接入总体方案.md)，再根据需要选择：
+6. 主联调路径：阅读 [本地OpenClaw联调操作手册.md](./本地OpenClaw联调操作手册.md) 中的 `openclaw-proxy`
+7. 底层诊断路径：阅读 [阶段七-本地直连OpenClaw开发联调方案.md](./阶段七-本地直连OpenClaw开发联调方案.md)
 
 ### 用户
 1. 阅读 [技能市场使用指南.md](./技能市场使用指南.md)
@@ -111,4 +125,4 @@ npm run build
 ---
 
 **维护者**：开发团队
-**最后更新**：2026-03-26
+**最后更新**：2026-03-27

@@ -75,6 +75,37 @@ class MockOpenClawSessionStore {
     });
   }
 
+  /**
+   * 更新会话标题。
+   *
+   * 设计原因：
+   * - mock 阶段也要与真实 Gateway 对齐，支持 `sessions.patch`
+   * - 这样页面侧的重命名与首条消息自动命名逻辑无需再区分 runtime
+   */
+  updateSessionTitle(sessionKey: string, title: string | null | undefined): OpenClawSessionRecord {
+    const session = this.ensureSession(sessionKey);
+    const nextTitle = title?.trim() || session.title;
+    const nextRecord = {
+      ...session,
+      title: nextTitle,
+      updatedAt: Date.now(),
+    };
+    this.sessions.set(sessionKey, nextRecord);
+    return nextRecord;
+  }
+
+  /**
+   * 删除会话及其历史。
+   *
+   * 设计原因：
+   * - mock 要覆盖完整的会话生命周期，避免删除只停留在 UI 内存层
+   */
+  deleteSession(sessionKey: string): void {
+    this.sessions.delete(sessionKey);
+    this.histories.delete(sessionKey);
+    this.guidedSessions.delete(sessionKey);
+  }
+
   hasGuided(sessionKey: string): boolean {
     return this.guidedSessions.has(sessionKey);
   }
@@ -164,6 +195,29 @@ export class MockOpenClawTransport implements OpenClawGatewayTransport {
     switch (method) {
       case 'sessions.list':
         return { sessions: this.sessionStore.listSessions() } as OpenClawMethodResultMap[TMethod];
+      case 'sessions.patch': {
+        const patched = this.sessionStore.updateSessionTitle(
+          (params as OpenClawMethodParamsMap['sessions.patch']).key,
+          (params as OpenClawMethodParamsMap['sessions.patch']).label,
+        );
+        return {
+          ok: true,
+          key: patched.sessionKey,
+          entry: {
+            key: patched.sessionKey,
+            label: patched.title,
+            createdAtMs: patched.createdAt,
+            updatedAtMs: patched.updatedAt,
+          },
+        } as OpenClawMethodResultMap[TMethod];
+      }
+      case 'sessions.delete':
+        this.sessionStore.deleteSession((params as OpenClawMethodParamsMap['sessions.delete']).key);
+        return {
+          ok: true,
+          deleted: true,
+          key: (params as OpenClawMethodParamsMap['sessions.delete']).key,
+        } as OpenClawMethodResultMap[TMethod];
       case 'chat.history':
         return {
           sessionKey: (params as OpenClawMethodParamsMap['chat.history']).sessionKey,
@@ -306,20 +360,29 @@ export class MockOpenClawTransport implements OpenClawGatewayTransport {
   ): Promise<OpenClawMethodResultMap['chat.send']> {
     const session = this.sessionStore.ensureSession(params.sessionKey);
     const { runId, messageId } = this.createPendingRun(params.sessionKey, params.idempotencyKey);
+    /**
+     * mock 协议同时兼容早期 `text` 与真实风格 `message` 字段。
+     *
+     * 设计原因：
+     * - 当前仓库已经进入 OpenClaw-compatible 过渡阶段
+     * - direct adapter 会发送 `message`，而 mock 历史逻辑仍使用 `text`
+     * - 这里统一收敛，避免 mock 与 direct 在聊天语义上再次分叉
+     */
+    const messageText = (params.text ?? params.message ?? '').trim();
 
-    if (params.text.trim()) {
+    if (messageText) {
       this.sessionStore.appendHistory(params.sessionKey, {
         id: prefixedId('history'),
         role: 'user',
         kind: 'text',
-        text: params.text,
+        text: messageText,
         timestamp: Date.now(),
       });
     }
 
     this.emitAgentState(session.sessionKey, 'researching', '正在分析用户请求', messageId);
 
-    const fullText = params.text.trim();
+    const fullText = messageText;
 
     if (fullText.includes('test card')) {
       this.scheduleRunStep(runId, 80, () => {
@@ -399,7 +462,7 @@ export class MockOpenClawTransport implements OpenClawGatewayTransport {
       runId,
       params,
       messageId,
-      this.generateReply(params.sessionKey, params.text, params.files?.length ?? 0),
+      this.generateReply(params.sessionKey, messageText, params.files?.length ?? 0),
     );
     return { accepted: true, runId };
   }

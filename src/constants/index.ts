@@ -1,5 +1,40 @@
+import { createChatRuntimeConfig } from '@/config/chatRuntime';
+
 /** 应用名称 */
 export const APP_NAME = import.meta.env.VITE_APP_NAME || 'OpenClaw 助手';
+
+/** 统一 chat runtime 配置。 */
+export const CHAT_RUNTIME_CONFIG = createChatRuntimeConfig(import.meta.env);
+
+/** 当前 chat runtime 模式。 */
+export const CHAT_RUNTIME = CHAT_RUNTIME_CONFIG.mode;
+
+/** 当前运行时是否要求走仓库原有登录态。 */
+export const CHAT_RUNTIME_REQUIRES_LOGIN = CHAT_RUNTIME_CONFIG.requiresUserLogin;
+
+/** 本地直连 OpenClaw Gateway 地址。 */
+export const OPENCLAW_GATEWAY_URL = CHAT_RUNTIME_CONFIG.directGatewayUrl;
+
+/** 本地直连 OpenClaw Gateway token。 */
+export const OPENCLAW_GATEWAY_TOKEN = CHAT_RUNTIME_CONFIG.directGatewayToken;
+
+/** 本地直连 OpenClaw Gateway password。 */
+export const OPENCLAW_GATEWAY_PASSWORD = CHAT_RUNTIME_CONFIG.directGatewayPassword;
+
+/** 本地直连 OpenClaw Gateway device token。 */
+export const OPENCLAW_GATEWAY_DEVICE_TOKEN = CHAT_RUNTIME_CONFIG.directGatewayDeviceToken;
+
+/** 本地直连 OpenClaw Gateway role。 */
+export const OPENCLAW_GATEWAY_ROLE = CHAT_RUNTIME_CONFIG.directGatewayRole;
+
+/** 本地直连 OpenClaw Gateway scopes。 */
+export const OPENCLAW_GATEWAY_SCOPES = CHAT_RUNTIME_CONFIG.directGatewayScopes;
+
+/** 本地直连 OpenClaw 客户端实例标识。 */
+export const OPENCLAW_CLIENT_INSTANCE_ID = CHAT_RUNTIME_CONFIG.directClientInstanceId;
+
+/** OpenClaw company gateway / proxy 基础地址。 */
+export const OPENCLAW_PROXY_URL = CHAT_RUNTIME_CONFIG.proxyUrl;
 
 /** 飞书 OAuth 相关 */
 export const FEISHU_APP_ID = import.meta.env.VITE_FEISHU_APP_ID || '';
@@ -43,13 +78,15 @@ export const STAR_OFFICE_MOCK_BASE = rawStarOfficeMockBase.startsWith('/')
   : `/${rawStarOfficeMockBase}`;
 
 /** 是否开启 Mock */
-export const IS_MOCK_ENABLED = import.meta.env.VITE_MOCK_ENABLED === 'true';
+export const IS_MOCK_ENABLED = CHAT_RUNTIME === 'mock-openclaw';
 
 /** 本地存储 key */
 export const STORAGE_KEYS = {
   TOKEN: 'oc_token',
   USER_INFO: 'oc_user_info',
   THEME: 'oc_theme_mode',
+  OPENCLAW_DIRECT_DEVICE_IDENTITY: 'oc_openclaw_direct_device_identity',
+  OPENCLAW_DIRECT_DEVICE_TOKENS: 'oc_openclaw_direct_device_tokens',
 } as const;
 
 /** WebSocket 配置 */

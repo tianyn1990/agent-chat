@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import AuthGuard from '@/components/Auth/AuthGuard';
+import { CHAT_RUNTIME_REQUIRES_LOGIN } from '@/constants';
 import { useUserStore } from '@/stores/useUserStore';
 
 /** 生成有效的 Mock JWT */
@@ -40,7 +41,13 @@ describe('AuthGuard', () => {
   it('未登录时重定向到登录页', () => {
     useUserStore.setState({ token: null });
     render(<TestApp />);
-    expect(screen.getByText('登录页')).toBeInTheDocument();
+
+    if (CHAT_RUNTIME_REQUIRES_LOGIN) {
+      expect(screen.getByText('登录页')).toBeInTheDocument();
+      return;
+    }
+
+    expect(screen.getByText('受保护页面')).toBeInTheDocument();
   });
 
   it('已登录时渲染子组件', () => {

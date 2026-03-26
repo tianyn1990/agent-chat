@@ -5,6 +5,7 @@ import {
   useChatStore,
   findReusableDraftSession,
   generateSessionTitle,
+  isEphemeralSessionTitle,
 } from '@/stores/useChatStore';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
@@ -56,10 +57,13 @@ export default function ChatPage() {
     sendingSessionIds,
     setCurrentSession,
     addMessage,
+    addSession,
+    upsertSessions,
     updateSession,
     setSessionSending,
     drafts,
     setDraft,
+    replaceMessages,
   } = useChatStore();
 
   const setExtraContent = useSidebarStore((s) => s.setExtraContent);
@@ -101,6 +105,17 @@ export default function ChatPage() {
     text: string;
     files: SelectedFile[];
   } | null>(null);
+  /** 已完成历史加载的会话集合，避免重复读取同一会话。 */
+  const [loadedHistorySessionIds, setLoadedHistorySessionIds] = useState<string[]>([]);
+  /**
+   * 首次远端会话 bootstrap 是否已完成。
+   *
+   * 设计原因：
+   * - 刷新已有会话页面时，远端列表与历史恢复存在一个很短的异步窗口
+   * - 若此时直接把“当前没有消息”解释成欢迎页，会产生明显的首页闪屏
+   * - 通过一个显式的 bootstrap 完成标记，可以只在真正完成初始化后再决定是否展示欢迎态
+   */
+  const [hasBootstrappedSessions, setHasBootstrappedSessions] = useState(false);
 
   // ===========================
   // 新建对话
@@ -141,17 +156,93 @@ export default function ChatPage() {
     setComposerFocusVersion((value) => value + 1);
   }, []);
 
+  /**
+   * 统一持久化会话标题。
+   *
+   * 设计原因：
+   * - 直连 OpenClaw 时，会话标题不能只停留在前端内存，否则刷新后会回退
+   * - 将“先本地乐观更新，再异步 patch 远端”的流程集中到这里，便于复用在重命名与首条消息自动命名场景
+   */
+  const persistSessionTitle = useCallback(
+    async (sessionId: string, nextTitle: string, options?: { silent?: boolean }) => {
+      const previousTitle = useChatStore
+        .getState()
+        .sessions.find((session) => session.id === sessionId)?.title;
+      useChatStore.getState().updateSession(sessionId, { title: nextTitle });
+
+      try {
+        await chatAdapter.renameSession(sessionId, nextTitle);
+      } catch (error) {
+        if (previousTitle) {
+          useChatStore.getState().updateSession(sessionId, { title: previousTitle });
+        }
+
+        console.error('[ChatPage] 持久化会话标题失败', error);
+        if (!options?.silent) {
+          antMessage.error('保存会话标题失败，请稍后重试');
+        }
+      }
+    },
+    [antMessage],
+  );
+
+  /**
+   * 删除会话并收敛路由/工作台状态。
+   *
+   * 设计原因：
+   * - 仅删除 store 会导致当前路由仍停留在旧 sessionId，随后又被 hydrate 逻辑补回来
+   * - 删除成功后必须同时推进路由、当前会话与执行状态缓存，才能真正完成收口
+   */
+  const handleDeleteSession = useCallback(
+    async (sessionId: string) => {
+      try {
+        const deletingCurrentSession = useChatStore.getState().currentSessionId === sessionId;
+
+        await chatAdapter.deleteSession(sessionId);
+        useChatStore.getState().removeSession(sessionId);
+        useVisualizeStore.getState().clearSessionRuntime(sessionId);
+        setLoadedHistorySessionIds((sessionIds) => sessionIds.filter((item) => item !== sessionId));
+
+        const nextCurrentSessionId = useChatStore.getState().currentSessionId;
+        if (deletingCurrentSession) {
+          if (nextCurrentSessionId) {
+            navigate(`${ROUTES.CHAT}/${nextCurrentSessionId}`, { replace: true });
+          } else {
+            navigate(ROUTES.CHAT, { replace: true });
+          }
+        }
+
+        antMessage.success('对话已删除');
+      } catch (error) {
+        console.error('[ChatPage] 删除会话失败', error);
+        antMessage.error('删除对话失败，请稍后重试');
+        throw error;
+      }
+    },
+    [antMessage, navigate],
+  );
+
+  /**
+   * 处理用户主动重命名。
+   *
+   * 说明：
+   * - 页面层直接复用统一的持久化函数，确保 mock/direct 行为一致
+   */
+  const handleRenameSession = useCallback(
+    async (sessionId: string, newTitle: string) => {
+      await persistSessionTitle(sessionId, newTitle);
+    },
+    [persistSessionTitle],
+  );
+
   // ===========================
   // 路由参数与当前会话同步
   // ===========================
 
   useEffect(() => {
     if (routeSessionId) {
-      // URL 带有 sessionId：切换到对应会话
-      const target = sessions.find((s) => s.id === routeSessionId);
-      if (target) {
-        setCurrentSession(routeSessionId);
-      }
+      // URL 带有 sessionId 时直接切换，真实会话详情由后续 bootstrap 补齐。
+      setCurrentSession(routeSessionId);
     } else if (sessions.length > 0 && !currentSessionId && !pendingSessionSubmission) {
       // URL 无 sessionId 但有历史会话：自动切换到最近一个
       setCurrentSession(sessions[0].id);
@@ -165,6 +256,118 @@ export default function ChatPage() {
     setCurrentSession,
     navigate,
   ]);
+
+  /**
+   * 首次同步远端会话列表。
+   *
+   * 设计原因：
+   * - direct / proxy 模式下真实会话都不能只依赖前端内存
+   * - mock 模式继续复用同一路径，有助于后续协议切换时保持页面行为稳定
+   */
+  useEffect(() => {
+    let cancelled = false;
+
+    const bootstrapSessions = async () => {
+      try {
+        await chatAdapter.connect();
+        const remoteSessions = await chatAdapter.listSessions();
+        if (cancelled) {
+          return;
+        }
+
+        upsertSessions(remoteSessions);
+      } catch (error) {
+        if (!cancelled) {
+          console.error('[ChatPage] 初始化远端会话列表失败', error);
+        }
+      } finally {
+        if (!cancelled) {
+          setHasBootstrappedSessions(true);
+        }
+      }
+    };
+
+    void bootstrapSessions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [upsertSessions]);
+
+  /**
+   * 当前会话首次激活时按需加载历史记录。
+   *
+   * 设计原因：
+   * - 页面刷新后 store 为空，但路由可能已经指向一个真实 session
+   * - 这里统一补历史，避免 direct / mock 各写一套初始化逻辑
+   */
+  useEffect(() => {
+    if (!currentSessionId || loadedHistorySessionIds.includes(currentSessionId)) {
+      return;
+    }
+
+    const existingMessages = useChatStore.getState().messages[currentSessionId];
+    if (existingMessages && existingMessages.length > 0) {
+      setLoadedHistorySessionIds((sessionIds) =>
+        sessionIds.includes(currentSessionId) ? sessionIds : [...sessionIds, currentSessionId],
+      );
+      return;
+    }
+
+    let cancelled = false;
+
+    const hydrateHistory = async () => {
+      try {
+        const existingSession = useChatStore
+          .getState()
+          .sessions.find((session) => session.id === currentSessionId);
+
+        if (!existingSession) {
+          addSession({
+            id: currentSessionId,
+            title: 'OpenClaw 会话',
+            createdAt: Date.now(),
+            messageCount: 0,
+          });
+        }
+
+        const result = await chatAdapter.getHistory(currentSessionId);
+        if (cancelled) {
+          return;
+        }
+
+        /**
+         * 防止欢迎页首次发送与历史拉取并发时，空历史把本地乐观消息覆盖掉。
+         *
+         * 设计原因：
+         * - 创建新会话后会立即触发一次历史探测
+         * - 同时欢迎页桥接发送也会快速写入用户消息
+         * - 若此时无保护地用空历史覆盖，会导致首条用户消息“消失”
+         */
+        const latestMessages = useChatStore.getState().messages[currentSessionId] ?? [];
+        if (latestMessages.length === 0) {
+          replaceMessages(currentSessionId, result.messages);
+        }
+
+        if (result.sessionPatch) {
+          updateSession(currentSessionId, result.sessionPatch);
+        }
+        setLoadedHistorySessionIds((sessionIds) =>
+          sessionIds.includes(currentSessionId) ? sessionIds : [...sessionIds, currentSessionId],
+        );
+      } catch (error) {
+        if (!cancelled) {
+          console.error('[ChatPage] 加载会话历史失败', error);
+        }
+      }
+    };
+
+    void hydrateHistory();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [addSession, currentSessionId, loadedHistorySessionIds, replaceMessages, updateSession]);
 
   /**
    * 当新会话创建完成或切换到可复用空白会话后，将桥接草稿注入输入框。
@@ -229,11 +432,15 @@ export default function ChatPage() {
   // ===========================
 
   useEffect(() => {
-    setExtraContent(<SessionList onNewChat={handleNewChat} />);
+    setExtraContent(
+      <SessionList
+        onNewChat={handleNewChat}
+        onDeleteSession={(sessionId) => handleDeleteSession(sessionId)}
+        onRenameSession={handleRenameSession}
+      />,
+    );
     return () => setExtraContent(null);
-    // 每次 handleNewChat 引用变化时重新注入
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setExtraContent]);
+  }, [handleDeleteSession, handleNewChat, handleRenameSession, setExtraContent]);
 
   // ===========================
   // 发送消息
@@ -331,9 +538,14 @@ export default function ChatPage() {
         });
 
       if (existingMessages.length === 0) {
-        updateSession(targetSessionId, {
-          title: generateSessionTitle(lastMessageSummary),
-        });
+        const currentSessionTitle = useChatStore
+          .getState()
+          .sessions.find((session) => session.id === targetSessionId)?.title;
+        const nextSessionTitle = generateSessionTitle(lastMessageSummary);
+
+        if (isEphemeralSessionTitle(currentSessionTitle)) {
+          void persistSessionTitle(targetSessionId, nextSessionTitle, { silent: true });
+        }
       }
     },
     [
@@ -344,6 +556,7 @@ export default function ChatPage() {
       setSessionSending,
       updateSession,
       antMessage,
+      persistSessionTitle,
     ],
   );
 
@@ -468,19 +681,50 @@ export default function ChatPage() {
   const currentSession = currentSessionId
     ? (sessions.find((session) => session.id === currentSessionId) ?? null)
     : null;
+  /**
+   * 当前会话是否仍在等待首次历史恢复。
+   *
+   * 设计原因：
+   * - 刷新已存在会话时，路由会先恢复 sessionId，再异步请求 `chat.history`
+   * - 在结果返回前，这个会话“临时没有消息”不代表它应该展示欢迎页
+   */
+  const isCurrentSessionHydrating = Boolean(
+    currentSessionId &&
+    !loadedHistorySessionIds.includes(currentSessionId) &&
+    currentMessages.length === 0,
+  );
+  /**
+   * 是否展示初始化占位态。
+   *
+   * 设计原因：
+   * - 只有在确认会话 bootstrap 与当前会话历史恢复都结束后，欢迎页才有资格出现
+   * - 这样可避免刷新已有会话时短暂闪过首页欢迎内容
+   */
+  const showInitializationPlaceholder =
+    (!hasBootstrappedSessions && Boolean(routeSessionId)) || isCurrentSessionHydrating;
 
   // 检查是否有消息正在流式传输
   const isStreaming =
     currentSessionSending && currentMessages.some((m) => m.status === 'streaming');
+  /**
+   * 已发送但尚未收到首个 delta 时，展示 pending 承接态。
+   *
+   * 设计原因：
+   * - 真实 OpenClaw 在排队、鉴权或模型 warm-up 阶段可能存在明显空窗
+   * - 用户此时最容易误判为“没发出去”，因此需要一个独立于 streaming 的等待态
+   */
+  const isAwaitingResponse = currentSessionSending && !isStreaming;
 
-  const showWelcome = currentMessages.length === 0;
+  const showWelcome = !showInitializationPlaceholder && currentMessages.length === 0;
   /**
    * 将会话摘要压缩为简洁的工作台副标题。
    * `Graphite Console` 阶段有意弱化头部说明，因此这里只保留真正影响下一步操作的信息。
    */
   const stageSummary = showWelcome
     ? '从左侧档案架恢复历史协作，或直接在下方开始新的任务。'
-    : currentRuntime?.detail || '围绕当前会话继续推进分析、写作、代码与执行动作。';
+    : showInitializationPlaceholder
+      ? '正在恢复会话档案与历史消息，界面将保持在当前工作上下文。'
+      : currentRuntime?.detail || '围绕当前会话继续推进分析、写作、代码与执行动作。';
   return (
     <div className={styles.container}>
       <div className={styles.chatColumn}>
@@ -489,7 +733,11 @@ export default function ChatPage() {
           <div className={styles.stageIdentity}>
             <div className={styles.titleRow}>
               <span className={styles.eyebrow}>Agent Console</span>
-              <h1 className={styles.stageTitle}>{currentSession?.title ?? '新建会话'}</h1>
+              <h1 className={styles.stageTitle}>
+                {showInitializationPlaceholder
+                  ? '载入会话中'
+                  : (currentSession?.title ?? '新建会话')}
+              </h1>
             </div>
             <p className={styles.stageSubtitle}>{stageSummary}</p>
           </div>
@@ -516,13 +764,17 @@ export default function ChatPage() {
         <div className={styles.workspace}>
           {/* 主舞台保持最大可视面积：欢迎态居中，对话态优先正文轨道。 */}
           <div className={styles.messageArea}>
-            {showWelcome ? (
+            {showInitializationPlaceholder ? (
+              <div className={styles.initializingState} aria-label="会话初始化中" />
+            ) : showWelcome ? (
               <WelcomeScreen onSuggestionClick={handleSuggestion} />
             ) : (
               <MessageList
+                sessionId={currentSessionId}
                 messages={currentMessages}
                 streamingBuffer={streamingBuffer}
                 isStreaming={isStreaming}
+                isAwaitingResponse={isAwaitingResponse}
                 onCardAction={handleCardAction}
                 onCardExpire={handleCardExpire}
               />

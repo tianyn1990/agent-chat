@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { CHAT_RUNTIME_REQUIRES_LOGIN } from '@/constants';
 import LoginPage from '@/pages/Login';
 import { useUserStore } from '@/stores/useUserStore';
 
@@ -51,7 +52,11 @@ describe('LoginPage', () => {
 
     expect(screen.getByText('Paper Ops Workspace')).toBeInTheDocument();
     expect(screen.getByText(/把对话、技能与执行状态放进同一张工作台/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /登录/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: CHAT_RUNTIME_REQUIRES_LOGIN ? /登录/ : /进入开发工作台/,
+      }),
+    ).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 

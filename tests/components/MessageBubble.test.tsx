@@ -63,7 +63,17 @@ describe('MessageBubble', () => {
 
     it('用户文本消息也展示复制动作', () => {
       render(<MessageBubble message={makeMessage({ content: { text: '可复制的用户输入' } })} />);
-      expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '复制消息' })).toBeInTheDocument();
+    });
+
+    it('等待回复时会在用户消息下方展示轻量状态挂件', () => {
+      render(
+        <MessageBubble
+          message={makeMessage({ content: { text: '请继续处理这个任务' } })}
+          pendingAccessory
+        />,
+      );
+      expect(screen.getByRole('status', { name: 'OpenClaw 正在准备回复' })).toBeInTheDocument();
     });
 
     it('用户消息无 Markdown 特征时使用 <pre> 纯文本渲染', () => {

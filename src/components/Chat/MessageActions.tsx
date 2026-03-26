@@ -74,10 +74,8 @@ export default function MessageActions({ copyText }: MessageActionsProps) {
           icon={<CopyOutlined />}
           className={styles.btn}
           onClick={handleCopy}
-          aria-label="复制"
-        >
-          复制
-        </Button>
+          aria-label="复制消息"
+        />
       ) : null}
     </div>
   );

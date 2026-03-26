@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { App } from 'antd';
 import {
-  IS_MOCK_ENABLED,
+  CHAT_RUNTIME,
+  CHAT_RUNTIME_REQUIRES_LOGIN,
   STAR_OFFICE_MOCK_ENABLED,
   STAR_OFFICE_REAL_DEV_ENABLED,
   STAR_OFFICE_URL,
@@ -12,8 +13,13 @@ import { useChatStore } from '@/stores/useChatStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { useVisualizeStore } from '@/stores/useVisualizeStore';
 import type { Message } from '@/types/message';
+import {
+  shouldBridgeLocalStarOfficeRuntime,
+  shouldRecoverSessionFromHistory,
+} from '@/components/Chat/chatRuntimeHost.utils';
 
 const chatAdapter = getActiveChatAdapter();
+const DIRECT_HISTORY_RECOVERY_INTERVAL = 2200;
 
 /**
  * 全局常驻的 chat runtime 宿主。
@@ -30,8 +36,8 @@ export default function ChatRuntimeHost() {
   const token = useUserStore((state) => state.token);
 
   useEffect(() => {
-    // 真实链路下至少要有 token 才建立连接；mock 模式则允许直接接入本地 transport。
-    if (!IS_MOCK_ENABLED && !token) {
+    // legacy websocket 仍依赖仓库原有登录态；mock / direct 均允许在无登录态下接入。
+    if (CHAT_RUNTIME_REQUIRES_LOGIN && !token) {
       return;
     }
 
@@ -134,7 +140,11 @@ export default function ChatRuntimeHost() {
       }
     });
 
-    void chatAdapter.connect();
+    void Promise.resolve(chatAdapter.connect()).catch((error: unknown) => {
+      console.error('[ChatRuntimeHost] 初始化 chat runtime 失败', error);
+      useChatStore.getState().setConnected(false);
+      antMessage.error(error instanceof Error ? error.message : '聊天运行时初始化失败');
+    });
 
     return () => {
       unsubStatus();
@@ -143,10 +153,106 @@ export default function ChatRuntimeHost() {
   }, [antMessage, token]);
 
   useEffect(() => {
-    const shouldUseLocalAdapter =
-      IS_MOCK_ENABLED &&
-      !STAR_OFFICE_URL &&
-      (STAR_OFFICE_MOCK_ENABLED || STAR_OFFICE_REAL_DEV_ENABLED);
+    if (CHAT_RUNTIME !== 'openclaw-direct' && CHAT_RUNTIME !== 'openclaw-proxy') {
+      return;
+    }
+
+    const inflightSessionIds = new Set<string>();
+    let recoveryTimer: number | null = null;
+
+    const clearRecoveryTimer = () => {
+      if (recoveryTimer !== null) {
+        window.clearTimeout(recoveryTimer);
+        recoveryTimer = null;
+      }
+    };
+
+    const hasSendingSessions = () =>
+      Object.keys(useChatStore.getState().sendingSessionIds).length > 0;
+
+    const recoverSendingSessions = async () => {
+      const { sendingSessionIds, messages, replaceMessages, setSessionSending, updateSession } =
+        useChatStore.getState();
+      const sendingIds = Object.keys(sendingSessionIds);
+      if (sendingIds.length === 0) {
+        return;
+      }
+
+      await Promise.allSettled(
+        sendingIds.map(async (sessionId) => {
+          if (inflightSessionIds.has(sessionId)) {
+            return;
+          }
+
+          inflightSessionIds.add(sessionId);
+
+          try {
+            const result = await chatAdapter.getHistory(sessionId);
+            const existingMessages = messages[sessionId] ?? [];
+            if (
+              !shouldRecoverSessionFromHistory({
+                existingMessages,
+                historyMessages: result.messages,
+              })
+            ) {
+              return;
+            }
+
+            replaceMessages(sessionId, result.messages);
+            if (result.sessionPatch) {
+              updateSession(sessionId, result.sessionPatch);
+            }
+            setSessionSending(sessionId, false);
+            useVisualizeStore.getState().setSessionRuntime(sessionId, {
+              state: 'idle',
+              detail: '已同步到最新回复',
+              updatedAt: Date.now(),
+              source: 'gateway',
+            });
+          } catch (error) {
+            console.warn('[ChatRuntimeHost] sending 会话历史补偿失败', sessionId, error);
+          } finally {
+            inflightSessionIds.delete(sessionId);
+          }
+        }),
+      );
+    };
+
+    const scheduleRecoveryIfNeeded = () => {
+      if (recoveryTimer !== null || !hasSendingSessions()) {
+        return;
+      }
+
+      recoveryTimer = window.setTimeout(async () => {
+        recoveryTimer = null;
+        await recoverSendingSessions();
+        scheduleRecoveryIfNeeded();
+      }, DIRECT_HISTORY_RECOVERY_INTERVAL);
+    };
+
+    const unsubscribe = useChatStore.subscribe((state) => {
+      if (Object.keys(state.sendingSessionIds).length === 0) {
+        clearRecoveryTimer();
+        return;
+      }
+
+      scheduleRecoveryIfNeeded();
+    });
+
+    scheduleRecoveryIfNeeded();
+
+    return () => {
+      clearRecoveryTimer();
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const shouldUseLocalAdapter = shouldBridgeLocalStarOfficeRuntime({
+      hasStarOfficeUrl: Boolean(STAR_OFFICE_URL),
+      starOfficeMockEnabled: STAR_OFFICE_MOCK_ENABLED,
+      starOfficeRealDevEnabled: STAR_OFFICE_REAL_DEV_ENABLED,
+    });
 
     if (!shouldUseLocalAdapter) {
       return;

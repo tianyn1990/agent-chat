@@ -38,6 +38,14 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 - 主应用框架优先采用“线性分隔工作台”策略：避免重新引入左右双大壳体；框架级区域尽量用分隔线、留白和弱表面层表达，内容级主舞台再保留必要容器。
 - 执行状态相关体验继续遵循“主界面克制专业、沉浸式工作台 iframe-first”的边界，不要重新引入大面积说明层挤占真实工作台画面。
 
+## 本地 OpenClaw 联调规则（长期生效）
+
+- 当任务涉及本地 OpenClaw 启动、`mock-openclaw / openclaw-direct` 切换、`19001`、Gateway health、直连联调、模型配置排查时，必须先阅读 [docs/本地OpenClaw联调操作手册.md](/Users/hetao/Documents/github/agent-chat/docs/本地OpenClaw联调操作手册.md)。
+- 当任务目标是在本仓库内启动本地直连联调时，优先使用 `npm run dev:openclaw-direct`，不要先手工改写 `.env.local` 或单独常驻一个 Gateway 前台终端，除非任务明确要求这样做。
+- 进行本地直连排查时，优先执行 `openclaw --dev gateway health` 与端口监听检查，再判断是否是前端问题。
+- 当本地直连受阻时，优先帮助用户切回 `mock-openclaw` 以保持开发连续性，不要让 UI 开发被真实 Gateway 阻塞。
+- 若错误本质属于 OpenClaw 模型或 auth 配置，应明确说明是 OpenClaw 侧问题，不要错误归因到前端仓库。
+
 ## 提交协作规则（长期生效）
 
 - 当 Agent 认为当前任务阶段适合提交时，必须先询问用户是否同意提交。

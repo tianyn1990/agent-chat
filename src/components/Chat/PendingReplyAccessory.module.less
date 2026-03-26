@@ -1,0 +1,80 @@
+@import '@/styles/variables.less';
+
+.container {
+  display: flex;
+  justify-content: flex-end;
+  align-self: flex-end;
+  margin-top: -2px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  margin-right: 1px;
+  padding: 3px 7px;
+  border: 1px solid @frame-divider-strong;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, @frame-surface-elevated, @frame-surface-subtle), @frame-surface-subtle;
+  box-shadow: none;
+}
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  animation: orbitSpin 1.15s linear infinite;
+}
+
+.spinnerSvg {
+  width: 13px;
+  height: 13px;
+  display: block;
+}
+
+.spinnerTrack,
+.spinnerPrimary,
+.spinnerAccent,
+.spinnerMuted {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 1.6;
+}
+
+.spinnerTrack {
+  stroke: @frame-divider-strong;
+  opacity: 0.48;
+}
+
+.spinnerPrimary {
+  stroke: @primary-color;
+}
+
+.spinnerAccent {
+  stroke: @success-color;
+}
+
+.spinnerMuted {
+  stroke: @accent-color;
+  opacity: 0.86;
+}
+
+@keyframes orbitSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}

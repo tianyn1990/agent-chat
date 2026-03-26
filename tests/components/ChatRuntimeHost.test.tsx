@@ -1,7 +1,22 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { App } from 'antd';
+vi.mock('@/services/chatAdapter', async () => {
+  const actual = await vi.importActual<typeof import('@/services/chatAdapter')>(
+    '@/services/chatAdapter',
+  );
+
+  return {
+    ...actual,
+    getActiveChatAdapter: () => actual.mockOpenClawChatAdapter,
+  };
+});
+
 import ChatRuntimeHost from '@/components/Chat/ChatRuntimeHost';
+import {
+  shouldRecoverSessionFromHistory,
+  shouldBridgeLocalStarOfficeRuntime,
+} from '@/components/Chat/chatRuntimeHost.utils';
 import { mockOpenClawChatAdapter, resetMockChatAdapterRuntime } from '@/services/chatAdapter';
 import { useChatStore } from '@/stores/useChatStore';
 import { useUserStore } from '@/stores/useUserStore';
@@ -93,5 +108,72 @@ describe('ChatRuntimeHost', () => {
     expect(sessionMessages.some((message) => message.role === 'assistant')).toBe(true);
     expect(useChatStore.getState().sendingSessionIds[session.id]).toBeUndefined();
     expect(useVisualizeStore.getState().runtimeBySession[session.id]?.state).toBe('idle');
+  });
+
+  it('direct 模式下只要存在本地 Star-Office 承载能力，也应继续启用 runtime bridge', () => {
+    expect(
+      shouldBridgeLocalStarOfficeRuntime({
+        hasStarOfficeUrl: false,
+        starOfficeMockEnabled: true,
+        starOfficeRealDevEnabled: false,
+      }),
+    ).toBe(true);
+
+    expect(
+      shouldBridgeLocalStarOfficeRuntime({
+        hasStarOfficeUrl: false,
+        starOfficeMockEnabled: false,
+        starOfficeRealDevEnabled: true,
+      }),
+    ).toBe(true);
+
+    expect(
+      shouldBridgeLocalStarOfficeRuntime({
+        hasStarOfficeUrl: true,
+        starOfficeMockEnabled: true,
+        starOfficeRealDevEnabled: true,
+      }),
+    ).toBe(false);
+  });
+
+  it('会仅在历史记录出现更晚的 assistant 回复时收敛 sending 会话', () => {
+    const existingMessages = [
+      {
+        id: 'msg_user',
+        sessionId: 'session_1',
+        role: 'user' as const,
+        contentType: 'text' as const,
+        content: { text: '你好' },
+        status: 'done' as const,
+        timestamp: 100,
+      },
+    ];
+
+    const historyMessages = [
+      ...existingMessages,
+      {
+        id: 'msg_assistant',
+        sessionId: 'session_1',
+        role: 'assistant' as const,
+        contentType: 'text' as const,
+        content: { text: '您好，我在。' },
+        status: 'done' as const,
+        timestamp: 200,
+      },
+    ];
+
+    expect(
+      shouldRecoverSessionFromHistory({
+        existingMessages,
+        historyMessages,
+      }),
+    ).toBe(true);
+
+    expect(
+      shouldRecoverSessionFromHistory({
+        existingMessages,
+        historyMessages: existingMessages,
+      }),
+    ).toBe(false);
   });
 });

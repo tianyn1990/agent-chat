@@ -6,6 +6,7 @@ import { useUserStore } from '@/stores/useUserStore';
 import { isTokenValid } from '@/utils/token';
 import {
   APP_NAME,
+  CHAT_RUNTIME_REQUIRES_LOGIN,
   FEISHU_APP_ID,
   FEISHU_REDIRECT_URI,
   FEISHU_OAUTH_URL,
@@ -31,6 +32,11 @@ export default function LoginPage() {
 
   // 已登录则直接跳转
   useEffect(() => {
+    if (!CHAT_RUNTIME_REQUIRES_LOGIN) {
+      navigate(fromPath, { replace: true });
+      return;
+    }
+
     if (token && isTokenValid(token)) {
       navigate(fromPath, { replace: true });
     }
@@ -41,7 +47,7 @@ export default function LoginPage() {
    * state 参数用于防 CSRF，同时携带 fromPath 以便回调后跳回
    */
   const handleFeishuLogin = () => {
-    if (IS_MOCK_ENABLED) {
+    if (!CHAT_RUNTIME_REQUIRES_LOGIN || IS_MOCK_ENABLED) {
       // Mock 模式：直接使用模拟数据登录
       const { token: mockToken, userInfo } = mockLogin();
       login(mockToken, userInfo);
@@ -92,7 +98,9 @@ export default function LoginPage() {
 
           {/* 登录区域 */}
           <div className={styles.loginArea}>
-            <p className={styles.hint}>请使用飞书账号登录</p>
+            <p className={styles.hint}>
+              {CHAT_RUNTIME_REQUIRES_LOGIN ? '请使用飞书账号登录' : '当前运行时无需飞书登录'}
+            </p>
             <Button
               type="primary"
               size="large"
@@ -101,7 +109,7 @@ export default function LoginPage() {
               onClick={handleFeishuLogin}
               className={styles.loginBtn}
             >
-              {IS_MOCK_ENABLED ? '开发模式登录' : '使用飞书登录'}
+              {!CHAT_RUNTIME_REQUIRES_LOGIN || IS_MOCK_ENABLED ? '进入开发工作台' : '使用飞书登录'}
             </Button>
           </div>
 

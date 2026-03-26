@@ -28,7 +28,7 @@ describe('MessageActions', () => {
       </App>,
     );
 
-    await user.click(screen.getByRole('button', { name: '复制' }));
+    await user.click(screen.getByRole('button', { name: '复制消息' }));
 
     expect(writeText).toHaveBeenCalledWith('可复制内容');
     expect(await screen.findByText('已复制消息内容')).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('MessageActions', () => {
       </App>,
     );
 
-    await user.click(screen.getByRole('button', { name: '复制' }));
+    await user.click(screen.getByRole('button', { name: '复制消息' }));
 
     expect(writeText).toHaveBeenCalledWith('可复制内容');
     expect(execCommand).toHaveBeenCalledWith('copy');
@@ -76,6 +76,6 @@ describe('MessageActions', () => {
     );
 
     expect(screen.queryByRole('button', { name: '查看执行状态' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '复制消息' })).toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SessionList from '@/components/Chat/SessionList';
 import { useChatStore, createTempSession } from '@/stores/useChatStore';
@@ -108,5 +108,30 @@ describe('SessionList', () => {
     useChatStore.getState().updateSession(session.id, { title: '新标题' });
 
     expect(useChatStore.getState().sessions[0].title).toBe('新标题');
+  });
+
+  it('删除会优先走外部处理器', async () => {
+    const session = createTempSession('待删除会话');
+    const onDeleteSession = vi.fn().mockResolvedValue(undefined);
+    useChatStore.setState({
+      sessions: [session],
+      currentSessionId: session.id,
+    });
+
+    const { container } = renderWithRouter(
+      <SessionList onNewChat={mockOnNewChat} onDeleteSession={onDeleteSession} />,
+    );
+
+    const sessionItem = container.querySelector('[class*="itemActive"]') as HTMLElement;
+    const menuButton = container.querySelector('[class*="menuBtn"]') as HTMLElement;
+
+    fireEvent.mouseEnter(sessionItem);
+    fireEvent.click(menuButton);
+    fireEvent.click(await screen.findByText('删除'));
+    fireEvent.click(await screen.findByRole('button', { name: /删\s*除/ }));
+
+    await waitFor(() => {
+      expect(onDeleteSession).toHaveBeenCalledWith(session.id, '待删除会话');
+    });
   });
 });

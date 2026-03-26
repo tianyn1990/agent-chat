@@ -1,6 +1,6 @@
 # 阶段七：OpenClaw 协议接入总体方案
 
-> 最后更新：2026-03-26
+> 最后更新：2026-03-27
 >
 > 本文档用于统一说明 `agent-chat` 从“当前自定义 chat mock 协议”演进到“可接入真实 OpenClaw 协议体系”的总体路线。本文不直接等同于某一个实现 change，而是作为后续多个 change 的上位方案文档。
 
@@ -193,6 +193,20 @@ mock 不应被删除，而应从“自定义业务消息 mock”升级为“Open
 本阶段主要服务于本地研发与联调，不代表最终生产拓扑。  
 即使本地支持 direct，也不意味着公司正式环境应让浏览器直连 OpenClaw。
 
+### 4.2.5 当前已确认的 direct 能力边界
+
+在真实联调中，已经确认浏览器以 `webchat` 客户端直连 OpenClaw Gateway 时存在明确边界：
+
+- `sessions.patch` 不允许浏览器 `webchat` 客户端直接调用
+- `sessions.delete` 不允许浏览器 `webchat` 客户端直接调用
+- 即使补齐更高 scopes，这个限制仍然存在，因为它属于客户端职责边界，而不是单纯权限不足
+
+因此，`openclaw-direct` 的定位已经明确收缩为：
+
+- 用于底层协议诊断
+- 用于确认握手、事件流、会话命名空间与真实模型回复
+- 不再作为未来正式环境的主接入模式
+
 ---
 
 ## 4.3 第三阶段：公司网关
@@ -221,6 +235,35 @@ mock 不应被删除，而应从“自定义业务消息 mock”升级为“Open
 3. 鉴权策略
 4. 错误码和可观测性
 5. 像素风办公室服务端适配层与 session facade 的真实落地
+
+### 4.3.4 当前仓库已落地的本地 company-gateway dev 形态
+
+为了避免前端长期停留在“知道 direct 不够，但又无法验证 proxy”的状态，当前仓库已经先落地一套本地可跑的 `company-gateway dev`：
+
+调用拓扑：
+
+`Browser -> Local Company Gateway Dev -> Local OpenClaw Gateway`
+
+已实现的关键点：
+
+- 前端新增 `openclaw-proxy` runtime
+- 浏览器默认通过同域相对路径 `/__openclaw_proxy` 访问 proxy
+- Vite dev server 在本地将 `/__openclaw_proxy` 代理到 `http://127.0.0.1:19002`
+- 本地 proxy dev server 通过官方 `GatewayClient` 连接本机 OpenClaw Gateway，而不是手写一套自定义 WS 握手
+- 当前最小闭环已覆盖：
+  - `sessions.list`
+  - `sessions.patch`
+  - `sessions.delete`
+  - `chat.history`
+  - `chat.send`
+  - `chat.abort`
+  - 统一会话级 runtime / SSE 事件流
+
+这样做的价值是：
+
+- 前端已经开始走更贴近未来正式环境的主链路
+- 会话重命名、删除不再依赖浏览器 `webchat` 的受限调用
+- 后续接公司正式网关时，前端主要替换的是 BFF 地址与服务端实现，而不是再次重写页面协议
 
 ---
 
@@ -256,6 +299,12 @@ mock 不应被删除，而应从“自定义业务消息 mock”升级为“Open
 - `mock-openclaw`
 - `openclaw-direct`
 - `openclaw-proxy`
+
+说明：
+
+- `mock-openclaw`：稳定兜底，面向 UI 开发与测试
+- `openclaw-direct`：底层协议诊断，不承担正式会话管理
+- `openclaw-proxy`：主联调路径，对齐未来 `Browser -> Company Gateway / BFF -> OpenClaw` 拓扑
 
 ### 5.4 适配层
 

@@ -1,5 +1,6 @@
 import type { InteractiveCard } from './card';
 import type { ChartMessage } from './chart';
+import type { Message } from './message';
 import type { Session } from './session';
 import type { SessionVisualizeRuntime } from './visualize';
 
@@ -60,7 +61,14 @@ export interface ChatAdapter {
   onStatus(handler: (connected: boolean) => void): () => void;
   onEvent(handler: (event: ChatAdapterEvent) => void): () => void;
   createSession(title?: string): Promise<Session>;
+  /** 持久化更新会话标题。 */
+  renameSession(sessionId: string, title: string): Promise<void>;
+  /** 删除会话及其远端上下文。 */
+  deleteSession(sessionId: string): Promise<void>;
   listSessions(): Promise<Session[]>;
+  getHistory(
+    sessionId: string,
+  ): Promise<{ messages: Message[]; sessionPatch?: Partial<Session> | null }>;
   sendMessage(
     sessionId: string,
     input: {

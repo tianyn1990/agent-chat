@@ -19,6 +19,31 @@
 详细总体路线请先阅读：
 
 - [阶段七-OpenClaw协议接入总体方案.md](./阶段七-OpenClaw协议接入总体方案.md)
+- [阶段七-本地直连OpenClaw开发联调方案.md](./阶段七-本地直连OpenClaw开发联调方案.md)
+- [本地OpenClaw联调操作手册.md](./本地OpenClaw联调操作手册.md)
+
+## 0.1 当前文档边界说明
+
+本文件保留“从 mock 逐步替换为真实后端”的阶段入口作用，但其中较旧的“直接替换旧 websocket”为真实后端的表述，已经不再适合作为第二阶段的直接实施依据。
+
+目前推荐阅读顺序为：
+
+1. [阶段七-OpenClaw协议接入总体方案.md](./阶段七-OpenClaw协议接入总体方案.md)
+2. [阶段七-本地直连OpenClaw开发联调方案.md](./阶段七-本地直连OpenClaw开发联调方案.md)
+3. [本地OpenClaw联调操作手册.md](./本地OpenClaw联调操作手册.md)
+4. 对应 OpenSpec change 文档
+
+也就是说：
+
+- 本地 mock：已完成
+- 本地直连：应按新的 direct runtime 方案推进
+- 公司网关：后续独立推进
+
+补充说明：
+
+- 本地直连阶段当前已新增稳定化 change：`stabilize-openclaw-direct-runtime-and-session-boundaries`
+- 该 change 负责解决 `device signature invalid / expired`、dashboard 会话边界、权威 session 创建与工作台 bridge 等真实联调问题
+- 因此在进入公司网关阶段前，应先以该稳定化结果为基线，而不是回退到更早的 direct 方案
 
 ## 1. 目标
 - 将飞书 OAuth 登录的 Mock 替换为真实后端接口
@@ -47,12 +72,19 @@
 | Mock 位置 | 真实替换 | 说明 |
 |-----------|---------|------|
 | `src/mocks/websocket.ts → MockWebSocketService` | `src/services/websocket.ts → WebSocketService` | 真实 WS 连接 |
-| `IS_MOCK_ENABLED` 环境变量 | `.env.local` 中设为 `false` | 切换开关 |
+| `VITE_CHAT_RUNTIME` 环境变量 | `.env.local` 中改为 `openclaw-direct` | 切换到本地直连运行时 |
 
 **替换步骤**：
-1. 修改 `.env.local`：`VITE_MOCK_ENABLED=false`
-2. 确保后端 WebSocket 端点为 `ws://{host}/ws?token={jwt}`
-3. 验证消息协议与 `src/types/message.ts` 中定义一致
+1. 修改 `.env.local`：
+
+   ```env
+   VITE_CHAT_RUNTIME=openclaw-direct
+   VITE_OPENCLAW_GATEWAY_URL=ws://127.0.0.1:19001
+   ```
+
+2. 如需鉴权，再补充 `VITE_OPENCLAW_GATEWAY_TOKEN` 或 `VITE_OPENCLAW_GATEWAY_PASSWORD`
+3. 建议优先使用 `npm run dev:openclaw-direct`，让脚本自动托管 Gateway 生命周期与本地工作台 mock
+4. 验证真实 Gateway 握手、`sessions.list / sessions.create / chat.history / chat.send / chat.abort` 是否正常
 
 ### 2.3 文件上传（阶段三）
 
@@ -91,14 +123,24 @@
 
 ```env
 # .env.production（生产环境）
-VITE_MOCK_ENABLED=false
+VITE_CHAT_RUNTIME=legacy-websocket
 VITE_API_BASE_URL=https://api.your-domain.com
 VITE_FEISHU_APP_ID=your_feishu_app_id
 VITE_FEISHU_REDIRECT_URI=https://your-domain.com/auth/callback
 VITE_STAR_OFFICE_URL=https://star-office.your-domain.com
 
 # .env.local（本地开发，默认 Mock）
-VITE_MOCK_ENABLED=true
+VITE_CHAT_RUNTIME=mock-openclaw
+
+# .env.local（本地直连真实 OpenClaw）
+VITE_CHAT_RUNTIME=openclaw-direct
+VITE_OPENCLAW_GATEWAY_URL=ws://127.0.0.1:19001
+VITE_OPENCLAW_GATEWAY_TOKEN=
+VITE_OPENCLAW_GATEWAY_PASSWORD=
+VITE_OPENCLAW_GATEWAY_DEVICE_TOKEN=
+VITE_OPENCLAW_GATEWAY_ROLE=operator
+VITE_OPENCLAW_GATEWAY_SCOPES=operator.read,operator.write
+VITE_STAR_OFFICE_MOCK_ENABLED=true
 ```
 
 ## 4. 接口联调测试清单
@@ -118,7 +160,7 @@ VITE_MOCK_ENABLED=true
 - [ ] WebSocket 真实连接，AI 回复正常
 - [ ] 文件上传到服务端，fileId 真实有效
 - [ ] Skills 数据从服务端加载
-- [ ] 无 Mock 依赖运行（`VITE_MOCK_ENABLED=false`）
+- [ ] 本地直连模式可运行（`VITE_CHAT_RUNTIME=openclaw-direct`）
 - [ ] 生产构建正常
 
 ## 6. 注意事项

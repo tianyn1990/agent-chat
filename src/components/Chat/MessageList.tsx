@@ -17,12 +17,16 @@ const ESTIMATED_HEIGHT_CHART = 420;
 const ESTIMATED_HEIGHT_CARD = 200;
 
 interface MessageListProps {
+  /** 当前所属会话 ID，用于在切换会话时重置滚动状态 */
+  sessionId?: string | null;
   /** 消息列表 */
   messages: Message[];
   /** 流式文本缓冲（messageId → 累积文本） */
   streamingBuffer: Record<string, string>;
   /** 是否有消息正在流式传输（显示 TypingIndicator） */
   isStreaming: boolean;
+  /** 是否处于“已发送但首个 delta 尚未到达”的等待阶段 */
+  isAwaitingResponse?: boolean;
   /**
    * 卡片动作回调，透传给 MessageBubble
    * ChatPage 注入，通过 WS 回传服务端
@@ -44,12 +48,26 @@ interface MessageListProps {
  * - 支持流式消息实时文本更新
  */
 export default function MessageList({
+  sessionId = null,
   messages,
   streamingBuffer,
   isStreaming,
+  isAwaitingResponse = false,
   onCardAction,
   onCardExpire,
 }: MessageListProps) {
+  /**
+   * 统一抽象“当前存在活跃助手反馈”。
+   *
+   * 设计原因：
+   * - pending 与 streaming 对滚动跟随的要求一致，都是会持续增长的底部反馈
+   * - 收敛成一个布尔值后，可以避免两套 effect 分支在后续维护时再次漂移
+   */
+  const hasLiveAssistantFeedback = isAwaitingResponse || isStreaming;
+  const pendingAccessoryMessageId = isAwaitingResponse
+    ? ([...messages].reverse().find((message) => message.role === 'user')?.id ?? null)
+    : null;
+
   /** 实际承载消息滚动的视口 ref */
   const scrollViewportRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +87,8 @@ export default function MessageList({
 
   /** 上一次消息数量，用于检测新消息到达 */
   const prevMsgCountRef = useRef(messages.length);
+  /** 会话切换后的稳定滚底调度句柄 */
+  const settleScrollTimerIdsRef = useRef<number[]>([]);
 
   // ===========================
   // 虚拟列表配置
@@ -98,6 +118,30 @@ export default function MessageList({
     if (!container) return;
     container.scrollTo({ top: container.scrollHeight, behavior });
   }, []);
+
+  /**
+   * 在会话切换后补一次“稳定滚底”。
+   *
+   * 设计原因：
+   * - 切换会话时，虚拟列表与图片/图表测量经常会在首帧后再次修正高度
+   * - 仅首帧 `scrollToBottom` 可能停在接近底部但不是真正底部的位置
+   * - 这里用两次短延迟补滚，确保内容完成布局后仍然落在最后一条消息
+   */
+  const scheduleSettleScrollToBottom = useCallback(() => {
+    settleScrollTimerIdsRef.current.forEach((timerId) => {
+      window.clearTimeout(timerId);
+    });
+
+    const timerIds = [0, 32].map((delayMs) =>
+      window.setTimeout(() => {
+        if (!isUserScrolledUpRef.current) {
+          scrollToBottom('instant');
+        }
+      }, delayMs),
+    );
+
+    settleScrollTimerIdsRef.current = timerIds;
+  }, [scrollToBottom]);
 
   // ===========================
   // 监听滚动位置，判断用户是否在底部
@@ -148,20 +192,41 @@ export default function MessageList({
 
   // 流式消息更新时，若用户在底部则持续跟随
   useEffect(() => {
-    if (isStreaming && !isUserScrolledUpRef.current) {
+    if (hasLiveAssistantFeedback && !isUserScrolledUpRef.current) {
       scrollToBottom('instant');
     }
-  }, [streamingBuffer, isStreaming, scrollToBottom]);
+  }, [streamingBuffer, hasLiveAssistantFeedback, scrollToBottom]);
 
-  // 初次进入会话，立即滚底（不需要动画）
+  /**
+   * 会话切换后首批消息渲染完成时，再补一次稳定滚底。
+   *
+   * 设计原因：
+   * - 历史消息通常在切会话后异步注入
+   * - 若只在 `sessionId` 变化时滚动，容易因为内容尚未挂载完整而停在半中腰
+   */
+  useEffect(() => {
+    if (!sessionId || messages.length === 0 || isUserScrolledUpRef.current) {
+      return;
+    }
+
+    scheduleSettleScrollToBottom();
+  }, [messages.length, scheduleSettleScrollToBottom, sessionId]);
+
+  // 初次进入或切换会话时，立即滚底并清理旧会话遗留的滚动状态。
   useEffect(() => {
     scrollToBottom('instant');
     isUserScrolledUpRef.current = false;
     setIsUserScrolledUp(false);
     setHasNewMessage(false);
     prevMsgCountRef.current = messages.length;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 仅在首次挂载时执行
+    scheduleSettleScrollToBottom();
+    return () => {
+      settleScrollTimerIdsRef.current.forEach((timerId) => {
+        window.clearTimeout(timerId);
+      });
+      settleScrollTimerIdsRef.current = [];
+    };
+  }, [messages.length, scheduleSettleScrollToBottom, scrollToBottom, sessionId]);
 
   return (
     <div className={styles.root}>
@@ -195,6 +260,7 @@ export default function MessageList({
                 <MessageBubble
                   message={message}
                   streamingText={streamingText}
+                  pendingAccessory={message.id === pendingAccessoryMessageId}
                   onCardAction={onCardAction}
                   onCardExpire={onCardExpire}
                 />
@@ -206,7 +272,7 @@ export default function MessageList({
         {/* AI 思考中动画（在最后一条消息之后显示） */}
         {isStreaming && (
           <div className={styles.typingWrapper}>
-            <TypingIndicator />
+            <TypingIndicator mode="streaming" />
           </div>
         )}
       </div>

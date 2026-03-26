@@ -10,13 +10,21 @@ import styles from './SessionList.module.less';
 interface SessionListProps {
   /** 点击"新建对话"的回调 */
   onNewChat: () => void;
+  /** 删除会话时的外部处理器。 */
+  onDeleteSession?: (sessionId: string, title: string) => Promise<void> | void;
+  /** 重命名会话时的外部处理器。 */
+  onRenameSession?: (sessionId: string, newTitle: string) => Promise<void> | void;
 }
 
 /**
  * 会话列表组件
  * 展示所有历史会话，支持新建、切换、重命名、删除操作
  */
-export default function SessionList({ onNewChat }: SessionListProps) {
+export default function SessionList({
+  onNewChat,
+  onDeleteSession,
+  onRenameSession,
+}: SessionListProps) {
   const navigate = useNavigate();
   const sessions = useChatStore((s) => s.sessions);
   const messages = useChatStore((s) => s.messages);
@@ -37,20 +45,32 @@ export default function SessionList({ onNewChat }: SessionListProps) {
         okText: '删除',
         okButtonProps: { danger: true },
         cancelText: '取消',
-        onOk: () => removeSession(sessionId),
+        onOk: async () => {
+          if (onDeleteSession) {
+            await onDeleteSession(sessionId, title);
+            return;
+          }
+
+          removeSession(sessionId);
+        },
         // 避免点击空白处误触 Modal 关闭逻辑
         maskClosable: false,
       });
     },
-    [removeSession],
+    [onDeleteSession, removeSession],
   );
 
   /** 处理重命名会话 */
   const handleRename = useCallback(
     (sessionId: string, newTitle: string) => {
+      if (onRenameSession) {
+        void onRenameSession(sessionId, newTitle);
+        return;
+      }
+
       updateSession(sessionId, { title: newTitle });
     },
-    [updateSession],
+    [onRenameSession, updateSession],
   );
 
   return (
